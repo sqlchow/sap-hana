@@ -41,7 +41,7 @@ output "db_subnet" {
 // Return the key vault in which the secrets should be stored
 output "sid_kv_user" {
   value = local.enable_sid_deployment ? (
-    var.options.use_local_keyvault_for_secrets ? (
+    try(var.options.use_local_keyvault_for_secrets, false) ? (
       azurerm_key_vault.sid_kv_user) : (
       data.azurerm_key_vault.sid_kv_user
     )) : (
@@ -70,5 +70,5 @@ output "storage_subnet" {
 }
 
 output "sdu_public_key" {
-  value = var.options.use_local_keyvault_for_secrets ? tls_private_key.sdu[0].public_key_openssh : ""
+  value = try(var.options.use_local_keyvault_for_secrets, false) ? tls_private_key.sdu[0].public_key_openssh : ""
 }
