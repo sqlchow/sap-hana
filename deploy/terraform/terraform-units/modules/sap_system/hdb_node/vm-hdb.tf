@@ -67,6 +67,7 @@ resource "azurerm_network_interface" "nics_dbnodes_storage" {
   location                      = var.resource_group[0].location
   resource_group_name           = var.resource_group[0].name
   enable_accelerated_networking = true
+}
 
 resource "azurerm_lb" "hdb" {
   count               = local.enable_deployment ? 1 : 0
