@@ -1,3 +1,10 @@
+output "anydb_vms" {
+  value = (upper(local.anydb_ostype) == "LINUX") ? [
+    azurerm_linux_virtual_machine.dbserver, azurerm_linux_virtual_machine.observer] : [
+    azurerm_windows_virtual_machine.dbserver, azurerm_windows_virtual_machine.observer
+  ]
+}
+
 output "nics_anydb" {
   value = local.enable_deployment ? azurerm_network_interface.anydb_db : []
 }
@@ -32,7 +39,7 @@ output "dns_info_vms" {
     zipmap(
       compact(concat(
         local.anydb_vms[*].name,
-        slice(var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME,0, local.db_server_count)
+        slice(var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME, 0, local.db_server_count)
       )),
       compact(concat(
         azurerm_network_interface.anydb_admin[*].private_ip_address,
@@ -51,4 +58,8 @@ output "dns_info_loadbalancers" {
     zipmap([format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)], [azurerm_lb.anydb[0].private_ip_addresses[0]])) : (
     null
   )
+}
+
+output "anydb_vm_ids" {
+  value = local.enable_deployment ? concat(azurerm_windows_virtual_machine.dbserver[*].id, azurerm_linux_virtual_machine.dbserver[*].id) : []
 }

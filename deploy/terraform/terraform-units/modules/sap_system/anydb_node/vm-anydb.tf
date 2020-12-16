@@ -52,6 +52,7 @@ resource "azurerm_network_interface" "anydb_admin" {
 
 // Section for Linux Virtual machine 
 resource "azurerm_linux_virtual_machine" "dbserver" {
+  depends_on          = [var.anchor_vm]
   count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? local.db_server_count : 0) : 0
   name                = local.anydb_vms[count.index].name
   computer_name       = local.anydb_vms[count.index].computername
@@ -94,10 +95,11 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.osdisk)
-      caching              = disk.value.caching
-      storage_account_type = disk.value.disk_type
-      disk_size_gb         = disk.value.size_gb
+      name                   = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.osdisk)
+      caching                = disk.value.caching
+      storage_account_type   = disk.value.disk_type
+      disk_size_gb           = disk.value.size_gb
+      disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
 
@@ -120,14 +122,13 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
-  tags = {
-    environment = "SAP"
-    SID         = upper(local.sap_sid)
-  }
+
+  tags = local.tags
 }
 
 // Section for Windows Virtual machine 
 resource "azurerm_windows_virtual_machine" "dbserver" {
+  depends_on          = [var.anchor_vm]
   count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "WINDOWS") ? local.db_server_count : 0) : 0
   name                = local.anydb_vms[count.index].name
   computer_name       = local.anydb_vms[count.index].computername
@@ -170,10 +171,11 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.osdisk)
-      caching              = disk.value.caching
-      storage_account_type = disk.value.disk_type
-      disk_size_gb         = disk.value.size_gb
+      name                   = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.osdisk)
+      caching                = disk.value.caching
+      storage_account_type   = disk.value.disk_type
+      disk_size_gb           = disk.value.size_gb
+      disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
 
@@ -187,21 +189,20 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
-  tags = {
-    environment = "SAP"
-    SID         = upper(local.sap_sid)
-  }
+
+  tags = local.tags
 }
 
 // Creates managed data disks
 resource "azurerm_managed_disk" "disks" {
-  count                = local.enable_deployment ? length(local.anydb_disks) : 0
-  name                 = local.anydb_disks[count.index].name
-  location             = var.resource_group[0].location
-  resource_group_name  = var.resource_group[0].name
-  create_option        = "Empty"
-  storage_account_type = local.anydb_disks[count.index].storage_account_type
-  disk_size_gb         = local.anydb_disks[count.index].disk_size_gb
+  count                  = local.enable_deployment ? length(local.anydb_disks) : 0
+  name                   = local.anydb_disks[count.index].name
+  location               = var.resource_group[0].location
+  resource_group_name    = var.resource_group[0].name
+  create_option          = "Empty"
+  storage_account_type   = local.anydb_disks[count.index].storage_account_type
+  disk_size_gb           = local.anydb_disks[count.index].disk_size_gb
+  disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
 
   zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
     upper(local.anydb_ostype) == "LINUX" ? (
