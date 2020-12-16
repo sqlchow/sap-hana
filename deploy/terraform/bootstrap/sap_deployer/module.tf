@@ -15,7 +15,7 @@ module "sap_deployer" {
 }
 
 module "sap_namegenerator" {
-  source               = "../../terraform-units/modules/sap_namegenerator"
+  source               = "../../../../../WORKSPACES/LOCAL/CONA/sap_namegenerator"
   environment          = local.environment
   deployer_environment = local.environment
   location             = local.location
