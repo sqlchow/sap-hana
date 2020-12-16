@@ -265,6 +265,32 @@ locals {
     ]
   }
 
+  // Ports used for specific ASCS, ERS and Web dispatcher
+  lb_ports = {
+    "scs" = [
+      3200 + tonumber(local.scs_instance_number),          // e.g. 3201
+      3600 + tonumber(local.scs_instance_number),          // e.g. 3601
+      3900 + tonumber(local.scs_instance_number),          // e.g. 3901
+      8100 + tonumber(local.scs_instance_number),          // e.g. 8101
+      50013 + (tonumber(local.scs_instance_number) * 100), // e.g. 50113
+      50014 + (tonumber(local.scs_instance_number) * 100), // e.g. 50114
+      50016 + (tonumber(local.scs_instance_number) * 100), // e.g. 50116
+    ]
+
+    "ers" = [
+      3200 + tonumber(local.ers_instance_number),          // e.g. 3202
+      3300 + tonumber(local.ers_instance_number),          // e.g. 3302
+      50013 + (tonumber(local.ers_instance_number) * 100), // e.g. 50213
+      50014 + (tonumber(local.ers_instance_number) * 100), // e.g. 50214
+      50016 + (tonumber(local.ers_instance_number) * 100), // e.g. 50216
+    ]
+
+    "web" = [
+      80,
+      3200
+    ]
+  }
+
   // Ports used for ASCS, ERS and Web dispatcher NSG rules
   nsg_ports = {
     "web" = [
