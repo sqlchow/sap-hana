@@ -23,6 +23,7 @@ resource "azurerm_network_interface" "observer" {
 
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "observer" {
+  depends_on          = [var.anchor_vm]
   count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]
@@ -49,9 +50,10 @@ resource "azurerm_linux_virtual_machine" "observer" {
   disable_password_authentication = true
 
   os_disk {
-    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+    caching                = "ReadWrite"
+    storage_account_type   = "Premium_LRS"
+    disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
   }
 
   source_image_id = local.observer_custom_image ? local.observer_custom_image_id : null
@@ -74,6 +76,8 @@ resource "azurerm_linux_virtual_machine" "observer" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.tags
 }
 
 # Create the Windows Application VM(s)
@@ -125,4 +129,6 @@ resource "azurerm_windows_virtual_machine" "observer" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.tags
 }
