@@ -169,7 +169,7 @@ locals {
   xsa        = try(local.hdb.xsa, { routing = "ports" })
   shine      = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
 
-  dbnodes = local.hdb_ha ? (
+dbnodes = local.hdb_ha ? (
     flatten([for idx, dbnode in try(local.hdb.dbnodes, [{}]) :
       [
         {
@@ -200,6 +200,7 @@ locals {
       }]
     )
   )
+
 
   loadbalancer = try(local.hdb.loadbalancer, {})
 
