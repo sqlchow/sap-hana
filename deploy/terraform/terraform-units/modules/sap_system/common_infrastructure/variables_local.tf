@@ -265,8 +265,8 @@ locals {
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
-  user_kv_exist     = try(length(local.user_key_vault_id) > 0, false)
-  prvt_kv_exist     = try(length(local.prvt_key_vault_id) > 0, false)
+  user_kv_exist     = length(local.user_key_vault_id) > 0 ? true : false
+  prvt_kv_exist     = length(local.prvt_key_vault_id) > 0 ? true : false
 
   // Extract information from the specified key vault arm ids
   user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
