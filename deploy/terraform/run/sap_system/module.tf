@@ -20,7 +20,7 @@ module "common_infrastructure" {
 }
 
 module "sap_namegenerator" {
-  source               = "../../../../../WORKSPACES/LOCAL/CONA/sap_namegenerator"
+  source           = "../../../../../WORKSPACES/LOCAL/CONA/sap_namegenerator"
   environment      = var.infrastructure.environment
   location         = var.infrastructure.region
   codename         = lower(try(var.infrastructure.codename, ""))
@@ -122,7 +122,7 @@ module "anydb_node" {
 
 // Generate output files
 module "output_files" {
-  source               = "../../../../../WORKSPACES/LOCAL/CONA/sap_namegenerator"
+  source                    = "../../terraform-units/modules/sap_system/output_files"
   application               = module.app_tier.application
   databases                 = var.databases
   infrastructure            = var.infrastructure
