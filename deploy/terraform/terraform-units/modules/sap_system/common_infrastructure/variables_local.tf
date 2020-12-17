@@ -278,8 +278,7 @@ locals {
   // If the user specifies the secret name of key pair/password in input, the secrets will be imported instead of creating new secrets
   input_sid_public_key_secret_name  = try(var.key_vault.kv_sid_sshkey_pub, "")
   input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
-  sid_key_exist                     = try(length(local.input_sid_public_key_secret_name) > 0, false)
-
+  sid_key_exist                     = length(local.input_sid_public_key_secret_name) > 0 ? true : false
 
   //---- Update infrastructure with defaults ----//
   infrastructure = {
