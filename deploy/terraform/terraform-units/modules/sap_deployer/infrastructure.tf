@@ -11,6 +11,10 @@ resource "azurerm_resource_group" "deployer" {
   location = local.region
 }
 
+data "azurerm_resource_group" "deployer" {
+  count = local.rg_exists ? 1 : 0
+  name  = local.rg_name
+}
 // TODO: Add management lock when this issue is addressed https://github.com/terraform-providers/terraform-provider-azurerm/issues/5473
 
 // Create/Import management vnet

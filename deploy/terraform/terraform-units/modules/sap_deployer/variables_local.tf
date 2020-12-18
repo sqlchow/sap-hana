@@ -22,7 +22,10 @@ locals {
   // Resource group and location
   region  = try(var.infrastructure.region, "")
   prefix  = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
-  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_rg))
+
+  rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
+  rg_exists = length(local.rg_arm_id) > 0 ? true : false
+  rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_rg))
 
   // Post fix for all deployed resources
   postfix = random_id.deployer.hex
