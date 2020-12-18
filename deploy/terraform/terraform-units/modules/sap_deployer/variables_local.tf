@@ -20,8 +20,8 @@ locals {
   enable_deployer_public_ip = try(var.options.enable_deployer_public_ip, false)
 
   // Resource group and location
-  region  = try(var.infrastructure.region, "")
-  prefix  = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
+  region = try(var.infrastructure.region, "")
+  prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
 
   rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
   rg_exists = length(local.rg_arm_id) > 0 ? true : false
@@ -34,7 +34,7 @@ locals {
   vnet_mgmt        = try(var.infrastructure.vnets.management, {})
   vnet_mgmt_arm_id = try(local.vnet_mgmt.arm_id, "")
   vnet_mgmt_exists = length(local.vnet_mgmt_arm_id) > 0 ? true : false
-  vnet_mgmt_name   = local.vnet_mgmt_exists ? split("/", local.vnet_mgmt_arm_id)[8] : try(local.vnet_mgmt.name, format("%s%s", local.prefix,local.resource_suffixes.vnet))
+  vnet_mgmt_name   = local.vnet_mgmt_exists ? split("/", local.vnet_mgmt_arm_id)[8] : try(local.vnet_mgmt.name, format("%s%s", local.prefix, local.resource_suffixes.vnet))
   vnet_mgmt_addr   = local.vnet_mgmt_exists ? "" : try(local.vnet_mgmt.address_space, "")
 
   // Management subnet
@@ -65,7 +65,7 @@ locals {
     try(deployer.authentication.type, "key") == "password" ? true : false
   ]), "true")
 
-  username = local.enable_deployers ? (local.username_exist ? data.azurerm_key_vault_secret.username[0].value : try(local.deployer_input[0].authentication.username, "azureadm")): "" 
+  username = local.enable_deployers ? (local.username_exist ? data.azurerm_key_vault_secret.username[0].value : try(local.deployer_input[0].authentication.username, "azureadm")) : ""
 
   // By default use generated password. Provide password under authentication overides it
   input_pwd_list = compact([

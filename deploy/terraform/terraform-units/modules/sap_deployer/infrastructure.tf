@@ -6,7 +6,7 @@ Description:
 
 // Create managed resource group for sap deployer with CanNotDelete lock
 resource "azurerm_resource_group" "deployer" {
-  count    = local.enable_deployers && !local.rg_exists ? 1 : 0
+  count    = local.enable_deployers && ! local.rg_exists ? 1 : 0
   name     = local.rg_name
   location = local.region
 }
