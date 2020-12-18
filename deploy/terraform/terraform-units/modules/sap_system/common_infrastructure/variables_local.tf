@@ -71,7 +71,7 @@ locals {
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate = var.landscape_tfstate
   kv_landscape_id   = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
-  secret_sid_pk_name = try(var.options.use_local_keyvault_for_secrets, false) ? (
+  secret_sid_pk_name = try(var.sshkey.ssh_for_sid, false) ? (
     format("%s-sshkey", local.prefix)) : (
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
   )
@@ -198,6 +198,7 @@ locals {
   // Additional users add to user KV
   kv_users = var.deployer_user
   */
+  use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
 
   //SAP vnet
   vnet_sap_arm_id              = try(local.landscape_tfstate.vnet_sap_arm_id, "")
