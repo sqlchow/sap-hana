@@ -17,6 +17,7 @@ module "common_infrastructure" {
   deployer_tfstate           = data.terraform_remote_state.deployer.outputs
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
+  key_vault                  = var.key_vault
 }
 
 module "sap_namegenerator" {
