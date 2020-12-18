@@ -41,7 +41,7 @@ variable "deployer_user" {
   default     = []
 }
 
-variable "sid_kv_user" {
+variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
 
@@ -114,9 +114,6 @@ locals {
     format("%s-sshkey", local.prefix)) : (
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
   )
-
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = try(var.sid_kv_user[0], null)
 
   // SAP vnet
   vnet_sap                     = try(var.vnet_sap, {})
