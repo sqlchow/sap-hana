@@ -27,8 +27,8 @@ resource "azurerm_network_interface" "deployer" {
   ip_configuration {
     name                          = "ipconfig1"
     subnet_id                     = local.sub_mgmt_deployed.id
-    private_ip_address            = local.deployers[count.index].private_ip_address
-    private_ip_address_allocation = "static"
+    private_ip_address            = local.use_DHCP ? null : local.deployers[count.index].private_ip_address
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "static"
     public_ip_address_id          = local.enable_deployer_public_ip ? azurerm_public_ip.deployer[count.index].id : ""
   }
 }
