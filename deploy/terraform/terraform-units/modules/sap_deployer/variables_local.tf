@@ -65,7 +65,15 @@ locals {
     try(deployer.authentication.type, "key") == "password" ? true : false
   ]), "true")
 
-  username = local.enable_deployers ? (local.username_exist ? data.azurerm_key_vault_secret.username[0].value : try(local.deployer_input[0].authentication.username, "azureadm")) : ""
+  // Deployer(s) authentication method with default
+  use_DHCP = contains(compact([
+    for deployer in local.deployer_input :
+    try(deployer.use_DHCP, false) == true ? true : false
+  ]), true)
+
+
+
+  username = local.enable_deployers ? (local.username_exist ? data.azurerm_key_vault_secret.username[0].value : try(local.deployer_input[0].authentication.username, "azureadm")): "" 
 
   // By default use generated password. Provide password under authentication overides it
   input_pwd_list = compact([
