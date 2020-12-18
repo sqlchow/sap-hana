@@ -42,20 +42,20 @@ output "db_subnet" {
 output "sid_kv_user" {
   value = local.enable_sid_deployment ? (
     try(var.options.use_local_keyvault_for_secrets, false) ? (
-      azurerm_key_vault.sid_kv_user) : (
-      data.azurerm_key_vault.sid_kv_user
+      azurerm_key_vault.sid_kv_user[0]) : (
+      data.azurerm_key_vault.sid_kv_user[0]
     )) : (
-    null
+    {}
   )
 }
 
 output "sid_kv_prvt" {
   value = local.enable_sid_deployment ? (
     local.prvt_kv_exist ? (
-      data.azurerm_key_vault.sid_kv_prvt) : (
-      azurerm_key_vault.sid_kv_prvt
+      data.azurerm_key_vault.sid_kv_prvt[0]) : (
+      azurerm_key_vault.sid_kv_prvt[0]
     )) : (
-    null
+    {}
   )
 }
 
