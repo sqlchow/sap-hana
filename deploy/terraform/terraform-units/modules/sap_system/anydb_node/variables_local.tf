@@ -223,7 +223,7 @@ locals {
   )
 
 
-dbnodes = local.anydb_ha ? (
+  dbnodes = local.anydb_ha ? (
     flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) :
       [
         {
