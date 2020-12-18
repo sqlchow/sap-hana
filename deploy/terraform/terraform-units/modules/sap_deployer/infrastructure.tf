@@ -21,8 +21,8 @@ data "azurerm_resource_group" "deployer" {
 resource "azurerm_virtual_network" "vnet_mgmt" {
   count               = (local.enable_deployers && ! local.vnet_mgmt_exists) ? 1 : 0
   name                = local.vnet_mgmt_name
-  location            = azurerm_resource_group.deployer[0].location
-  resource_group_name = azurerm_resource_group.deployer[0].name
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   address_space       = [local.vnet_mgmt_addr]
 }
 
@@ -52,8 +52,8 @@ data "azurerm_subnet" "subnet_mgmt" {
 resource "azurerm_storage_account" "deployer" {
   count                     = local.enable_deployers ? 1 : 0
   name                      = local.storageaccount_names
-  resource_group_name       = azurerm_resource_group.deployer[0].name
-  location                  = azurerm_resource_group.deployer[0].location
+  resource_group_name       = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
+  location                  = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   account_replication_type  = "LRS"
   account_tier              = "Standard"
   enable_https_traffic_only = local.enable_secure_transfer
