@@ -5,6 +5,7 @@ data "azurerm_key_vault_secret" "sid_pk" {
   key_vault_id = local.kv_landscape_id
 }
 
+
 data "azurerm_key_vault_secret" "sid_username" {
   count        = local.enable_auth_password ? 1 : 0
   name         = local.sid_username_secret_name
