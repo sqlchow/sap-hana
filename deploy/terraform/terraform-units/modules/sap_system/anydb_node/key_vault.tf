@@ -17,18 +17,6 @@ data "azurerm_key_vault_secret" "sid_password" {
   key_vault_id = local.kv_landscape_id
 }
 
-
-
-// Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
-resource "random_password" "password" {
-  count = (
-    local.enable_auth_password
-  && try(local.anydb.authentication.password, null) == null) ? 1 : 0
-  length           = 16
-  special          = true
-  override_special = "_%@"
-}
-
 /*
  To force dependency between kv access policy and secrets. Expected behavior:
  https://github.com/terraform-providers/terraform-provider-azurerm/issues/4971
