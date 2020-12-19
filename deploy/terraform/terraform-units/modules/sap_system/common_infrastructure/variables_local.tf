@@ -74,6 +74,10 @@ locals {
   secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
   iscsi_private_ip   = try(local.landscape_tfstate.iscsi_private_ip, [])
 
+  sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
+  sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
+
+
   //Filter the list of databases to only HANA platform entries
   databases = [
     for database in var.databases : database
