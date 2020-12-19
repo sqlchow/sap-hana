@@ -48,6 +48,9 @@ variable "sid_kv_user" {
 variable "landscape_tfstate" {
   description = "Landscape remote tfstate file"
 }
+variable "sid_password" {
+  description = "SDU specific password"
+}
 
 locals {
   // Imports Disk sizing sizing information
@@ -94,8 +97,19 @@ locals {
   sid_auth_type        = try(var.application.authentication.type, upper(local.app_ostype) == "LINUX" ? "key" : "password")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
-  sid_auth_username    = try(var.application.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(var.application.authentication.password, random_password.password[0].result) : ""
+  sid_auth_username = try(local.hdb.authentication.username, local.use_landscape_credentials ? (
+    try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")) : (
+    "azureadm"
+  ))
+
+  sid_auth_password = local.enable_auth_password ? (
+    try(local.hdb.authentication.password, local.use_landscape_credentials ? (
+      try(data.azurerm_key_vault_secret.sid_password[0].value, var.sid_password)
+      ) : (
+      var.sid_password)
+    )) : (
+    ""
+  )
 
   authentication = {
     "type"     = local.sid_auth_type

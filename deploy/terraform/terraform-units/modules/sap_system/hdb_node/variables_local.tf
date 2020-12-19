@@ -48,6 +48,10 @@ variable "landscape_tfstate" {
   description = "Landscape remote tfstate file"
 }
 
+variable "sid_password" {
+  description = "SDU specific password"
+}
+
 locals {
   // Resources naming
   computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME
@@ -78,8 +82,9 @@ locals {
   kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
   secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
 
-  sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
-  sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
+  sid_username_secret_name  = try(local.landscape_tfstate.sid_username_secret_name, "")
+  sid_password_secret_name  = try(local.landscape_tfstate.sid_password_secret_name, "")
+  use_landscape_credentials = length(local.sid_password_secret_name) > 0 ? true : false
 
   // Define this variable to make it easier when implementing existing kv.
   sid_kv_user = try(var.sid_kv_user[0], null)
@@ -138,8 +143,19 @@ locals {
   sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
-  sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : ""
+  sid_auth_username = try(local.hdb.authentication.username, local.use_landscape_credentials ? (
+    try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")) : (
+    "azureadm"
+  ))
+
+  sid_auth_password = local.enable_auth_password ? (
+    try(local.hdb.authentication.password, local.use_landscape_credentials ? (
+      try(data.azurerm_key_vault_secret.sid_password[0].value, var.sid_password)
+      ) : (
+      var.sid_password)
+    )) : (
+    ""
+  )
 
   db_systemdb_password   = "db_systemdb_password"
   os_sidadm_password     = "os_sidadm_password"

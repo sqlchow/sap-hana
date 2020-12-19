@@ -17,6 +17,7 @@ module "common_infrastructure" {
   deployer_tfstate           = data.terraform_remote_state.deployer.outputs
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
+  sid_password               = module.common_infrastructure.sid_password
 }
 
 module "sap_namegenerator" {
@@ -65,7 +66,8 @@ module "hdb_node" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   storage_subnet             = module.common_infrastructure.storage_subnet
   // Workaround to create dependency from anchor to db to app
-  anchor_vm = module.common_infrastructure.anchor_vm
+  anchor_vm    = module.common_infrastructure.anchor_vm
+  sid_password = module.common_infrastructure.sid_password
 }
 
 // Create Application Tier nodes
@@ -89,8 +91,9 @@ module "app_tier" {
   custom_disk_sizes_filename = var.app_disk_sizes_filename
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   // Workaround to create dependency from anchor to db to app
-  anydb_vms = module.anydb_node.anydb_vms
-  hdb_vms   = module.hdb_node.hdb_vms
+  anydb_vms    = module.anydb_node.anydb_vms
+  hdb_vms      = module.hdb_node.hdb_vms
+  sid_password = module.common_infrastructure.sid_password
 }
 
 // Create anydb database nodes
@@ -113,7 +116,8 @@ module "anydb_node" {
   db_subnet                  = module.common_infrastructure.db_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   // Workaround to create dependency from anchor to db to app
-  anchor_vm = module.common_infrastructure.anchor_vm
+  anchor_vm    = module.common_infrastructure.anchor_vm
+  sid_password = module.common_infrastructure.sid_password
 }
 
 // Generate output files

@@ -77,6 +77,7 @@ locals {
   sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
   sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
 
+  use_landscape_credentials = length(local.sid_password_secret_name) > 0 ? true : false
 
   //Filter the list of databases to only HANA platform entries
   databases = [
@@ -158,6 +159,21 @@ locals {
   anchor_auth_type            = try(local.anchor.authentication.type, "key")
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
   enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
+
+  sid_auth_username = try(local.anchor_authentication.authentication.username, local.use_landscape_credentials ? (
+    try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")) : (
+    "azureadm"
+  ))
+
+  sid_auth_password = local.enable_auth_password ? (
+    try(local.anchor_authentication.authentication.password, local.use_landscape_credentials ? (
+      try(data.azurerm_key_vault_secret.sid_password[0].value, random_password.password[0].result)
+      ) : (
+      random_password.password[0].result)
+    )) : (
+    ""
+  )
+
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [

@@ -55,3 +55,7 @@ output "storage_subnet" {
     null
   )
 }
+
+output "sid_password"  {
+  value = local.use_landscape_credentials ? random_password.password[0].result : ""
+}
