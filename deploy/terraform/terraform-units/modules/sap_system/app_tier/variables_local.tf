@@ -97,18 +97,29 @@ locals {
   sid_auth_type        = try(var.application.authentication.type, upper(local.app_ostype) == "LINUX" ? "key" : "password")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
-  sid_auth_username = try(local.hdb.authentication.username, local.use_landscape_credentials ? (
-    try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")) : (
-    "azureadm"
-  ))
 
-  sid_auth_password = local.enable_auth_password ? (
-    try(local.hdb.authentication.password, local.use_landscape_credentials ? (
-      try(data.azurerm_key_vault_secret.sid_password[0].value, var.sid_password)
-      ) : (
-      var.sid_password)
-    )) : (
-    ""
+  secret_sid_pk_name       = try(local.landscape_tfstate.sid_public_key_secret_name, "")
+  sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
+  sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
+
+  // If credentials are specified either for the SDU or for the application use them
+  sid_local_credentials_exist = try(length(try(var.credentials.username, "")) > 0, false) || try(length(try(var.application.authentication.username, "")) > 0, false)
+  use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
+
+  sid_auth_username = try(var.application.authentication.username, (
+    try(var.credentials.username, (
+      try(data.azurerm_key_vault_secret.sid_username[0].value, (
+        "azureadm")
+      )
+    )))
+  )
+
+  sid_auth_password = try(var.application.authentication.password, (
+    try(var.credentials.password, (
+      try(data.azurerm_key_vault_secret.sid_password[0].value, (
+        var.sid_password)
+      )
+    )))
   )
 
   authentication = {
@@ -118,12 +129,8 @@ locals {
   }
 
   // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate  = var.landscape_tfstate
-  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
-
-  sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
-  sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
+  landscape_tfstate = var.landscape_tfstate
+  kv_landscape_id   = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
 
   // Define this variable to make it easier when implementing existing kv.
   sid_kv_user = try(var.sid_kv_user[0], null)

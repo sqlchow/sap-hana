@@ -32,3 +32,8 @@ variable "sshkey" {
   description = "Details of ssh key pair"
   default     = {}
 }
+
+variable "credentials" {
+  description = "Defining the SDU credentials"
+  default     = {}
+}

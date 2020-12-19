@@ -37,6 +37,12 @@ variable "custom_disk_sizes_filename" {
   default     = ""
 }
 
+variable "sid_password" {
+  type        = string
+  description = "Password for the SID VMs"
+  default     = ""
+}
+
 locals {
   // Resources naming
   vnet_prefix                 = trimspace(var.naming.prefix.VNET)
@@ -73,11 +79,6 @@ locals {
   kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
   secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
   iscsi_private_ip   = try(local.landscape_tfstate.iscsi_private_ip, [])
-
-  sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
-  sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
-
-  use_landscape_credentials = length(local.sid_password_secret_name) > 0 ? true : false
 
   //Filter the list of databases to only HANA platform entries
   databases = [
@@ -160,20 +161,27 @@ locals {
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
   enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
 
-  sid_auth_username = try(local.anchor_authentication.authentication.username, local.use_landscape_credentials ? (
-    try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")) : (
-    "azureadm"
-  ))
+  sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
+  sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
 
-  sid_auth_password = local.enable_auth_password ? (
-    try(local.anchor_authentication.authentication.password, local.use_landscape_credentials ? (
-      try(data.azurerm_key_vault_secret.sid_password[0].value, random_password.password[0].result)
-      ) : (
-      random_password.password[0].result)
-    )) : (
-    ""
+  sid_local_credentials_exist = try(length(try(var.credentials.username, "")) > 0, false)
+  use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
+
+  sid_auth_username = try(local.anchor_authentication.authentication.username, (
+    try(var.credentials.username, (
+      try(data.azurerm_key_vault_secret.sid_username[0].value, (
+        "azureadm")
+      )
+    )))
   )
 
+  sid_auth_password = try(local.anchor_authentication.authentication.password, (
+    try(var.credentials.password, (
+      try(data.azurerm_key_vault_secret.sid_password[0].value, (
+        random_password.password[0].result)
+      )
+    )))
+  )
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [

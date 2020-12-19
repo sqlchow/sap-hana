@@ -28,9 +28,9 @@ resource "random_password" "password" {
   override_special = "_%@"
 }
 
-// Store the hdb logon username in KV when authentication type is password
+// Store the hdb logon username in KV 
 resource "azurerm_key_vault_secret" "auth_username" {
-  count        = local.enable_auth_password && local.use_landscape_credentials ? 1 : 0
+  count        = local.sid_local_credentials_exist ? 1 : 0
   name         = format("%s-hdb-auth-username", local.prefix)
   value        = local.sid_auth_username
   key_vault_id = local.sid_kv_user.id
@@ -38,7 +38,7 @@ resource "azurerm_key_vault_secret" "auth_username" {
 
 // Store the hdb logon username in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_password" {
-  count        = local.enable_auth_password && local.use_landscape_credentials ? 1 : 0
+  count        = local.enable_auth_password && local.sid_local_credentials_exist ? 1 : 0
   name         = format("%s-hdb-auth-password", local.prefix)
   value        = local.sid_auth_password
   key_vault_id = local.sid_kv_user.id
