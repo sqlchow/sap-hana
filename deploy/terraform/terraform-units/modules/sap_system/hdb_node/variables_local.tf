@@ -82,7 +82,7 @@ locals {
   kv_landscape_id   = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
 
   // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = try(var.sid_kv_user[0], null)
+  sid_kv_user = try(var.sid_kv_user, "")
 
   hdb_list = [
     for db in var.databases : db

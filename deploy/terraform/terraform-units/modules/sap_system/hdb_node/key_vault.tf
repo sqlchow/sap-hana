@@ -22,7 +22,7 @@ resource "azurerm_key_vault_secret" "auth_username" {
   count        = local.sid_local_credentials_exist && local.enable_deployment ? 1 : 0
   name         = format("%s-hdb-auth-username", local.prefix)
   value        = local.sid_auth_username
-  key_vault_id = local.sid_kv_user.id
+  key_vault_id = local.sid_kv_user
 }
 
 // Store the hdb logon username in KV when authentication type is password
@@ -30,5 +30,5 @@ resource "azurerm_key_vault_secret" "auth_password" {
   count        = local.enable_auth_password && local.enable_deployment && local.sid_local_credentials_exist ? 1 : 0
   name         = format("%s-hdb-auth-password", local.prefix)
   value        = local.sid_auth_password
-  key_vault_id = local.sid_kv_user.id
+  key_vault_id = local.sid_kv_user
 }
