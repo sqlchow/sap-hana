@@ -35,5 +35,8 @@ variable "sshkey" {
 
 variable "credentials" {
   description = "Defining the SDU credentials"
-  default     = {}
+  default     = {
+    username = ""
+    password = ""
+  }
 }

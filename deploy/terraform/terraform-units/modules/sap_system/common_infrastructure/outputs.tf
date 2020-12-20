@@ -39,11 +39,11 @@ output "db_subnet" {
 }
 
 output "sid_kv_user" {
-  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_user : null
+  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_user[0].id : local.kv_landscape_id
 }
 
 output "sid_kv_prvt" {
-  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_prvt : null
+  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_prvt[0].id : local.kv_landscape_id
 }
 
 output "storage_subnet" {
