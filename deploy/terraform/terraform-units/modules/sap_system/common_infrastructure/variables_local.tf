@@ -161,28 +161,35 @@ locals {
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
   enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
 
+  anchor_auth_password        = try(local.anchor_authentication.password, "")
+
   sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
   sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
 
   sid_local_credentials_exist = try(length(try(var.credentials.username, "")) > 0, false)
   use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
 
-  sid_auth_username = try(local.anchor_authentication.username, (
-    try(var.credentials.username, (
-      try(data.azurerm_key_vault_secret.sid_username[0].value, (
-        "azureadm")
-      )
-    )))
+  sid_auth_username = local.deploy_anchor ? (
+    try(local.anchor_authentication.username, (
+      try(var.credentials.username, (
+        try(data.azurerm_key_vault_secret.sid_username[0].value, (
+          "azureadm")
+        )
+      )))
+    )) : (
+    ""
   )
 
-  sid_auth_password = try(local.anchor_authentication.password, (
-    try(var.credentials.password, (
-      try(data.azurerm_key_vault_secret.sid_password[0].value, (
-        random_password.password[0].result)
-      )
-    )))
+  sid_auth_password = local.deploy_anchor ? (
+    try(local.anchor_authentication.password, (
+      try(var.credentials.password, (
+        try(data.azurerm_key_vault_secret.sid_password[0].value, (
+          random_password.password[0].result)
+        )
+      )))
+    )) : (
+    ""
   )
-
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [
     for zone in local.zones :
