@@ -11,13 +11,13 @@ data "azurerm_key_vault_secret" "sid_pk" {
 }
 
 data "azurerm_key_vault_secret" "sid_username" {
-  count        = !local.sid_local_credentials_exist && (length(local.sid_username_secret_name) > 0) ? 1 : 0
+  count        = !local.sid_local_credentials_exist && (length(trimspace(local.sid_username_secret_name)) > 0) ? 1 : 0
   name         = local.sid_username_secret_name
   key_vault_id = local.kv_landscape_id
 }
 
 data "azurerm_key_vault_secret" "sid_password" {
-  count        = !local.sid_local_credentials_exist  && (length(local.sid_password_secret_name) > 0) ? 1 : 0
+  count        = !local.sid_local_credentials_exist  && (length(trimspace(local.sid_password_secret_name)) > 0) ? 1 : 0
   name         = local.sid_password_secret_name
   key_vault_id = local.kv_landscape_id
 }
