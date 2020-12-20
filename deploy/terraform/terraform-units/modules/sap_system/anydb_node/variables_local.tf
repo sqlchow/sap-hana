@@ -146,20 +146,18 @@ locals {
   sid_local_credentials_exist = try(length(try(var.credentials.username, "")) > 0, false) || try(length(try(local.anydb.authentication.username, "")) > 0, false)
   use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
 
-  sid_auth_username = try(local.anydb.authentication.username, (
-    try(var.credentials.username, (
-      try(data.azurerm_key_vault_secret.sid_username[0].value, (
-        "azureadm")
-      )
-    )))
+  sid_auth_username = coalesce(
+    try(local.anydb.authentication.username, ""),
+    try(var.credentials.username, ""),
+    try(data.azurerm_key_vault_secret.sid_username[0].value, ""),
+    "azureadm"
   )
 
-  sid_auth_password = try(local.anydb.authentication.password, (
-    try(var.credentials.password, (
-      try(data.azurerm_key_vault_secret.sid_password[0].value, (
-        var.sid_password)
-      )
-    )))
+  sid_auth_password = coalesce(
+    try(local.anydb.authentication.password, ""),
+    try(var.credentials.password, ""),
+    try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
+    var.sid_password
   )
 
   db_systemdb_password = "db_systemdb_password"
