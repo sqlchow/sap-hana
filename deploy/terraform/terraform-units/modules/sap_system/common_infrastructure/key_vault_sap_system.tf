@@ -93,7 +93,7 @@ resource "random_id" "sapsystem" {
 
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
 resource "random_password" "password" {
-  count            = try(var.credentials.password, null) == null ? 1 : 0
+  count            = try(length(var.credentials.password) > 0 , false) ? 0 : 1
   length           = 32
   special          = true
   override_special = "_%@"
