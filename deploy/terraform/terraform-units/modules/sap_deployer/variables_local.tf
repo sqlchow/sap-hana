@@ -59,6 +59,8 @@ locals {
   // Deployer(s) information with default override
   enable_deployers = length(local.deployer_input) > 0 ? true : false
 
+  use_DHCP = try(local.deployer_input[0].use_DHCP, false)
+
   // Deployer(s) authentication method with default
   enable_password = contains(compact([
     for deployer in local.deployer_input :
