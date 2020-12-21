@@ -164,7 +164,7 @@ locals {
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
   enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
 
-  anchor_auth_password        = try(local.anchor_authentication.password, "")
+  anchor_auth_password = try(local.anchor_authentication.password, "")
 
   sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
   sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")

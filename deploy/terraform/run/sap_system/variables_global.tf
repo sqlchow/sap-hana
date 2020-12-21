@@ -40,7 +40,7 @@ variable "key_vault" {
 
 variable "credentials" {
   description = "Defining the SDU credentials"
-  default     = {
+  default = {
     username = ""
     password = ""
   }

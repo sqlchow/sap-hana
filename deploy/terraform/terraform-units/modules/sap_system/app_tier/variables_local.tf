@@ -135,7 +135,7 @@ locals {
   }
 
   use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
-  
+
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate = var.landscape_tfstate
   kv_landscape_id   = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")

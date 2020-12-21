@@ -11,13 +11,13 @@ data "azurerm_key_vault_secret" "sid_pk" {
 }
 
 data "azurerm_key_vault_secret" "sid_username" {
-  count        = !local.sid_local_credentials_exist && (length(trimspace(local.sid_username_secret_name)) > 0) ? 1 : 0
+  count        = ! local.sid_local_credentials_exist && (length(trimspace(local.sid_username_secret_name)) > 0) ? 1 : 0
   name         = local.sid_username_secret_name
   key_vault_id = local.kv_landscape_id
 }
 
 data "azurerm_key_vault_secret" "sid_password" {
-  count        = !local.sid_local_credentials_exist  && (length(trimspace(local.sid_password_secret_name)) > 0) ? 1 : 0
+  count        = ! local.sid_local_credentials_exist && (length(trimspace(local.sid_password_secret_name)) > 0) ? 1 : 0
   name         = local.sid_password_secret_name
   key_vault_id = local.kv_landscape_id
 }
@@ -116,7 +116,7 @@ resource "tls_private_key" "sdu" {
 
 
 data "azurerm_key_vault_secret" "sdu" {
-  count        = !local.use_local_keyvault ? 1 : 0
+  count        = ! local.use_local_keyvault ? 1 : 0
   name         = local.secret_sid_pk_name
   key_vault_id = local.kv_landscape_id
 }
@@ -141,7 +141,7 @@ resource "azurerm_key_vault_secret" "sdu_public_key" {
 
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
 resource "random_password" "password" {
-  count            = try(length(var.credentials.password) > 0 , false) ? 0 : 1
+  count            = try(length(var.credentials.password) > 0, false) ? 0 : 1
   length           = 32
   special          = true
   override_special = "_%@"

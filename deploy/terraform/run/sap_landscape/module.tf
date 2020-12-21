@@ -17,7 +17,7 @@ module "sap_landscape" {
 }
 
 module "sap_namegenerator" {
-  source               = "../../../../../WORKSPACES/LOCAL/CONA/sap_namegenerator"
+  source             = "../../../../../WORKSPACES/LOCAL/CONA/sap_namegenerator"
   environment        = var.infrastructure.environment
   location           = var.infrastructure.region
   iscsi_server_count = local.iscsi_count

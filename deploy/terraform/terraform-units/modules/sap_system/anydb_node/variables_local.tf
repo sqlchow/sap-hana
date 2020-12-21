@@ -113,11 +113,11 @@ locals {
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
   // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate  = var.landscape_tfstate
+  landscape_tfstate = var.landscape_tfstate
 
   use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
 
-  kv_landscape_id    = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
+  kv_landscape_id = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
 
   // Define this variable to make it easier when implementing existing kv.
   sid_kv_user = try(var.sid_kv_user, "")
@@ -255,27 +255,27 @@ locals {
     flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) :
       [
         {
-          name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-          computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-          role           = try(dbnode.role, "db")
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
-          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
+          name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+          computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+          role         = try(dbnode.role, "db")
+          admin_nic_ip = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+          db_nic_ip    = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
         },
         {
-          name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
-          computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
-          role           = try(dbnode.role, "db")
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[1]
-          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[1]
+          name         = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
+          computername = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
+          role         = try(dbnode.role, "db")
+          admin_nic_ip = lookup(dbnode, "admin_nic_ips", ["false", "false"])[1]
+          db_nic_ip    = lookup(dbnode, "db_nic_ips", ["false", "false"])[1]
         }
       ]
     ])) : (
     flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-      name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-      computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-      role           = try(dbnode.role, "db")
-      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
-      db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
+      name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+      computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+      role         = try(dbnode.role, "db")
+      admin_nic_ip = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+      db_nic_ip    = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
       }]
     )
   )
