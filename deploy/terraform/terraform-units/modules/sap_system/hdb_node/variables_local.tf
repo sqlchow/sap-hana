@@ -40,7 +40,7 @@ variable "storage_subnet" {
   description = "Information about storage subnet"
 }
 
-variable "sid_kv_user" {
+variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
 
@@ -82,7 +82,7 @@ locals {
   kv_landscape_id   = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
 
   // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = try(var.sid_kv_user, "")
+  sid_kv_user = try(var.sid_kv_user_id, "")
 
   hdb_list = [
     for db in var.databases : db
