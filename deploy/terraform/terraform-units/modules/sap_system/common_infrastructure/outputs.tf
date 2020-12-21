@@ -38,11 +38,11 @@ output "db_subnet" {
   value = local.enable_db_deployment ? local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] : null
 }
 
-output "sid_kv_user" {
+output "sid_kv_user_id" {
   value = local.enable_sid_deployment && local.sid_local_credentials_exist ? azurerm_key_vault.sid_kv_user[0].id : local.kv_landscape_id
 }
 
-output "sid_kv_prvt" {
+output "sid_kv_prvt_id" {
   value = local.enable_sid_deployment && local.sid_local_credentials_exist ? azurerm_key_vault.sid_kv_prvt[0].id : local.kv_landscape_id
 }
 

@@ -120,7 +120,7 @@ locals {
   kv_landscape_id = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
 
   // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = try(var.sid_kv_user, "")
+  sid_kv_user = try(var.sid_kv_user_id, "")
 
   // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
