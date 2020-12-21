@@ -70,8 +70,8 @@ locals {
 
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate = var.landscape_tfstate
-  kv_landscape_id    = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
-  secret_sid_pk_name = try(var.options.use_local_keyvault_for_secrets, false) ? (
+  kv_landscape_id   = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
+  secret_sid_pk_name = try(var.sshkey.ssh_for_sid, false) ? (
     format("%s-sshkey", local.prefix)) : (
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
   )
@@ -198,6 +198,7 @@ locals {
   // Additional users add to user KV
   kv_users = var.deployer_user
   */
+  use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
 
   //SAP vnet
   vnet_sap_arm_id              = try(local.landscape_tfstate.vnet_sap_arm_id, "")
@@ -279,6 +280,19 @@ locals {
   input_sid_public_key_secret_name  = try(var.key_vault.kv_sid_sshkey_pub, "")
   input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
   sid_key_exist                     = length(local.input_sid_public_key_secret_name) > 0 ? true : false
+
+  app_ostype = upper(try(var.application.os.os_type, "Linux"))
+  scs_ostype = upper(try(var.application.scs_os.os_type, local.app_ostype))
+  web_ostype = upper(try(var.application.web_os.os_type, local.app_ostype))
+
+  // TODO add the logic for mixed auth on app tier, i.e scs having a different authentication type than app
+  app_tier_on_Linux = (local.app_ostype == "LINUX" || local.scs_ostype == "LINUX" || local.web_ostype == "LINUX") ? true : false
+  app_auth_type     = try(var.application.authentication.type, local.app_tier_on_Linux ? "key" : "password")
+
+  db_auth_type = try(var.databases[0].authentication.type, upper(local.db_ostype) == "LINUX" ? "key" : "password")
+
+  enable_app_auth_password = (local.app_auth_type == "password" || local.db_auth_type == "password") ? true : false
+  enable_db_auth_password  = local.db_auth_type == "password" ? true : false
 
   //---- Update infrastructure with defaults ----//
   infrastructure = {
