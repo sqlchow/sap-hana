@@ -76,18 +76,20 @@ module "hdb_node" {
 
 // Create Application Tier nodes
 module "app_tier" {
-  source                     = "../../terraform-units/modules/sap_system/app_tier"
-  application                = var.application
-  databases                  = var.databases
-  infrastructure             = var.infrastructure
-  options                    = local.options
-  ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
-  resource_group             = module.common_infrastructure.resource_group
-  vnet_sap                   = module.common_infrastructure.vnet_sap
-  storage_bootdiag           = module.common_infrastructure.storage_bootdiag
-  ppg                        = module.common_infrastructure.ppg
-  sid_kv_user_id             = module.common_infrastructure.sid_kv_user_id
+  source           = "../../terraform-units/modules/sap_system/app_tier"
+  application      = var.application
+  databases        = var.databases
+  infrastructure   = var.infrastructure
+  options          = local.options
+  ssh-timeout      = var.ssh-timeout
+  sshkey           = var.sshkey
+  resource_group   = module.common_infrastructure.resource_group
+  vnet_sap         = module.common_infrastructure.vnet_sap
+  storage_bootdiag = module.common_infrastructure.storage_bootdiag
+  ppg              = module.common_infrastructure.ppg
+  sid_kv_user_id   = module.common_infrastructure.sid_kv_user_id
+  // Comment out code with users.object_id for the time being.  
+  // deployer_user    = module.deployer.deployer_user
   naming                     = module.sap_namegenerator.naming
   admin_subnet               = module.common_infrastructure.admin_subnet
   custom_disk_sizes_filename = var.app_disk_sizes_filename
