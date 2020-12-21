@@ -38,25 +38,12 @@ output "db_subnet" {
   value = local.enable_db_deployment ? local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] : null
 }
 
-// Return the key vault in which the secrets should be stored
-output "sid_kv_user_id" {
-  value = local.enable_sid_deployment ? (
-    local.use_local_keyvault ? (
-      azurerm_key_vault.sid_kv_user[0].id) : (
-      data.azurerm_key_vault.sid_kv_user[0].id
-    )) : (
-    ""
-  )
+output "sid_kv_user" {
+  value = local.enable_sid_deployment && local.sid_local_credentials_exist ? azurerm_key_vault.sid_kv_user[0].id : local.kv_landscape_id
 }
 
-output "sid_kv_prvt_id" {
-  value = local.enable_sid_deployment ? (
-    local.use_local_keyvault ? (
-      azurerm_key_vault.sid_kv_prvt[0].id) : (
-      data.azurerm_key_vault.sid_kv_prvt[0].id
-    )) : (
-    ""
-  )
+output "sid_kv_prvt" {
+  value = local.enable_sid_deployment && local.sid_local_credentials_exist ? azurerm_key_vault.sid_kv_prvt[0].id : local.kv_landscape_id
 }
 
 output "storage_subnet" {
@@ -71,4 +58,12 @@ output "storage_subnet" {
 
 output "sdu_public_key" {
   value = try(var.sshkey.ssh_for_sid, false) ? tls_private_key.sdu[0].public_key_openssh : ""
+}
+
+output "sid_password" {
+  value = coalesce(
+    try(var.credentials.password, ""),
+    try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
+    random_password.password[0].result
+  )
 }

@@ -18,6 +18,8 @@ module "common_infrastructure" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   key_vault                  = var.key_vault
+  sid_password               = module.common_infrastructure.sid_password
+  credentials  = var.credentials
 }
 
 module "sap_namegenerator" {
@@ -66,8 +68,10 @@ module "hdb_node" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   storage_subnet             = module.common_infrastructure.storage_subnet
   // Workaround to create dependency from anchor to db to app
-  anchor_vm      = module.common_infrastructure.anchor_vm
-  sdu_public_key = module.common_infrastructure.sdu_public_key
+  anchor_vm    = module.common_infrastructure.anchor_vm
+  sid_password = module.common_infrastructure.sid_password
+  credentials  = var.credentials
+  sdu_public_key             = module.common_infrastructure.sdu_public_key
 }
 
 // Create Application Tier nodes
@@ -89,12 +93,11 @@ module "app_tier" {
   custom_disk_sizes_filename = var.app_disk_sizes_filename
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   // Workaround to create dependency from anchor to db to app
-  anydb_vms                  = module.anydb_node.anydb_vms
-  hdb_vms                    = module.hdb_node.hdb_vms
+  anydb_vms    = module.anydb_node.anydb_vms
+  hdb_vms      = module.hdb_node.hdb_vms
+  sid_password = module.common_infrastructure.sid_password
+  credentials  = var.credentials
   sdu_public_key             = module.common_infrastructure.sdu_public_key
-  // Comment out code with users.object_id for the time being.  
-  // deployer_user    = module.deployer.deployer_user
-
 }
 
 // Create anydb database nodes
@@ -119,6 +122,9 @@ module "anydb_node" {
   // Workaround to create dependency from anchor to db to anydb
   anchor_vm                  = module.common_infrastructure.anchor_vm
   sdu_public_key             = module.common_infrastructure.sdu_public_key
+  // Workaround to create dependency from anchor to db to app
+  sid_password = module.common_infrastructure.sid_password
+  credentials  = var.credentials     
 }
 
 // Generate output files

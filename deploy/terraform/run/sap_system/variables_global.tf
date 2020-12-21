@@ -37,3 +37,11 @@ variable "key_vault" {
   description = "Import existing Azure Key Vaults"
   default     = {}
 }
+
+variable "credentials" {
+  description = "Defining the SDU credentials"
+  default     = {
+    username = ""
+    password = ""
+  }
+}

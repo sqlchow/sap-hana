@@ -32,7 +32,7 @@ resource "azurerm_linux_virtual_machine" "anchor" {
     azurerm_network_interface.anchor[count.index].id
   ]
   size                            = local.anchor_size
-  admin_username                  = local.anchor_authentication.username
+  admin_username                  = local.sid_auth_username
   disable_password_authentication = true
 
   os_disk {
@@ -84,8 +84,8 @@ resource "azurerm_windows_virtual_machine" "anchor" {
   ]
 
   size           = local.anchor_size
-  admin_username = local.anchor_authentication.username
-  admin_password = local.anchor_authentication.password
+  admin_username = local.sid_auth_username
+  admin_password = local.sid_auth_password
 
   os_disk {
     name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
