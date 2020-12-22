@@ -99,7 +99,7 @@ resource "random_password" "password" {
   override_special = "_%@"
 }
 
-// Store the hdb logon username in KV when authentication type is password
+// Store the logon username in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_username" {
   count        = local.sid_local_credentials_exist ? 1 : 0
   name         = format("%s-username", local.prefix)
@@ -107,7 +107,7 @@ resource "azurerm_key_vault_secret" "auth_username" {
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
 }
 
-// Store the hdb logon username in KV when authentication type is password
+// Store the password in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_password" {
   count        = local.sid_local_credentials_exist ? 1 : 0
   name         = format("%s-password", local.prefix)
