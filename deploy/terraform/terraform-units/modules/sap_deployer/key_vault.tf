@@ -188,13 +188,13 @@ data "azurerm_key_vault_secret" "ppk" {
 }
 
 data "azurerm_key_vault_secret" "username" {
-  count        = (local.enable_deployers && local.username_exist) ? 1 : 0
+  count        = (local.enable_deployers && local.username_exist && local.key_exist) ? 1 : 0
   name         = local.username_secret_name
   key_vault_id = local.user_key_vault_id
 }
 
 data "azurerm_key_vault_secret" "pwd" {
-  count        = (local.enable_deployers && local.enable_password && local.pwd_exist) ? 1 : 0
+  count        = (local.enable_deployers && local.enable_password && local.pwd_exist && local.key_exist) ? 1 : 0
   name         = local.pwd_secret_name
   key_vault_id = local.user_key_vault_id
 }
