@@ -100,7 +100,6 @@ locals {
   db_auth = try(local.db.authentication,
     {
       "type"     = "key"
-      "username" = "azureadm"
   })
 
   //Enable DB deployment 
@@ -161,7 +160,19 @@ locals {
   sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
   sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
 
-  sid_local_credentials_exist = try(length(try(var.credentials.username, "")) > 0, false)
+  sid_local_username_exists = try(length(
+    coalesce(
+      try(local.anchor.authentication.username, ""),
+      try(var.credentials.username, "")
+    ) > 0, false))
+
+  sid_local_password_exists = try(length(
+    coalesce(
+      try(local.anchor.authentication.password, ""),
+      try(var.credentials.password, "")
+    ) > 0, false))
+
+
   use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
 
   sid_auth_username = coalesce(
