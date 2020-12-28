@@ -17,7 +17,6 @@ module "common_infrastructure" {
   deployer_tfstate           = data.terraform_remote_state.deployer.outputs
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
-  sid_password               = module.common_infrastructure.sid_password
   credentials                = var.credentials
 }
 

@@ -37,12 +37,6 @@ variable "custom_disk_sizes_filename" {
   default     = ""
 }
 
-variable "sid_password" {
-  type        = string
-  description = "Password for the SID VMs"
-  default     = ""
-}
-
 locals {
   // Resources naming
   vnet_prefix                 = trimspace(var.naming.prefix.VNET)
@@ -181,7 +175,7 @@ locals {
     try(local.anchor.authentication.password, ""),
     try(var.credentials.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
-    var.sid_password
+    random_password.password[0].result
   )
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
