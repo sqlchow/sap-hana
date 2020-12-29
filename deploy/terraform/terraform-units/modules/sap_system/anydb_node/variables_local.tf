@@ -165,12 +165,11 @@ locals {
   // Tags
   tags = try(local.anydb.tags, {})
 
-  authentication = try(local.anydb.authentication,
-    {
+  authentication =  {
       "type"     = local.sid_auth_type
       "username" = local.sid_auth_username
       "password" = local.sid_auth_password
-  })
+  }
 
   // Default values in case not provided
   os_defaults = {

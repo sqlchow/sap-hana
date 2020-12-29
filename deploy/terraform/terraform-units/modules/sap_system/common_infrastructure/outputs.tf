@@ -57,9 +57,10 @@ output "storage_subnet" {
 }
 
 output "sid_password" {
-  value = coalesce(
+  value = trimspace(coalesce(
     try(var.credentials.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
-    random_password.password[0].result
-  )
+    try(random_password.password[0].result,""),
+    " "
+  ))
 }

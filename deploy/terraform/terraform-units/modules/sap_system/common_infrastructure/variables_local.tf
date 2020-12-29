@@ -184,12 +184,13 @@ locals {
     "azureadm"
   )
 
-  sid_auth_password = coalesce(
+  sid_auth_password = trimspace(coalesce(
     try(local.anchor.authentication.password, ""),
     try(var.credentials.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
-    random_password.password[0].result
-  )
+    try(random_password.password[0].result,""),
+    " "
+  ))
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [
