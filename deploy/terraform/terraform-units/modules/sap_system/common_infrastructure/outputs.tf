@@ -60,7 +60,7 @@ output "sid_password" {
   value = trimspace(coalesce(
     try(var.credentials.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
-    try(random_password.password[0].result,""),
+    try(random_password.password[0].result, ""),
     " "
   ))
 }
