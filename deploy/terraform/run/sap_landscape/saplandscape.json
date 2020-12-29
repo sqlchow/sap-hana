@@ -18,5 +18,9 @@
         }
     },
     "sshkey": {},
-    "options": {}
+    "options": {},
+    "credentials" :
+    {
+        "username": "azureadm"
+    }
 }

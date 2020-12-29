@@ -46,7 +46,6 @@ variable "sid_password" {
 locals {
   // Resources naming
   vnet_prefix                 = trimspace(var.naming.prefix.VNET)
-  storageaccount_name         = var.naming.storageaccount_names.SDU
   sid_keyvault_names          = var.naming.keyvault_names.SDU
   anchor_virtualmachine_names = var.naming.virtualmachine_names.ANCHOR_VMNAME
   anchor_computer_names       = var.naming.virtualmachine_names.ANCHOR_COMPUTERNAME
@@ -82,7 +81,8 @@ locals {
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
   )
   iscsi_private_ip = try(local.landscape_tfstate.iscsi_private_ip, [])
-
+  storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
+  storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
   //Filter the list of databases to only HANA platform entries
   databases = [
     for database in var.databases : database
