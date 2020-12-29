@@ -55,7 +55,7 @@ resource "azurerm_linux_virtual_machine" "anchor" {
   }
 
   admin_ssh_key {
-    username   = local.anchor_authentication.username
+    username   = local.sid_auth_username
     public_key = data.azurerm_key_vault_secret.sid_pk[0].value
   }
 

@@ -12,6 +12,7 @@ module "common_infrastructure" {
   options                    = local.options
   ssh-timeout                = var.ssh-timeout
   sshkey                     = var.sshkey
+  key_vault                  = var.key_vault
   naming                     = module.sap_namegenerator.naming
   service_principal          = local.service_principal
   deployer_tfstate           = data.terraform_remote_state.deployer.outputs

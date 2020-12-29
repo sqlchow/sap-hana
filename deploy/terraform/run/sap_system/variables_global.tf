@@ -33,6 +33,11 @@ variable "sshkey" {
   default     = {}
 }
 
+variable "key_vault" {
+  description = "Details of keyvault"
+  default     = {}
+}
+
 variable "credentials" {
   description = "Defining the SDU credentials"
   default     = {

@@ -99,7 +99,7 @@ locals {
 
   db_auth = try(local.db.authentication,
     {
-      "type"     = "key"
+      "type" = "key"
   })
 
   //Enable DB deployment 
@@ -155,25 +155,27 @@ locals {
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
   enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
 
-  anchor_auth_password        = try(local.anchor_authentication.password, "")
+  anchor_auth_password = try(local.anchor_authentication.password, "")
 
   sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
   sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
 
-  sid_local_username_exists = try(length(
+  sid_local_username_exists = length(
     coalesce(
       try(local.anchor.authentication.username, ""),
-      try(var.credentials.username, "")
-    ) > 0, false))
+      try(var.credentials.username, ""),
+      " "
+  )) > 1
 
-  sid_local_password_exists = try(length(
+  sid_local_password_exists = length(
     coalesce(
       try(local.anchor.authentication.password, ""),
-      try(var.credentials.password, "")
-    ) > 0, false))
+      try(var.credentials.password, ""),
+      " "
+  )) > 1
 
 
-  use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
+  use_landscape_credentials = length(local.sid_password_secret_name) > 0 ? true : false
 
   sid_auth_username = coalesce(
     try(local.anchor.authentication.username, ""),
