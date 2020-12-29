@@ -141,11 +141,7 @@ resource "azurerm_key_vault_secret" "sdu_public_key" {
 
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
 resource "random_password" "password" {
-<<<<<<< HEAD
-  count            = try(length(var.credentials.password) > 0, false) ? 0 : 1
-=======
   count            = local.sid_local_username_exists && ! local.sid_local_password_exists ? 0 : 1
->>>>>>> db7e5c11ace567f27230921b99fde3f65b7afef4
   length           = 32
   special          = true
   override_special = "_%@"
