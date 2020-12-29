@@ -32,7 +32,6 @@ output "iscsi_authentication_username" {
   value = try(module.sap_landscape.iscsi_authentication_username, "")
 }
 
-// Output for DNS
 output "storageaccount_name" {
   value = try(module.sap_landscape.storageaccount_name, "")
 }

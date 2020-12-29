@@ -39,11 +39,11 @@ output "db_subnet" {
 }
 
 output "sid_kv_user_id" {
-  value = local.enable_sid_deployment && local.sid_local_credentials_exist ? azurerm_key_vault.sid_kv_user[0].id : local.kv_landscape_id
+  value = local.enable_sid_deployment && local.sid_local_password_exists ? azurerm_key_vault.sid_kv_user[0].id : local.kv_landscape_id
 }
 
 output "sid_kv_prvt_id" {
-  value = local.enable_sid_deployment && local.sid_local_credentials_exist ? azurerm_key_vault.sid_kv_prvt[0].id : local.kv_landscape_id
+  value = local.enable_sid_deployment && local.sid_local_password_exists ? azurerm_key_vault.sid_kv_prvt[0].id : local.kv_landscape_id
 }
 
 output "storage_subnet" {
@@ -61,9 +61,10 @@ output "sdu_public_key" {
 }
 
 output "sid_password" {
-  value = coalesce(
+  value = trimspace(coalesce(
     try(var.credentials.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
-    random_password.password[0].result
-  )
+    try(random_password.password[0].result, ""),
+    " "
+  ))
 }

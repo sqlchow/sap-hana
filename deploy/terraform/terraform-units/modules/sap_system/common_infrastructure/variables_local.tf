@@ -37,12 +37,6 @@ variable "custom_disk_sizes_filename" {
   default     = ""
 }
 
-variable "sid_password" {
-  type        = string
-  description = "Password for the SID VMs"
-  default     = ""
-}
-
 locals {
   // Resources naming
   vnet_prefix                 = trimspace(var.naming.prefix.VNET)
@@ -107,8 +101,7 @@ locals {
 
   db_auth = try(local.db.authentication,
     {
-      "type"     = "key"
-      "username" = "azureadm"
+      "type" = "key"
   })
 
   //Enable DB deployment 
@@ -169,8 +162,22 @@ locals {
   sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
   sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
 
-  sid_local_credentials_exist = try(length(try(var.credentials.username, "")) > 0, false)
-  use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
+  sid_local_username_exists = length(
+    coalesce(
+      try(local.anchor.authentication.username, ""),
+      try(var.credentials.username, ""),
+      " "
+  )) > 1
+
+  sid_local_password_exists = length(
+    coalesce(
+      try(local.anchor.authentication.password, ""),
+      try(var.credentials.password, ""),
+      " "
+  )) > 1
+
+
+  use_landscape_credentials = length(local.sid_password_secret_name) > 0 ? true : false
 
   sid_auth_username = coalesce(
     try(local.anchor.authentication.username, ""),
@@ -179,12 +186,13 @@ locals {
     "azureadm"
   )
 
-  sid_auth_password = coalesce(
+  sid_auth_password = trimspace(coalesce(
     try(local.anchor.authentication.password, ""),
     try(var.credentials.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
-    var.sid_password
-  )
+    try(random_password.password[0].result, ""),
+    " "
+  ))
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [
