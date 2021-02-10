@@ -22,5 +22,5 @@ terraform init -upgrade=true --backend-config "subscription_id=$(subscription)" 
 terraform plan -var-file=${input} ${repo_path}/deploy/terraform/run/sap_system/ > plan_output.log
      
 if ! grep "No changes\|0 to change, 0 to destroy" plan_output.log; then 
-exit 1; 
+echo "Risk for Data loss"; 
 fi;

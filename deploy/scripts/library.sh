@@ -29,8 +29,6 @@ terraform init -upgrade=true ${repo_path}/deploy/terraform/bootstrap/sap_library
 terraform plan -var-file=${input} ${repo_path}/deploy/terraform/bootstrap/sap_library/ > plan_output.log
 fi
 
-
-     
 if ! grep "No changes\|0 to change, 0 to destroy" plan_output.log; then 
-exit 1; 
+echo "Risk for Data loss"; 
 fi;
