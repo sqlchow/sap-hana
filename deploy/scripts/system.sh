@@ -15,6 +15,7 @@ ok_to_proceed='N'
 
 cd ${folder_path}
 
+
 terraform init -upgrade=true --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
     --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
     --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
@@ -22,6 +23,7 @@ terraform init -upgrade=true --backend-config "subscription_id=${ARM_SUBSCRIPTIO
     --backend-config "key=${sap_system_key}" \
     ${repo_path}/deploy/terraform/run/sap_landscape/
 
+if "terraform output |  grep Warning: No outputs" ;then´ `
 terraform output > outputs.log
 if grep "Warning: No outputs found" outputs.log; then 
     ok_to_proceed='Y'
