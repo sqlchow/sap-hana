@@ -37,7 +37,7 @@ variable "landscape_tfstate_key" {
 
 locals {
 
-  version_label = "v2.3.3.1"
+  version_label = file("v2.3.3.1"
 
   // The environment of sap landscape and sap system
   environment = upper(try(var.infrastructure.environment, ""))
