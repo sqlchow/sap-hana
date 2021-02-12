@@ -8,7 +8,7 @@ repo_path=$HOME/Azure_SAP_Automated_Deployment/sap-hana
 # Read environment for later use
 readarray -d '-' -t environment<<<"$prefix"
 
-if [ $2 == false ]; then
+if [ $3 == false ]; then
     approve="--auto-approve"
 fi
 
