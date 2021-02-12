@@ -120,15 +120,3 @@ resource "local_file" "ansible_inventory_yml" {
   file_permission      = "0660"
   directory_permission = "0770"
 }
-
-
-##################################################################################################################
-# OUTPUT Files
-##################################################################################################################
-
-resource local_file "tfbackend" {
-  content = "####################################################\n# Empty backend file to overcome an Terraform issue \n####################################################\n \n terraform { \n\t backend \"azurerm\" {} \n}"
-  filename             = "${path.cwd}/backend.tf"
-  file_permission      = "0660"
-  directory_permission = "0770"
-}

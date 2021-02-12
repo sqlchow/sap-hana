@@ -37,8 +37,7 @@ variable "landscape_tfstate_key" {
 
 locals {
 
-  version_label = file("v2.3.3.1"
-
+  version_label = trimspace(file("${path.module}/../../../configs/version.txt"))
   // The environment of sap landscape and sap system
   environment = upper(try(var.infrastructure.environment, ""))
   vnet_sap_arm_id = data.terraform_remote_state.landscape.outputs.vnet_sap_arm_id

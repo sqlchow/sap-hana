@@ -5,7 +5,8 @@ variable "tfstate_resource_id" {
 }
 
 locals {
-
+  
+  version_label   = trimspace(file("${path.module}/../../../configs/version.txt"))
   deployer_prefix = module.sap_namegenerator.naming.prefix.DEPLOYER
   // If custom names are used for deployer, providing resource_group_name and msi_name will override the naming convention
   deployer_rg_name = try(var.deployer.resource_group_name, format("%s%s", local.deployer_prefix, module.sap_namegenerator.naming.resource_suffixes.deployer_rg))
