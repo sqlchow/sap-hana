@@ -8,27 +8,11 @@ repo_path=$HOME/Azure_SAP_Automated_Deployment/sap-hana
 # Read environment for later use
 readarray -d '-' -t environment<<<"$prefix"
 
-if [ $2 == true ]; then
-    echo "Interactive"
-else
+if [ $2 == false ]; then
     approve="--auto-approve"
 fi
 
-deployment_system=$3
-
-ok_to_proceed=false
-new_deployment=false
-
-if [ ! -d $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix} ]
-then
-    echo "############################################################################################"
-    echo "# " $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix} " not found!"
-    echo "############################################################################################"
-    echo ""
-    exit 1
-
-fi
-cd $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix}
+deployment_system=$2
 
 if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
         echo ""
@@ -66,6 +50,36 @@ if [ ! -n "$REMOTE_STATE_SA" ]; then
         exit 3
 fi
 
+if [ ! -d ${repo_path}/deploy/terraform/run/${deployment_system} ]
+then
+    echo "####################################################################################"
+    echo "# Incorrect system deployment type specified :" ${deployment_system} "       #"
+    echo "# Valid options are:                                                               #"   
+    echo "# sap_deployer                                                                     #" 
+    echo "# sap_library                                                                      #" 
+    echo "# sap_landscape                                                                    #" 
+    echo "# sap_system                                                                       #" 
+    echo "####################################################################################"
+    echo ""
+    exit 1
+fi
+
+
+
+if [ ! -d $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix} ]
+then
+    echo "####################################################################################"
+    echo "# Directory:" $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix} "not found!"
+    echo "####################################################################################"
+    echo ""
+    exit 1
+fi
+
+ok_to_proceed=false
+new_deployment=false
+
+
+cd $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix}
 
 cat <<EOF > backend.tf
 ####################################################
@@ -95,18 +109,17 @@ if echo $outputs | grep "No outputs"; then
     echo ""
 else
     echo ""
-    echo "####################################"
+        echo "####################################################################################"
     echo "# Existing deployment was detected #"
-    echo "####################################"
+        echo "####################################################################################"
     echo ""
     deployed_using_version=`terraform output automation_version`
     if [ ! -n "$deployed_using_version" ]; then
         echo ""
-        echo "####################################"
-        echo "# !!! Risk for Data loss!!!        #"
-        echo "# Please run Terraform plan and    #"
-        echo "# inspect the output .              #"
-        echo "####################################"
+        echo "####################################################################################"
+        echo "#                             !!! Risk for Data loss !!!                           #"
+        echo "#                    Please run Terraform plan and inspect the output .            #"
+        echo "####################################################################################"
 
         read -p "Do you want to continue Y/N?"  ans
         answer=${ans^^}
@@ -117,36 +130,37 @@ else
         fi
     else
         echo ""
-        echo "############################################################################"
-        echo "# Terraform templates version" $deployed_using_version "were used in the deployment"
-        echo "############################################################################"
+        echo "####################################################################################"
+        echo "# Terraform templates version" $deployed_using_version "were used in the deployment #"
+        echo "####################################################################################"
         echo ""
         #Add version logic here
     fi
 fi
 
 echo ""
-echo "####################################"
-echo "# Running Terraform plan           #"
-echo "####################################"
+echo "####################################################################################"
+echo "#                             Running Terraform plan                               #"
+echo "####################################################################################"
 echo ""
 terraform plan -var-file=${prefix}.json ${repo_path}/deploy/terraform/run/${deployment_system}/ > plan_output.log
 
 if ! $new_deployment; then
     if grep "No changes" plan_output.log ; then
-        echo ""
-        echo "#################################"
-        echo "# Infrastructure is up to date  #"
-        echo "#################################"
-        echo ""
+echo ""
+echo "####################################################################################"
+echo "#                             Infrastructure is up to date                         #"
+echo "####################################################################################"
+echo ""
         rm plan_output.log
         exit 0
     fi
     if ! grep "0 to change, 0 to destroy" plan_output.log ; then
         echo ""
-        echo "####################################"
-        echo "#!!! Risk for Data loss!!!         #"
-        echo "####################################"
+        echo "####################################################################################"
+        echo "#                             !!! Risk for Data loss !!!                           #"
+        echo "#                    Please run Terraform plan and inspect the output .            #"
+        echo "####################################################################################"
 
         read -p "Do you want to continue Y/N?"  ans
         answer=${ans^^}
@@ -165,9 +179,10 @@ if [ $ok_to_proceed ]; then
     rm plan_output.log
 
     echo ""
-    echo "####################################"
-    echo "# Running Terraform apply          #"
-    echo "####################################"
+        echo ""
+        echo "####################################################################################"
+        echo "#                             Running Terraform apply                              #"
+        echo "####################################################################################"
     echo ""
 
     terraform apply ${approve} -var-file=${prefix}.json ${repo_path}/deploy/terraform/run/${deployment_system}/
