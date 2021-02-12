@@ -1,41 +1,37 @@
 #!/bin/bash
 
 #Provide the environment state file
-terraform_state_key=$1
-
-#Provide the name if the input parameter file (*.json)
-input_json=$2
-
-# Provide the relative path to the parameter folder
-folder_path=$3
+prefix=$1
 
 # Provide the relative path to the repository root folder
-repo_path=$4
+repo_path=$2
 
-if [ $5 == true ]; then
+if [ $3 == true ]; then
     echo "Interactive"
 else
     approve="--auto-approve"
 fi
 
-deployment_system=$6
+deployment_system=$4
 
 ok_to_proceed=false
 new_deployment=false
-cd ${folder_path}
+cd $HOME/AZURE_SAP_AUTOMATED_DEPLOYMENT//WORKSPACES/LOCAL/${~prefix}
 
-echo "####################################################" > backend.tf
-echo "# To overcome terraform issue                      #" >> backend.tf
-echo "####################################################" >> backend.tf
-echo "terraform {"                                          >> backend.tf
-echo " backend \"azurerm\" {}"                              >> backend.tf
-echo "}"                                                    >> backend.tf
+cat <<EOF > backend.tf
+####################################################
+# To overcome terraform issue                      #
+####################################################
+terraform {                                         
+    backend \"azurerm\" {}
+}
+EOF
 
 terraform init -upgrade=true --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
 --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
 --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
 --backend-config "container_name=tfstate" \
---backend-config "key=${terraform_state_key}" \
+--backend-config "key=${prefix}.terraform.tfstate" \
 ${repo_path}/deploy/terraform/run/${deployment_system}/
 
 outputs=`terraform output`
@@ -57,7 +53,9 @@ else
     if [ ! -n "$deployed_using_version" ]; then
         echo ""
         echo "####################################"
-        echo "#!!! Risk for Data loss!!!         #"
+        echo "# !!! Risk for Data loss!!!        #"
+        echo "# Please run Terraform plan and    #"
+        echo "# inspect the output .              #"
         echo "####################################"
         
         read -p "Do you want to continue Y/N?"  ans
@@ -82,7 +80,7 @@ echo "####################################"
 echo "# Running Terraform plan           #"
 echo "####################################"
 echo ""
-terraform plan -var-file=${input_json} ${repo_path}/deploy/terraform/run/${deployment_system}/ > plan_output.log
+terraform plan -var-file=${prefix}.json ${repo_path}/deploy/terraform/run/${deployment_system}/ > plan_output.log
 
 if ! $new_deployment; then
     if grep "No changes" plan_output.log ; then
