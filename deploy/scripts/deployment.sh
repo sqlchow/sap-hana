@@ -1,30 +1,80 @@
 #!/bin/bash
 
-#Provide the environment state file
+# The prefix of the system
 prefix=$1
 
-# Provide the relative path to the repository root folder
-repo_path=$2
+repo_path=$HOME/Azure_SAP_Automated_Deployment/sap-hana
 
-if [ $3 == true ]; then
+# Read environment for later use
+readarray -d '-' -t environment<<<"$prefix"
+
+if [ $2 == true ]; then
     echo "Interactive"
 else
     approve="--auto-approve"
 fi
 
-deployment_system=$4
+deployment_system=$3
 
 ok_to_proceed=false
 new_deployment=false
-cd $HOME/AZURE_SAP_AUTOMATED_DEPLOYMENT//WORKSPACES/LOCAL/${~prefix}
+
+if [ ! -d $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix} ]
+then
+    echo "############################################################################################"
+    echo "# " $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix} " not found!"
+    echo "############################################################################################"
+    echo ""
+    exit 1
+
+fi
+cd $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix}
+
+if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
+        echo ""
+        echo "####################################################################################"
+        echo "# Missing environment variables (ARM_SUBSCRIPTION_ID)!!!                           #"
+        echo "# Please export the folloing variables:                                            #"
+        echo "# ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
+        echo "# REMOTE_STATE_RG (resource group name for storage account containing state files) #"
+        echo "# REMOTE_STATE_SA (storage account for state file)                                 #"
+        echo "####################################################################################"
+        exit 3
+fi
+
+if [ ! -n "$REMOTE_STATE_RG" ]; then
+        echo ""
+        echo "####################################################################################"
+        echo "# Missing environment variables (REMOTE_STATE_RG)!!!                               #"
+        echo "# Please export the folloing variables:                                            #"
+        echo "# ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
+        echo "# REMOTE_STATE_RG (resource group name for storage account containing state files) #"
+        echo "# REMOTE_STATE_SA (storage account for state file)                                 #"
+        echo "####################################################################################"
+        exit 3
+fi
+
+if [ ! -n "$REMOTE_STATE_SA" ]; then
+        echo ""
+        echo "####################################################################################"
+        echo "# Missing environment variables REMOTE_STATE_SA!!!                                 #"
+        echo "# Please export the folloing variables:                                            #"
+        echo "# ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
+        echo "# REMOTE_STATE_RG (resource group name for storage account containing state files) #"
+        echo "# REMOTE_STATE_SA (storage account for state file)                                 #"
+        echo "####################################################################################"
+        exit 3
+fi
+
 
 cat <<EOF > backend.tf
 ####################################################
 # To overcome terraform issue                      #
 ####################################################
-terraform {                                         
-    backend \"azurerm\" {}
+terraform {
+    backend "azurerm" {}
 }
+
 EOF
 
 terraform init -upgrade=true --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
@@ -57,7 +107,7 @@ else
         echo "# Please run Terraform plan and    #"
         echo "# inspect the output .              #"
         echo "####################################"
-        
+
         read -p "Do you want to continue Y/N?"  ans
         answer=${ans^^}
         if [ $answer == 'Y' ]; then
@@ -97,7 +147,7 @@ if ! $new_deployment; then
         echo "####################################"
         echo "#!!! Risk for Data loss!!!         #"
         echo "####################################"
-        
+
         read -p "Do you want to continue Y/N?"  ans
         answer=${ans^^}
         if [ $answer == 'Y' ]; then
@@ -113,13 +163,13 @@ fi
 if [ $ok_to_proceed ]; then
     cat plan_output.log
     rm plan_output.log
-    
+
     echo ""
     echo "####################################"
     echo "# Running Terraform apply          #"
     echo "####################################"
     echo ""
-    
-    terraform apply ${approve} -var-file=${input_json} ${repo_path}/deploy/terraform/run/${deployment_system}/
-    
+
+    terraform apply ${approve} -var-file=${prefix}.json ${repo_path}/deploy/terraform/run/${deployment_system}/
+
 fi
