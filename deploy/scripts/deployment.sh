@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# The prefix of the system
-prefix=$1
+# parameterfile
+parameterfile=$1
 
 repo_path=$HOME/Azure_SAP_Automated_Deployment/sap-hana
 
 # Read environment for later use
-readarray -d '-' -t environment<<<"$prefix"
+readarray -d '-' -t environment<<<"$parameterfile"
+
+key=`echo $parameterfile | cut -d. -f1`
 
 if [ $3 == false ]; then
     approve="--auto-approve"
@@ -65,21 +67,8 @@ then
 fi
 
 
-
-if [ ! -d $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix} ]
-then
-    echo "####################################################################################"
-    echo "# Directory:" $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix} "not found!"
-    echo "####################################################################################"
-    echo ""
-    exit 1
-fi
-
 ok_to_proceed=false
 new_deployment=false
-
-
-cd $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${prefix}
 
 cat <<EOF > backend.tf
 ####################################################
@@ -95,7 +84,7 @@ terraform init -upgrade=true --backend-config "subscription_id=${ARM_SUBSCRIPTIO
 --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
 --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
 --backend-config "container_name=tfstate" \
---backend-config "key=${prefix}.terraform.tfstate" \
+--backend-config "key=${key}.terraform.tfstate" \
 ${repo_path}/deploy/terraform/run/${deployment_system}/
 
 outputs=`terraform output`
@@ -143,7 +132,7 @@ echo "##########################################################################
 echo "#                             Running Terraform plan                               #"
 echo "####################################################################################"
 echo ""
-terraform plan -var-file=${prefix}.json ${repo_path}/deploy/terraform/run/${deployment_system}/ > plan_output.log
+terraform plan -var-file=${parameterfile} ${repo_path}/deploy/terraform/run/${deployment_system}/ > plan_output.log
 
 if ! $new_deployment; then
     if grep "No changes" plan_output.log ; then
@@ -185,6 +174,6 @@ if [ $ok_to_proceed ]; then
         echo "####################################################################################"
     echo ""
 
-    terraform apply ${approve} -var-file=${prefix}.json ${repo_path}/deploy/terraform/run/${deployment_system}/
+    terraform apply ${approve} -var-file=${parameterfile} ${repo_path}/deploy/terraform/run/${deployment_system}/
 
 fi
