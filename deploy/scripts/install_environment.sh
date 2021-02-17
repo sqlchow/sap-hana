@@ -163,6 +163,23 @@ do
    relative_path="../"$relative_path
 done
 
+# Checking for valid az session
+az account show > stdout.az 2>&1
+temp=`grep "az login" stdout.az`
+if [ -n "$temp" ]; then 
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #" 
+    echo "#                           Please login using az login                                 #"
+    echo "#                                                                                       #" 
+    echo "#########################################################################################"
+    echo ""
+    rm stdout.az
+    exit -1
+else
+    rm stdout.az
+fi
+
 curdir=`pwd`
 
 echo ""
