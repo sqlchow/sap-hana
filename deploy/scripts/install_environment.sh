@@ -153,7 +153,6 @@ if [ ! -n "$tf" ]; then
     echo "#                                                                                       #" 
     echo "#########################################################################################"
     echo ""
-    rm stdout.az
     exit -1
 fi
 
@@ -166,10 +165,8 @@ if [ ! -n "$az" ]; then
     echo "#                                                                                       #" 
     echo "#########################################################################################"
     echo ""
-    rm stdout.az
     exit -1
 fi
-
 
 # Helper variables
 deployer_dirname=`dirname $deployer_parameter_file`
@@ -219,10 +216,22 @@ echo "##########################################################################
 echo ""
 
 cd $deployer_dirname
- ${DEPLOYMENT_REPO_PATH}deploy/scripts/install_deployer.sh -p $deployer_file_parametername -i true
+${DEPLOYMENT_REPO_PATH}deploy/scripts/install_deployer.sh -p $deployer_file_parametername -i true
+if [ $? -eq 255 ]
+    then
+    exit $?
+fi 
 cd $curdir
 
-${DEPLOYMENT_REPO_PATH}deploy/scripts/set_secrets.sh -i
+read -p "Do you want to specify the keyvault secrets Y/N?"  ans
+answer=${ans^^}
+if [ $answer == 'Y' ]; then
+    ${DEPLOYMENT_REPO_PATH}deploy/scripts/set_secrets.sh -i -d $deployer_file_parametername
+    if [ $? -eq 255 ]
+        then
+        exit $?
+    fi 
+fi
 
 echo ""
 echo "#########################################################################################"
@@ -234,6 +243,10 @@ echo ""
 
 cd $library_dirname
 ${DEPLOYMENT_REPO_PATH}deploy/scripts/install_library.sh -p $library_file_parametername -i true -d $relative_path$deployer_dirname
+if [ $? -eq 255 ]
+    then
+    exit $?
+fi 
 cd $curdir
 
 echo ""
@@ -246,6 +259,10 @@ echo ""
 
 cd $deployer_dirname
 ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh -p $deployer_file_parametername -i true -t sap_deployer
+if [ $? -eq 255 ]
+    then
+    exit $?
+fi 
 cd $curdir
 
 echo ""
@@ -259,6 +276,10 @@ echo ""
 
 cd $library_dirname
 ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh -p $library_file_parametername  -i true -t sap_library
+if [ $? -eq 255 ]
+    then
+    exit $?
+fi 
 cd $curdir
 
 echo "#########################################################################################"
@@ -270,5 +291,9 @@ echo ""
 
 cd $environment_dirname
 ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh -p $environment_file_parametername  -i true -t sap_landscape
+if [ $? -eq 255 ]
+    then
+    exit $?
+fi 
 cd $curdir
 

@@ -49,6 +49,7 @@ done
 readarray -d '-' -t environment<<<"$parameterfile"
 readarray -d '-' -t -s 1 region<<<"$parameterfile"
 key=`echo $parameterfile | cut -d. -f1`
+deployment_system=sap_library
 
 if [ ! -f ${parameterfile} ]
 then
@@ -59,7 +60,6 @@ then
     echo "#                                                                                       #" 
     echo "#########################################################################################"
     exit
-
 fi
 
 #Persisting the parameters across executions
@@ -74,30 +74,36 @@ if [ ! -d ${automation_config_directory} ]
 then
     # No configuration directory exists
     mkdir $automation_config_directory
+
     if [ -n "$DEPLOYMENT_REPO_PATH" ]; then
         # Store repo path in ~/.sap_deployment_automation/config
         echo "DEPLOYMENT_REPO_PATH=${DEPLOYMENT_REPO_PATH}" >> $generic_config_information
-        config_stored=true
+        config_stored=1
+    else
+        config_stored=0
     fi
+
     if [ -n "$ARM_SUBSCRIPTION_ID" ]; then
         # Store ARM Subscription info in ~/.sap_deployment_automation
         echo "ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}" >> $library_config_information
-        arm_config_stored=true
+        arm_config_stored=1
+    else    
+        arm_config_stored=0
     fi
 
 else
-    temp=`grep "DEPLOYMENT_REPO_PATH" $generic_config_information | cut -d= -f2`
-    templen=`echo $temp | wc -c`
-    if [ ! $templen == 0 ]
+    temp=`grep "DEPLOYMENT_REPO_PATH" $generic_config_information`
+    if [ ! -z $temp ]
     then
         # Repo path was specified in ~/.sap_deployment_automation/config
-        DEPLOYMENT_REPO_PATH=$temp
-        config_stored=true
+        DEPLOYMENT_REPO_PATH=`echo $temp| cut -d= -f2`
+        config_stored=1
+    else
+        config_stored=0
     fi
 fi
 
 if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
-    echo ""
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #" 
@@ -108,27 +114,24 @@ if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #" 
     echo "#########################################################################################"
-    exit 4
+    exit -1
 else
-    if [ $config_stored == false ]
+    if [ $config_stored -eq 0 ]
     then
         echo "DEPLOYMENT_REPO_PATH=${DEPLOYMENT_REPO_PATH}" >> ${automation_config_directory}config
     fi
 fi
 
-temp=`grep "ARM_SUBSCRIPTION_ID" $library_config_information | cut -d= -f2`
-templen=`echo $temp | wc -c`
-# Subscription length is 37
-
-if [ 37 == $templen ] 
+temp=`grep "ARM_SUBSCRIPTION_ID" $library_config_information`
+if [ ! -z $temp ]
 then
     echo "Reading the configuration"
-    # ARM_SUBSCRIPTION_ID was specified in ~/.sap_deployment_automation/configuration file for deployer
-    ARM_SUBSCRIPTION_ID=$temp
-    arm_config_stored=true
+    # ARM_SUBSCRIPTION_ID was specified in ~/.sap_deployment_automation/configuration file for library
+    ARM_SUBSCRIPTION_ID=`echo $temp | cut -d= -f2`
+    arm_config_stored=1
 else    
     echo "No configuration"
-    arm_config_stored=false
+    arm_config_stored=0
 fi
 
 if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
@@ -142,9 +145,9 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #" 
     echo "#########################################################################################"
-    exit 3
+    exit -1
 else
-    if [  $arm_config_stored  == false ]
+    if [ $arm_config_stored  -eq 0 ]
     then
         echo "Storing the configuration"
         echo "ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}" >> ${library_config_information}
@@ -168,21 +171,24 @@ then
     echo "#                                                                                       #" 
     echo "#########################################################################################"
     echo ""
-    exit 1
+    exit -1
 fi
 
-ok_to_proceed=false
+k_to_proceed=false
 new_deployment=false
 
-cat <<EOF > backend.tf
-####################################################
-# To overcome terraform issue                      #
-####################################################
-terraform {
-    backend "local" {}
-}
+reinitialized=0
+if [ -f ./backend-config.tfvars ]
+then
+    terraform_module_directory=${DEPLOYMENT_REPO_PATH}deploy/terraform/run/${deployment_system}/
 
-EOF
+    echo "#########################################################################################"
+    echo "#                                                                                       #" 
+    echo "#                          The bootstrapping has already been done!                     #"
+    echo "#                                                                                       #" 
+    echo "#########################################################################################"
+    exit 0
+fi
 
 if [ ! -d ./.terraform/ ]; then
     echo "#########################################################################################"
@@ -192,19 +198,23 @@ if [ ! -d ./.terraform/ ]; then
     echo "#########################################################################################"
     terraform init -upgrade=true  $terraform_module_directory
 else
-    echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#                          .terraform directory already exists!                         #"
-    echo "#                                                                                       #" 
-    echo "#########################################################################################"
-    read -p "Do you want to continue with the deployment Y/N?"  ans
-    answer=${ans^^}
-    if [ $answer == 'Y' ]; then
-        terraform init -upgrade=true -reconfigure $terraform_module_directory
-    else
-        exit 1
+    if [ $reinitialized -eq 0 ]
+    then
+        echo "#########################################################################################"
+        echo "#                                                                                       #" 
+        echo "#                          .terraform directory already exists!                         #"
+        echo "#                                                                                       #" 
+        echo "#########################################################################################"
+        read -p "Do you want to continue with the deployment Y/N?"  ans
+        answer=${ans^^}
+        if [ $answer == 'Y' ]; then
+            terraform init -upgrade=true $terraform_module_directory
+        else
+            exit -1
+        fi
     fi
 fi
+
 
 echo ""
 echo "#########################################################################################"
@@ -235,26 +245,48 @@ else
     terraform apply ${approve} -var-file=${parameterfile} $terraform_module_directory
 fi
 
-REMOTE_STATE_RG=`terraform output remote_state_resource_group_name | tr -d \"` 
+cat <<EOF > backend.tf
+####################################################
+# To overcome terraform issue                      #
+####################################################
+terraform {
+    backend "local" {}
+}
+EOF
 
+REMOTE_STATE_RG=`terraform output remote_state_resource_group_name | tr -d \"` 
 temp=`echo $REMOTE_STATE_RG | grep "Warning"`
 if [ -z $temp ]
 then
-    echo "REMOTE_STATE_RG=${REMOTE_STATE_RG}" >> ${library_config_information}
+    temp=`echo $REMOTE_STATE_RG | grep "Backend reinitialization required"`
+    if [ -z $temp ]
+    then
+        echo "REMOTE_STATE_RG=${REMOTE_STATE_RG}" >> ${library_config_information}
+    fi
 fi
 
 REMOTE_STATE_SA=`terraform output remote_state_storage_account_name| tr -d \"`
 temp=`echo $REMOTE_STATE_SA | grep "Warning"`
 if [ -z $temp ]
 then
-    echo "REMOTE_STATE_SA=${REMOTE_STATE_SA}" >> ${library_config_information}
+    temp=`echo $REMOTE_STATE_SA | grep "Backend reinitialization required"`
+    if [ -z $temp ]
+    then
+        echo "REMOTE_STATE_SA=${REMOTE_STATE_SA}" >> ${library_config_information}
+    fi
 fi
 
 tfstate_resource_id=`terraform output tfstate_resource_id| tr -d \"`
-
 temp=`echo $tfstate_resource_id | grep "Warning"`
 if [ -z $temp ]
 then
-    echo "tfstate_resource_id=${tfstate_resource_id}" >> ${library_config_information}
+    temp=`echo $tfstate_resource_id | grep "Backend reinitialization required"`
+    if [ -z $temp ]
+    then
+        echo "tfstate_resource_id=${tfstate_resource_id}" >> ${library_config_information}
+    fi
 fi
 
+rm backend.tf
+
+exit 0

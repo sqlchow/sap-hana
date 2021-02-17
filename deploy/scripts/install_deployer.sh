@@ -49,6 +49,7 @@ while getopts ":p:i:h" option; do
            ;; 
     esac
 done
+
 deployment_system=sap_deployer
 
 # Read environment
@@ -63,7 +64,7 @@ then
     echo "#                  Parameter file" ${parameterfile} " does not exist!!! #"
     echo "#                                                                                       #" 
     echo "#########################################################################################"
-    exit
+    exit -1
 
 fi
 
@@ -91,18 +92,16 @@ then
     fi
 
 else
-    temp=`grep "DEPLOYMENT_REPO_PATH" $generic_config_information | cut -d= -f2`
-    templen=`echo $temp | wc -c`
-    if [ ! $templen == 0 ]
+    temp=`grep "DEPLOYMENT_REPO_PATH" $generic_config_information`
+    if [ $temp ]
     then
         # Repo path was specified in ~/.sap_deployment_automation/config
-        DEPLOYMENT_REPO_PATH=$temp
+        DEPLOYMENT_REPO_PATH=`echo $temp | cut -d= -f2`
         config_stored=true
     fi
 fi
 
 if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
-    echo ""
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #" 
@@ -158,6 +157,8 @@ fi
 
 terraform_module_directory=${DEPLOYMENT_REPO_PATH}deploy/terraform/bootstrap/${deployment_system}/
 
+exit 0
+
 if [ ! -d ${terraform_module_directory} ]
 then
     echo "#########################################################################################"
@@ -169,21 +170,11 @@ then
     echo "#                                                                                       #" 
     echo "#########################################################################################"
     echo ""
-    exit 1
+    exit -1
 fi
 
 ok_to_proceed=false
 new_deployment=false
-
-cat <<EOF > backend.tf
-####################################################
-# To overcome terraform issue                      #
-####################################################
-terraform {
-    backend "local" {}
-}
-
-EOF
 
  if [ ! -d ./.terraform/ ]; then
     echo "#########################################################################################"
@@ -204,7 +195,7 @@ else
         terraform init -upgrade=true -reconfigure $terraform_module_directory
         terraform refresh -var-file=${parameterfile} $terraform_module_directory
     else
-        exit 1
+        exit 0
     fi
  fi
 
@@ -226,3 +217,5 @@ echo "##########################################################################
 echo ""
 
 terraform apply ${approve} -var-file=${parameterfile} $terraform_module_directory
+
+exit 0

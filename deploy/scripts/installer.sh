@@ -28,6 +28,22 @@ function showhelp {
     echo "#########################################################################################"
 }
 
+function missing {
+    echo ""
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #" 
+    echo "#   Missing environment variables ("${option} " )!!!                         #"
+    echo "#                                                                                       #" 
+    echo "#   Please export the folloing variables:                                               #"
+    echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
+    echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
+    echo "#      REMOTE_STATE_RG (resource group name for storage account containing state files) #"
+    echo "#      REMOTE_STATE_SA (storage account for state file)                                 #"
+    echo "#                                                                                       #" 
+    echo "#########################################################################################"
+}
+
 show_help=false
 
 while getopts ":p:t:i:d:h" option; do
@@ -83,41 +99,41 @@ then
     if [ -n "$DEPLOYMENT_REPO_PATH" ]; then
         # Store repo path in ~/.sap_deployment_automation/config
         echo "DEPLOYMENT_REPO_PATH=${DEPLOYMENT_REPO_PATH}" >> $generic_config_information
-        config_stored=true
+        config_stored=1
     fi
     if [ -n "$ARM_SUBSCRIPTION_ID" ]; then
         # Store ARM Subscription info in ~/.sap_deployment_automation
         echo "ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}" >> $library_config_information
-        arm_config_stored=true
+        arm_config_stored=1
     fi
 else
     temp=`grep "DEPLOYMENT_REPO_PATH" $generic_config_information`
-    if [ $temp ]
+    if [ ! -z $temp ]
     then
         # Repo path was specified in ~/.sap_deployment_automation/config
         DEPLOYMENT_REPO_PATH=`echo $temp | cut -d= -f2`
-        config_stored=true
+        
+        config_stored=1
+    else
+        config_stored=0
     fi
 
     temp=`grep "REMOTE_STATE_RG" $library_config_information`
-    if [  $temp ]
+    if [ ! -z $temp ]
     then
-        # Remmote state storage group was specified in ~/.sap_deployment_automation library config
+        # Remote state storage group was specified in ~/.sap_deployment_automation library config
         REMOTE_STATE_RG=`echo $temp | cut -d= -f2`
-        config_stored=true
     fi
 
     temp=`grep "REMOTE_STATE_SA" $library_config_information`
-    if [ $temp ]
+    if [ ! -z $temp ]
     then
         # Remmote state storage group was specified in ~/.sap_deployment_automation library config
         REMOTE_STATE_SA=`echo $temp | cut -d= -f2`
-        config_stored=true
     fi
 
-
     temp=`grep "tfstate_resource_id" $library_config_information`
-    if [ $temp ]
+    if [ ! -z $temp ]
     then
         echo "tfstate_resource_id specified"
         tfstate_resource_id=`echo $temp | cut -d= -f2`
@@ -128,7 +144,7 @@ else
     fi
 
     temp=`grep "deployer_tfstate_key" $library_config_information`
-    if [ $temp ]
+    if [ ! -z $temp ]
     then
         # Deployer state was specified in ~/.sap_deployment_automation library config
         deployer_tfstate_key=`echo $temp | cut -d= -f2`
@@ -141,7 +157,7 @@ else
     fi
 
     temp=`grep "landscape_tfstate_key" $library_config_information`
-    if [ $temp ]
+    if [ ! -z $temp ]
     then
         # Landscape state was specified in ~/.sap_deployment_automation library config
         landscape_tfstate_key=`echo $temp | cut -d= -f2`
@@ -155,66 +171,27 @@ else
 fi
 
 if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
-    echo ""
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#   Missing environment variables (DEPLOYMENT_REPO_PATH)!!!                             #"
-    echo "#                                                                                       #" 
-    echo "#   Please export the folloing variables:                                               #"
-    echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
-    echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
-    echo "#      REMOTE_STATE_RG (resource group name for storage account containing state files) #"
-    echo "#      REMOTE_STATE_SA (storage account for state file)                                 #"
-    echo "#                                                                                       #" 
-    echo "#########################################################################################"
-    exit 4
+    option='$DEPLOYMENT_REPO_PATH'
+    missing
+    exit -1
 fi
 
 if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#   Missing environment variables (ARM_SUBSCRIPTION_ID)!!!                              #"
-    echo "#                                                                                       #" 
-    echo "#   Please export the folloing variables:                                               #"
-    echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
-    echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
-    echo "#      REMOTE_STATE_RG (resource group name for storage account containing state files) #"
-    echo "#      REMOTE_STATE_SA (storage account for state file)                                 #"
-    echo "#                                                                                       #" 
-    echo "#########################################################################################"
-    exit 3
+    option='$ARM_SUBSCRIPTION_ID'
+    missing
+    exit -1
 fi
 
 if [ ! -n "$REMOTE_STATE_RG" ]; then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#   Missing environment variables (REMOTE_STATE_RG)!!!                                  #"
-    echo "#   Please export the folloing variables:                                               #"
-    echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
-    echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
-    echo "#      REMOTE_STATE_RG (resource group name for storage account containing state files) #"
-    echo "#      REMOTE_STATE_SA (storage account for state file)                                 #"
-    echo "#                                                                                       #" 
-    echo "#########################################################################################"
-    exit 5
+    option='$REMOTE_STATE_RG'
+    missing
+    exit -1
 fi
 
 if [ ! -n "$REMOTE_STATE_SA" ]; then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#   Missing environment variables (REMOTE_STATE_SA)!!!                                  #"
-    echo "#   Please export the folloing variables:                                               #"
-    echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
-    echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
-    echo "#      REMOTE_STATE_RG (resource group name for storage account containing state files) #"
-    echo "#      REMOTE_STATE_SA (storage account for state file)                                 #"
-    echo "#                                                                                       #" 
-    echo "#########################################################################################"
-    exit 6
+    option='$REMOTE_STATE_SA'
+    missing
+    exit -1
 fi
 
 terraform_module_directory=${DEPLOYMENT_REPO_PATH}deploy/terraform/run/${deployment_system}/
@@ -233,7 +210,7 @@ then
     echo "#                                                                                       #" 
     echo "#########################################################################################"
     echo ""
-    exit 7
+    exit -1
 fi
 
 ok_to_proceed=false
@@ -387,7 +364,7 @@ if ! $new_deployment; then
         if [ $answer == 'Y' ]; then
             ok_to_proceed=true
         else
-            exit 1
+            exit -1
         fi
     else
         ok_to_proceed=true
@@ -425,3 +402,5 @@ then
         echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
     fi
 fi
+
+exit 0
