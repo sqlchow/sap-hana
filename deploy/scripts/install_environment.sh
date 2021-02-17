@@ -143,6 +143,34 @@ if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     exit 4
 fi
 
+# Check terraform
+tf=`terraform -version | grep Terraform`
+if [ ! -n "$tf" ]; then 
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #" 
+    echo "#                           Please install Terraform                                    #"
+    echo "#                                                                                       #" 
+    echo "#########################################################################################"
+    echo ""
+    rm stdout.az
+    exit -1
+fi
+
+az=`az version | grep azure-cli`
+if [ ! -n "$az" ]; then 
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #" 
+    echo "#                           Please install the Azure CLI                                #"
+    echo "#                                                                                       #" 
+    echo "#########################################################################################"
+    echo ""
+    rm stdout.az
+    exit -1
+fi
+
+
 # Helper variables
 deployer_dirname=`dirname $deployer_parameter_file`
 deployer_file_parametername=`basename $deployer_parameter_file`
