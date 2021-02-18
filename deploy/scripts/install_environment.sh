@@ -162,7 +162,7 @@ automation_config_directory=~/.sap_deployment_automation/
 deployer_dirname=`dirname $deployer_parameter_file`
 deployer_file_parametername=`basename $deployer_parameter_file`
 deployer_key=`echo $deployer_file_parametername | cut -d. -f1`
-deployer_config_information=${automation_config_directory}${key}
+deployer_config_information=${automation_config_directory}${deployer_key}
 
 library_dirname=`dirname $library_parameter_file`
 library_file_parametername=`basename $library_parameter_file`

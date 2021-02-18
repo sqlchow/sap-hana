@@ -67,7 +67,7 @@ if [ -n "$deployer_paramfile" ]; then
             environment_exists=0
         fi
         
-        temp=`grep "keyvault" $deployer_config_information`
+        temp=`grep "Keyvault" $deployer_config_information`
         if [ ! -z $temp ]
         then
             vaultname=`echo $temp | cut -d= -f2`
@@ -162,25 +162,21 @@ echo ""
 
 if [ $environment_exists  -eq 0 ]
     then
-    sed -i /Environment/d  $deployer_config_information
     echo "Environment=${environment}" >> ${deployer_config_information}
 fi
 
 if [ $vaultname_exists -eq 0 ]
     then
-    sed -i /keyvault/d  $deployer_config_information
-    echo "keyvault=${vaultname}" >> ${deployer_config_information}
+    echo "Keyvault=${vaultname}" >> ${deployer_config_information}
 fi
 
 if [ $client_id_exists -eq 0 ]
     then
-    sed -i /SPNAppID/d  $deployer_config_information
     echo "SPNAppID=${client_id}" >> ${deployer_config_information}
 fi
 
 if [ $tenant_exists -eq 0 ]
     then
-    sed -i /Tenant/d  $deployer_config_information
     echo "Tenant=${tenant}" >> ${deployer_config_information}
 fi
 

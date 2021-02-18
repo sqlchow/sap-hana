@@ -131,7 +131,6 @@ then
     ARM_SUBSCRIPTION_ID=$temp
     arm_config_stored=true
 else    
-    echo "No configuration"
     arm_config_stored=false
 fi
 
@@ -151,13 +150,12 @@ else
     if [  $arm_config_stored  == false ]
     then
         echo "Storing the configuration"
+        sed -i /ARM_SUBSCRIPTION_ID/d  $deployer_config_information
         echo "ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}" >> ${deployer_config_information}
     fi
 fi
 
 terraform_module_directory=${DEPLOYMENT_REPO_PATH}deploy/terraform/bootstrap/${deployment_system}/
-
-exit 0
 
 if [ ! -d ${terraform_module_directory} ]
 then
@@ -206,7 +204,7 @@ echo "#                             Running Terraform plan                      
 echo "#                                                                                       #" 
 echo "#########################################################################################"
 echo ""
-terraform plan -var-file=${parameterfile} $terraform_module_directory > plan_output.log
+terraform plan -var-file=${parameterfile} $terraform_module_directory 
 
 echo ""
 echo "#########################################################################################"
@@ -228,12 +226,14 @@ terraform {
 EOF
 
 kv_name=`terraform output deployer_kv_user_name | tr -d \"` 
+
 temp=`echo $kv_name | grep "Warning"`
 if [ -z $temp ]
 then
     temp=`echo $kv_name | grep "Backend reinitialization required"`
     if [ -z $temp ]
     then
+        sed -i /keyvault/d  $deployer_config_information
         echo "keyvault=${kv_name}" >> ${deployer_config_information}
     fi
 fi

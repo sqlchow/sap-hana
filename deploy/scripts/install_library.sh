@@ -226,9 +226,9 @@ echo ""
 
 if [ -n "$deployer_statefile_foldername" ]; then
     echo "Deployer folder specified: "$deployer_statefile_foldername
-    terraform plan -var-file=${parameterfile} -var deployer_statefile_foldername=${deployer_statefile_foldername} ${terraform_module_directory}  > plan_output.log
+    terraform plan -var-file=${parameterfile} -var deployer_statefile_foldername=${deployer_statefile_foldername} ${terraform_module_directory} 
 else
-    terraform plan -var-file=${parameterfile} $terraform_module_directory  > plan_output.log
+    terraform plan -var-file=${parameterfile} $terraform_module_directory
 fi
 
 echo ""
@@ -261,6 +261,7 @@ then
     temp=`echo $REMOTE_STATE_RG | grep "Backend reinitialization required"`
     if [ -z $temp ]
     then
+        sed -i /REMOTE_STATE_RG/d  $library_config_information
         echo "REMOTE_STATE_RG=${REMOTE_STATE_RG}" >> ${library_config_information}
     fi
 fi
@@ -272,6 +273,7 @@ then
     temp=`echo $REMOTE_STATE_SA | grep "Backend reinitialization required"`
     if [ -z $temp ]
     then
+        sed -i /REMOTE_STATE_SA/d  $library_config_information
         echo "REMOTE_STATE_SA=${REMOTE_STATE_SA}" >> ${library_config_information}
     fi
 fi
@@ -283,6 +285,7 @@ then
     temp=`echo $tfstate_resource_id | grep "Backend reinitialization required"`
     if [ -z $temp ]
     then
+        sed -i /tfstate_resource_id/d  $library_config_information
         echo "tfstate_resource_id=${tfstate_resource_id}" >> ${library_config_information}
     fi
 fi
