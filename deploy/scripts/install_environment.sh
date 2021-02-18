@@ -51,6 +51,22 @@ function showhelp {
     echo "#########################################################################################"
 }
 
+function missing {
+        echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #" 
+    echo "#   Missing :" ${missing_value}
+    echo "#                                                                                       #" 
+    echo "#   Usage: install_environment.sh                                                       #"
+    echo "#      -d deployer parameter file                                                       #"
+    echo "#      -l library parameter file                                                        #"
+    echo "#      -e environment parameter file                                                    #"
+    echo "#      -h Show help                                                                     #"
+    echo "#                                                                                       #" 
+    echo "#########################################################################################"
+
+}
+
 interactive=false
 
 while getopts ":d:l:e:h" option; do
@@ -67,51 +83,21 @@ while getopts ":d:l:e:h" option; do
     esac
 done
 if [ -z $deployer_parameter_file ]; then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#   Missing deployer parameter file!!!                                                  #"
-    echo "#                                                                                       #" 
-    echo "#   Usage: install_environment.sh                                                       #"
-    echo "#      -d deployer parameter file <--                                                   #"
-    echo "#      -l library parameter file                                                        #"
-    echo "#      -e environment parameter file                                                    #"
-    echo "#      -h Show help                                                                     #"
-    echo "#                                                                                       #" 
-    echo "#########################################################################################"
-    exit 20
+    missing_value='deployer parameter file'
+    missing
+    exit -1
 fi
 
 if [ -z $library_parameter_file ]; then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#   Missing library parameter file!!!                                                   #"
-    echo "#                                                                                       #" 
-    echo "#   Usage: install_environment.sh                                                       #"
-    echo "#      -d deployer parameter file                                                       #"
-    echo "#      -l library parameter file <--                                                    #"
-    echo "#      -e environment parameter file                                                    #"
-    echo "#      -h Show help                                                                     #"
-    echo "#                                                                                       #" 
-    echo "#########################################################################################"
-    exit 30
+    missing_value='library parameter file'
+    missing
+    exit -1
 fi
 
 if [ -z $environment_parameter_file ]; then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#   Missing environment parameter file!!!                                               #"
-    echo "#                                                                                       #" 
-    echo "#   Usage: install_environment.sh                                                       #"
-    echo "#      -d deployer parameter file                                                       #"
-    echo "#      -l library parameter file                                                        #"
-    echo "#      -e environment parameter file <--                                                #"
-    echo "#      -h Show help                                                                     #"
-    echo "#                                                                                       #" 
-    echo "#########################################################################################"
-    exit 40
+    missing_value='environment parameter file'
+    missing
+    exit -1
 fi
 
 if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
@@ -125,7 +111,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #" 
     echo "#########################################################################################"
-    exit 3
+    exit -1
 fi
 
 if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
@@ -140,7 +126,7 @@ if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #" 
     echo "#########################################################################################"
-    exit 4
+    exit -1
 fi
 
 # Check terraform
@@ -169,8 +155,14 @@ if [ ! -n "$az" ]; then
 fi
 
 # Helper variables
+
+automation_config_directory=~/.sap_deployment_automation/
+
+
 deployer_dirname=`dirname $deployer_parameter_file`
 deployer_file_parametername=`basename $deployer_parameter_file`
+deployer_key=`echo $deployer_file_parametername | cut -d. -f1`
+deployer_config_information=${automation_config_directory}${key}
 
 library_dirname=`dirname $library_parameter_file`
 library_file_parametername=`basename $library_parameter_file`
@@ -226,7 +218,15 @@ cd $curdir
 read -p "Do you want to specify the keyvault secrets Y/N?"  ans
 answer=${ans^^}
 if [ $answer == 'Y' ]; then
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/set_secrets.sh -i -d $deployer_file_parametername
+    temp=`grep "keyvault=" $deployer_config_information`
+    if [ ! -z $temp ]
+    then
+        # Key vault was specified in ~/.sap_deployment_automation in the deployer file
+        keyvault_name=`echo $temp | cut -d= -f2`
+        keyvault_param='-v $keyvault_name'
+    fi    
+
+    ${DEPLOYMENT_REPO_PATH}deploy/scripts/set_secrets.sh -i -d $deployer_file_parametername $keyvault_param
     if [ $? -eq 255 ]
         then
         exit $?

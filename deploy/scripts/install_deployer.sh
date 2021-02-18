@@ -218,4 +218,24 @@ echo ""
 
 terraform apply ${approve} -var-file=${parameterfile} $terraform_module_directory
 
+cat <<EOF > backend.tf
+####################################################
+# To overcome terraform issue                      #
+####################################################
+terraform {
+    backend "local" {}
+}
+EOF
+
+kv_name=`terraform output deployer_kv_user_name | tr -d \"` 
+temp=`echo $kv_name | grep "Warning"`
+if [ -z $temp ]
+then
+    temp=`echo $kv_name | grep "Backend reinitialization required"`
+    if [ -z $temp ]
+    then
+        echo "keyvault=${kv_name}" >> ${deployer_config_information}
+    fi
+fi
+
 exit 0
