@@ -44,7 +44,7 @@ Licensed under the MIT license.
     )
 
     Write-Host -ForegroundColor green ""
-    Write-Host -ForegroundColor green "Deploying the library"
+    Write-Host -ForegroundColor green "Bootstrap the library"
 
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
@@ -82,15 +82,25 @@ Licensed under the MIT license.
         $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
 
         if ("Y" -ne $ans) {
-            exit 0
+            return
         }
         else {
+            if (Test-Path ".\.terraform\terraform.tfstate" -PathType Leaf) {
+                $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
+
+                if ("azurerm" -eq $jsonData.backend.type) {
+                    Write-Host -ForegroundColor red "The state is already migrated to Azure"
+                    $ans = Read-Host -Prompt "Press any key to return"
+                    return
+                }
+            }
+
             $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
         }
-
+         
     }
     else {
-        $Command = " init -upgrade=true " + $terraform_module_directory
+        $Command = " init " + $terraform_module_directory
     }
 
     $Cmd = "terraform $Command"
@@ -107,12 +117,30 @@ Licensed under the MIT license.
         $Command = " plan -var-file " + $Parameterfile + " -var deployer_statefile_foldername=" + $DeployerFolderRelativePath + " " + $terraform_module_directory
     }
 
-
     $Cmd = "terraform $Command"
-    & ([ScriptBlock]::Create($Cmd)) 
+    $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+    
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
     }
+
+    $planResultsPlain = $planResults -replace '\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]', ''
+
+    if ( $planResultsPlain.Contains('Infrastructure is up-to-date')) {
+        Write-Host ""
+        Write-Host -ForegroundColor Green "Infrastructure is up to date"
+        Write-Host ""
+        return;
+    }
+
+    if ( $planResultsPlain.Contains('Plan: 0 to add, 0 to change, 0 to destroy')) {
+        Write-Host ""
+        Write-Host -ForegroundColor Green "Infrastructure is up to date"
+        Write-Host ""
+        return;
+    }
+
+    Write-Host $planResults
 
     Write-Host -ForegroundColor green "Running apply"
     if ($DeployerFolderRelativePath -eq "") {
@@ -157,5 +185,5 @@ Licensed under the MIT license.
 
     $iniContent | Out-IniFile -Force $filePath
 
-
+    Remove-Item -Path ".\backend.tf" -ItemType "file" -Force 
 }

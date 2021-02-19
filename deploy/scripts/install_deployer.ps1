@@ -38,16 +38,14 @@ Licensed under the MIT license.
     )
 
     Write-Host -ForegroundColor green ""
-    Write-Host -ForegroundColor green "Deploying the deployer"
+    Write-Host -ForegroundColor green "Bootstrap the deployer"
 
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
     $iniContent = Get-IniContent $filePath
 
-
     [IO.FileInfo] $fInfo = $Parameterfile
     $environmentname = ($fInfo.Name -split "-")[0]
-
 
     # Subscription
     $sub = $iniContent[$environmentname]["subscription"] 
@@ -78,12 +76,11 @@ Licensed under the MIT license.
         $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
 
         if ("Y" -ne $ans) {
-            exit 0
+            return
         }
         else {
             $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
         }
-
     }
     else {
         $Command = " init -upgrade=true " + $terraform_module_directory
@@ -99,16 +96,35 @@ Licensed under the MIT license.
     $Command = " plan -var-file " + $Parameterfile + " " + $terraform_module_directory
 
     $Cmd = "terraform $Command"
-    & ([ScriptBlock]::Create($Cmd)) 
+    $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+    
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
     }
 
-    Write-Host -ForegroundColor green "Running apply"
-    $Command = " apply -var-file " + $Parameterfile + " " + $terraform_module_directory
+    $planResultsPlain = $planResults -replace '\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]', ''
 
+    if ( $planResultsPlain.Contains('Infrastructure is up-to-date')) {
+        Write-Host ""
+        Write-Host -ForegroundColor Green "Infrastructure is up to date"
+        Write-Host ""
+        return;
+    }
+
+    if ( $planResultsPlain.Contains('Plan: 0 to add, 0 to change, 0 to destroy')) {
+        Write-Host ""
+        Write-Host -ForegroundColor Green "Infrastructure is up to date"
+        Write-Host ""
+        return;
+    }
+
+    Write-Host $planResults
+    
+    Write-Host -ForegroundColor green "Running apply"
+
+    $Command = " apply -var-file " + $Parameterfile + " " + $terraform_module_directory
     $Cmd = "terraform $Command"
-    & ([ScriptBlock]::Create($Cmd))  
+    & ([ScriptBlock]::Create($Cmd)) 
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
     }
@@ -119,12 +135,18 @@ Licensed under the MIT license.
 
     $Cmd = "terraform $Command"
     $kvName = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
     }
 
-    $iniContent[$environmentname]["Vault"] = $kvName
+    Write-Host $kvName.Replace("""", "")
+    $iniContent[$environmentname]["Vault"] = $kvName.Replace("""", "")
     $iniContent | Out-IniFile -Force $filePath
 
+    Remove-Item -Path ".\backend.tf" -ItemType "file" -Force 
+
+
 }
+
 

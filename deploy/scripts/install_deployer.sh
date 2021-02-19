@@ -183,6 +183,18 @@ else
     read -p "Do you want to continue with the deployment Y/N?"  ans
     answer=${ans^^}
     if [ $answer == 'Y' ]; then
+
+        if [ -f ./.terraform/terraform.tfstate ]; then
+            if grep "azurerm" ./.terraform/terraform.tfstate ; then
+                echo "#########################################################################################"
+                echo "#                                                                                       #" 
+                echo "#                     The state is already migrated to Azure!!!                         #"
+                echo "#                                                                                       #" 
+                echo "#########################################################################################"
+                return 0
+            fi
+        fi
+        
         terraform init -upgrade=true -reconfigure $terraform_module_directory
         terraform refresh -var-file=${parameterfile} $terraform_module_directory
     else

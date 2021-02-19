@@ -91,7 +91,7 @@ Licensed under the MIT license.
         $vault = $iniContent[$Environment]["Vault"]
         $spnid = $iniContent[$Environment]["Client_id"]
         $Tenant = $iniContent[$Environment]["Tenant"]
-        Set-Secrets -Environment $environmentname -VaultName $vault -Client_id $spnid -Tenant $Tenant
+        Set-Secrets -Environment $Environment -VaultName $vault -Client_id $spnid -Tenant $Tenant
     }
 
     $fileDir = $dirInfo.ToString() + $LibraryParameterfile
@@ -122,6 +122,8 @@ Licensed under the MIT license.
     Set-Location -Path $fInfo.Directory.FullName
 
     New-System -Parameterfile $fInfo.Name -Type "sap_landscape"
+
+    Set-Location -Path $curDir
 
 
 }
