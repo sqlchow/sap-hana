@@ -1,32 +1,41 @@
-<#
+function New-Deployer {
+    <#
+    .SYNOPSIS
+        Bootstrap a new deployer
 
-.SYNOPSIS
-    Provide the SPN secrets and store them in keyvault 
+    .DESCRIPTION
+        Bootstrap a new deployer
 
-.DESCRIPTION
-    The script saves the SPN credentials in the key vault.
+    .PARAMETER Parameterfile
+        This is the parameter file for the deployer
 
+    .EXAMPLE 
 
-.EXAMPLE
-    ./Install-Deployer.ps1 
+    #
+    #
+    # Import the module
+    Import-Module "SAPDeploymentUtilities.psd1"
+    New-Deployer -Parameterfile .\PROD-WEEU-MGMT00-INFRASTRUCTURE.json
 
-.LI
+    
+.LINK
+    https://github.com/Azure/sap-hana
 
 .NOTES
     v0.1 - Initial version
 
-#>
-<#
+.
+
+    #>
+    <#
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT license.
 #>
-function New-Deployer {
-    [OutputType([Bool])]
-
+    [cmdletbinding()]
     param(
         #Parameter file
         [Parameter(Mandatory = $true)][string]$Parameterfile
-         )
+    )
 
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Deploying the deployer"

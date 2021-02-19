@@ -1,28 +1,45 @@
-<#
+function New-System {
+    <#
+    .SYNOPSIS
+        Bootstrap a new system
 
-.SYNOPSIS
-    Deploy a component
+    .DESCRIPTION
+        Bootstrap a new system
 
-.DESCRIPTION
-    This script deploys a Terraform module
+    .PARAMETER Parameterfile
+        This is the parameter file for the system
 
+    .EXAMPLE 
 
-.EXAMPLE
-    ./Installer.ps1 
+    #
+    #
+    # Import the module
+    Import-Module "SAPDeploymentUtilities.psd1"
+    New-System -Parameterfile .\PROD-WEEU-SAP00-ZZZ.json -Type sap_system
 
-.LI
+    .EXAMPLE 
+
+    #
+    #
+    # Import the module
+    Import-Module "SAPDeploymentUtilities.psd1"
+    New-System -Parameterfile .\PROD-WEEU-SAP_LIBRARY.json -Type sap_library
+
+    
+.LINK
+    https://github.com/Azure/sap-hana
 
 .NOTES
     v0.1 - Initial version
 
-#>
-<#
+.
+
+    #>
+    <#
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT license.
 #>
-function New-System {
-    [OutputType([Bool])]
-
+    [cmdletbinding()]
     param(
         #Parameter file
         [Parameter(Mandatory = $true)][string]$Parameterfile ,

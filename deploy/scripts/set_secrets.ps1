@@ -1,7 +1,41 @@
 #>
 Function Set-Secrets {
-    [OutputType([Bool])]
+    <#
+    .SYNOPSIS
+        Sets the Secrets in Azure Keyvault
 
+    .DESCRIPTION
+        Sets the secrets in Azure Keyvault that are required for the deployment automation
+
+    .PARAMETER VirtualMachineName
+        This is the name of the Virtual Machine.
+
+    .PARAMETER ResourceGroupName
+        This is the name of the resource group .
+
+    .EXAMPLE 
+
+    #
+    #
+    # Import the module
+    Import-Module "SAPDeploymentUtilities.psd1"
+    Set-Secrets -Environment PROD -Client_id <appId> -VaultName <vaultname> -Client_secret <clientsecret> -Tenant <TenantID> 
+
+    
+.LINK
+    https://github.com/Azure/sap-hana
+
+.NOTES
+    v0.1 - Initial version
+
+.
+
+    #>
+    <#
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT license.
+#>
+    [cmdletbinding()]
     param(
         #Environment name
         [Parameter(Mandatory = $true)][string]$Environment,
@@ -98,3 +132,4 @@ Function Set-Secrets {
     Set-AzKeyVaultSecret -VaultName $v -Name $Secret_name -SecretValue $Secret
 
 }
+

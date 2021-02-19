@@ -1,26 +1,46 @@
-<#
+function New-Environment {
+    <#
+    .SYNOPSIS
+        Bootstrap a new SAP Environment (Deployer, Library and Workload VNet)
 
-.SYNOPSIS
-    Deploy a component
+    .DESCRIPTION
+        Bootstrap a new SAP Environment (Deployer, Library and Workload VNet)
 
-.DESCRIPTION
-    This script deploys a Terraform module
+    .PARAMETER DeployerParameterfile
+        This is the parameter file for the Deployer
+
+    .PARAMETER LibraryParameterfile
+        This is the parameter file for the library
+
+    .PARAMETER -EnvironmentParameterfile
+        This is the parameter file for the Workload VNet
 
 
-.EXAMPLE
-    ./Installer.ps1 
+    .EXAMPLE 
 
-.LI
+    #
+    #
+    # Import the module
+    Import-Module "SAPDeploymentUtilities.psd1"
+     New-Environment -DeployerParameterfile .\DEPLOYER\PROD-WEEU-DEP00-INFRASTRUCTURE\PROD-WEEU-DEP00-INFRASTRUCTURE.json \
+     -LibraryParameterfile .\LIBRARY\PROD-WEEU-SAP_LIBRARY\PROD-WEEU-SAP_LIBRARY.json \
+     -EnvironmentParameterfile .\LANDSCAPE\PROD-WEEU-SAP00-INFRASTRUCTURE\PROD-WEEU-SAP00-INFRASTRUCTURE.json
+
+    
+.LINK
+    https://github.com/Azure/sap-hana
 
 .NOTES
     v0.1 - Initial version
 
-#>
-<#
+.
+
+    #>
+    <#
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT license.
 #>
-Function New-Environment() {
+    [cmdletbinding()]
     param(
         #Parameter file
         [Parameter(Mandatory = $true)][string]$DeployerParameterfile,
@@ -63,7 +83,8 @@ Function New-Environment() {
     $iniContent | Out-IniFile -Force $filePath
 
     Set-Location -Path $fInfo.Directory.FullName
-    #New-Deployer -Parameterfile $fInfo.Name
+    
+    New-Deployer -Parameterfile $fInfo.Name 
 
     $ans = Read-Host -Prompt "Do you want to enter the Keyvault secrets Y/N?"
     if ("Y" -eq $ans) {
@@ -77,14 +98,14 @@ Function New-Environment() {
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
 
-    #New-Library -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerRelativePath
+    New-Library -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerRelativePath
 
     Set-Location -Path $curDir
     $fileDir = $dirInfo.ToString() + $DeployerParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
 
-    #New-System -Parameterfile $fInfo.Name -Type "sap_deployer"
+    New-System -Parameterfile $fInfo.Name -Type "sap_deployer"
 
     Set-Location -Path $curDir
 

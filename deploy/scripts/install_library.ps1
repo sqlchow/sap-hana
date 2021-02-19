@@ -1,31 +1,46 @@
-<#
+function New-Library {
+    <#
+    .SYNOPSIS
+        Bootstrap a new SAP Library
 
-.SYNOPSIS
-    Provide the SPN secrets and store them in keyvault 
+    .DESCRIPTION
+        Bootstrap a new SAP Library
 
-.DESCRIPTION
-    The script saves the SPN credentials in the key vault.
+    .PARAMETER Parameterfile
+        This is the parameter file for the library
+
+    .PARAMETER DeployerFolderRelativePath
+        This is the relative folder path to the folder containing the deployerparameter terraform.tfstate file
 
 
-.EXAMPLE
-    ./Save-Secrets.ps1 
+    .EXAMPLE 
 
-.LI
+    #
+    #
+    # Import the module
+    Import-Module "SAPDeploymentUtilities.psd1"
+    New-Library -Parameterfile .\PROD-WEEU-SAP_LIBRARY.json -DeployerFolderRelativePath ..\..\DEPLOYER\PROD-WEEU-DEP00-INFRASTRUCTURE\
+
+    
+.LINK
+    https://github.com/Azure/sap-hana
 
 .NOTES
     v0.1 - Initial version
 
-#>
-<#
+.
+
+    #>
+    <#
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT license.
 #>
-function New-Library {
+    [cmdletbinding()]
     param(
         #Parameter file
-        [Parameter(Mandatory = $true)][string]$Parameterfile = "",
+        [Parameter(Mandatory = $true)][string]$Parameterfile,
         #Deployer parameterfile
-        [Parameter(Mandatory = $true)][string]$DeployerFolderRelativePath = ""
+        [Parameter(Mandatory = $true)][string]$DeployerFolderRelativePath
     )
 
     Write-Host -ForegroundColor green ""
