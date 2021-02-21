@@ -86,6 +86,9 @@ Licensed under the MIT license.
     
     New-Deployer -Parameterfile $fInfo.Name 
 
+    # Re-read the ini file
+    $iniContent = Get-IniContent $filePath
+
     $ans = Read-Host -Prompt "Do you want to enter the Keyvault secrets Y/N?"
     if ("Y" -eq $ans) {
         $vault = $iniContent[$Environment]["Vault"]

@@ -59,11 +59,13 @@ Licensed under the MIT license.
     # Subscription
     $sub = $iniContent[$Environment]["Subscription"]
 
-    Write-Host $Environment
-    Write-Host $iniContent[$Environment]["Subscription"]
+    Write-Host "Setting the secrets for " $Environment
 
     # Read keyvault
     $v = $iniContent[$Environment]["Vault"]
+
+    Write-Host $v
+
 
     if ($VaultName -eq "") {
         if ($v -eq "" -or $null -eq $v) {

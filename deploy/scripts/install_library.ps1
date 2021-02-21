@@ -78,29 +78,20 @@ Licensed under the MIT license.
 
     Write-Host -ForegroundColor green "Initializing Terraform"
 
+    $Command = " init -upgrade=true " + $terraform_module_directory
     if (Test-Path ".terraform" -PathType Container) {
-        $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
+        $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
 
-        if ("Y" -ne $ans) {
-            return
-        }
-        else {
-            if (Test-Path ".\.terraform\terraform.tfstate" -PathType Leaf) {
-                $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
-
-                if ("azurerm" -eq $jsonData.backend.type) {
-                    Write-Host -ForegroundColor red "The state is already migrated to Azure"
-                    $ans = Read-Host -Prompt "Press any key to return"
-                    return
-                }
+        if ("azurerm" -eq $jsonData.backend.type) {
+            Write-Host -ForegroundColor green "State file already migrated to Azure!"
+            $ans = Read-Host -Prompt "State is already migrated to Azure. Do you want to re-initialize the deployer Y/N?"
+            if ("Y" -ne $ans) {
+                return
             }
-
-            $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
+            else {
+                $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
+            }
         }
-         
-    }
-    else {
-        $Command = " init " + $terraform_module_directory
     }
 
     $Cmd = "terraform $Command"
@@ -185,5 +176,8 @@ Licensed under the MIT license.
 
     $iniContent | Out-IniFile -Force $filePath
 
-    Remove-Item -Path ".\backend.tf" -ItemType "file" -Force 
+    if (Test-Path ".\backend.tf" -PathType Leaf) {
+        Remove-Item -Path ".\backend.tf" -Force 
+    }
+
 }

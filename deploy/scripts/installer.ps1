@@ -207,4 +207,9 @@ Licensed under the MIT license.
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
     }
+
+    if (Test-Path ".\backend.tf" -PathType Leaf) {
+        Remove-Item -Path ".\backend.tf"  -Force 
+    }
+
 }
