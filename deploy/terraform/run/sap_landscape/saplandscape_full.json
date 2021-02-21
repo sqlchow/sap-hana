@@ -3,7 +3,7 @@
     "deployer_tfstate_key": "",
     "infrastructure": {
         "environment": "np",
-        "region": "eastus",
+        "region": "westeurope",
         "resource_group": {
             "arm_id": "",
             "name": "azure-test-saplandscape-rg"
