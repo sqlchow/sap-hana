@@ -15,10 +15,11 @@ Description:
 
 provider "azurerm" {
   features {}
-  subscription_id = local.spn.subscription_id
-  client_id       = local.spn.client_id
-  client_secret   = local.spn.client_secret
-  tenant_id       = local.spn.tenant_id
+  
+  subscription_id = var.use_spn ? local.spn.subscription_id : null
+  client_id       = var.use_spn ? local.spn.client_id: null
+  client_secret   = var.use_spn ? local.spn.client_secret: null
+  tenant_id       = var.use_spn ? local.spn.tenant_id: null
 }
 
 provider "azurerm" {

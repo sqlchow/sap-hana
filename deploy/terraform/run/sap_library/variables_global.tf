@@ -59,3 +59,9 @@ variable "key_vault" {
   description = "Import existing Azure Key Vaults"
   default     = {}
 }
+
+variable "use_spn" {
+  description = "Control if the automation uses an SPN"
+  default = true
+}
+

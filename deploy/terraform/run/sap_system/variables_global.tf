@@ -96,3 +96,9 @@ variable "authentication" {
   default = {
   }
 }
+
+variable "use_spn" {
+  description = "Control if the automation uses an SPN"
+  default = true
+}
+

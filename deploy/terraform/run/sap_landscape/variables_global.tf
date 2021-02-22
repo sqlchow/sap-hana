@@ -62,3 +62,10 @@ variable "diagnostics_storage_account" {
     arm_id = ""
   }
 }
+
+variable "use_spn" {
+  description = "Control if the automation uses an SPN"
+  default = true
+  
+}
+
