@@ -20,7 +20,7 @@ locals {
     client_id       = local.spn.client_id,
     client_secret   = local.spn.client_secret,
     tenant_id       = local.spn.tenant_id,
-    object_id       = try(data.azuread_service_principal[0].sp.id, null)
+    object_id       = try(data.azuread_service_principal.sp.id[0], null)
   }
 
 }
