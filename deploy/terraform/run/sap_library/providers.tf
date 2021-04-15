@@ -15,10 +15,10 @@ Description:
 
 provider "azurerm" {
   features {}
-  subscription_id = local.spn.subscription_id
-  client_id       = local.spn.client_id
-  client_secret   = local.spn.client_secret
-  tenant_id       = local.spn.tenant_id
+  subscription_id = local.use_deployer ? local.spn.subscription_id : null
+  client_id       = local.use_deployer ? local.spn.client_id : null
+  client_secret   = local.use_deployer ? local.spn.client_secret : null
+  tenant_id       = local.use_deployer ? local.spn.tenant_id : null
 }
 
 provider "azurerm" {
@@ -27,9 +27,9 @@ provider "azurerm" {
 }
 
 provider "azuread" {
-  client_id     = local.spn.client_id
-  client_secret = local.spn.client_secret
-  tenant_id     = local.spn.tenant_id
+  client_id     = local.use_deployer ? local.spn.client_id : null
+  client_secret = local.use_deployer ? local.spn.client_secret : null
+  tenant_id     = local.use_deployer ? local.spn.tenant_id : null
 }
 
 terraform {
