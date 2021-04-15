@@ -45,5 +45,6 @@ data "azurerm_key_vault_secret" "tenant_id" {
 
 // Import current service principal
 data "azuread_service_principal" "sp" {
+  count          = local.use_deployer ? 1 : 0
   application_id = local.spn.client_id
 }

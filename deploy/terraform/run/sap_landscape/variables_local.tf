@@ -26,14 +26,14 @@ variable "tfstate_resource_id" {
 
 variable "deployer_tfstate_key" {
   description = "The key of deployer's remote tfstate file"
-  default = ""
+  default     = ""
 
 }
 
 locals {
 
   version_label = trimspace(file("${path.module}/../../../configs/version.txt"))
-  
+
   // The environment of sap landscape and sap system
   environment = upper(try(var.infrastructure.environment, ""))
 
@@ -69,10 +69,10 @@ locals {
   spn_key_vault_arm_id = try(var.key_vault.kv_spn_id, try(data.terraform_remote_state.deployer[0].outputs.deployer_kv_user_arm_id, ""))
 
   spn = {
-    subscription_id = data.azurerm_key_vault_secret.subscription_id.value,
-    client_id       = data.azurerm_key_vault_secret.client_id.value,
-    client_secret   = data.azurerm_key_vault_secret.client_secret.value,
-    tenant_id       = data.azurerm_key_vault_secret.tenant_id.value,
+    subscription_id = !try(var.options.nospn, false) ? data.azurerm_key_vault_secret.subscription_id[0].value : null,
+    client_id       = !try(var.options.nospn, false) ? data.azurerm_key_vault_secret.client_id[0].value : null,
+    client_secret   = !try(var.options.nospn, false) ? data.azurerm_key_vault_secret.client_secret[0].value : null,
+    tenant_id       = !try(var.options.nospn, false) ? data.azurerm_key_vault_secret.tenant_id[0].value : null,
   }
 
   service_principal = {
@@ -80,6 +80,6 @@ locals {
     client_id       = local.spn.client_id,
     client_secret   = local.spn.client_secret,
     tenant_id       = local.spn.tenant_id,
-    object_id       = data.azuread_service_principal.sp.id
+    object_id       = !try(var.options.nospn, false) ? data.azuread_service_principal.sp[0].id : null
   }
 }
