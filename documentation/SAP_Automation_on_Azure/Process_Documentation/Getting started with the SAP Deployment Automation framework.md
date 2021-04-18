@@ -64,7 +64,7 @@ From a privilaged account, create an Service Principal. Use a descriptive name t
     }
  ```
 
-3. Add Role Assignment to SPN.
+3. Add User Access Administrator Role Assignment to SPN.
 
    ```bash
    az role assignment create --assignee <appId> --role "User Access Administrator"
@@ -75,6 +75,8 @@ From a privilaged account, create an Service Principal. Use a descriptive name t
 The Terraform automation templates are hosted in the public sap-hana github repository. In most cases customers should treat this folder as read only.
 
 The deployment automation leverages json parameter files to configure the Azure environment. It is highly recommended that these parameter files would be stored in the customers source control environment. For more details on how to optimally structure the folder hierarchy for the deployment parameter files see [Folder hierarchy](./Deployment_folder_structure.md). Having the parameter files in a predefined folder structure will simplify automated deployment operations.
+
+**Note! The json parameter name will become the terraform state file name so the file names need to be unique.
 
 The default deployment model of the SAP Deployment Automation Framework will deploy an Azure Virtual Machine that can be used to execute the deployment activities, future versions of the framework will provide means to use other execution environment as well (Azure DevOps)
 
@@ -99,7 +101,7 @@ The automation also supports having the deployment environment and the SAP Libra
 
 - Which Azure regions are in scope?
 
-#### **Deployment environment** ####
+#### **Deployment environment services** ####
 
 The deployment environment provides the following services
 
@@ -114,13 +116,13 @@ The deployment configuration file defines the region and the environment name an
    ```json
    {
       "infrastructure": {
-         "region": "westeurope",
-         "environment": "MGMT",
+         "region"                      : "westeurope",
+         "environment"                 : "MGMT",
          "vnets": {
                "management": {
-                  "address_space": "10.10.20.0/25",
+                  "address_space"      : "10.10.20.0/25",
                   "subnet_mgmt": {
-                     "prefix": "10.10.20.64/28"
+                     "prefix"          : "10.10.20.64/28"
                   }
                }
          }
@@ -148,16 +150,16 @@ The SAP Library configuration file defines the region and the environment name .
 ```json
    {
       "infrastructure": {
-         "region": "westeurope",
-         "environment": "MGMT",
+         "region"                   : "westeurope",
+         "environment"              : "MGMT",
          "resource_group": {
-            "name" : "WEEU-SAP_LIBRARY"
+            "name"                  : "WEEU-MGMT-SAP_LIBRARY"
          }
       },
       "deployer": {
-         "environment": "MGMT",
-         "region": "westeurope",
-         "vnet": "MGMT00"
+         "environment"              : "MGMT",
+         "region"                   : "westeurope",
+         "vnet"                     : "MGMT00"
       }
    }
 ```
@@ -205,15 +207,15 @@ The Workload Zone configuration file defines the region and the environment name
 ```json
    {
       "authentication": {
-         "username": "azureadm"
+         "username"                 : "azureadm"
       },
       "infrastructure": {
-         "environment": "DEV",
-         "region": "westeurope",
+         "environment"              : "DEV",
+         "region"                   : "westeurope",
          "vnets": {
                "sap": {
-                  "name" :"SAP01",
-                  "address_space": "10.110.0.0/24"
+                  "name"            : "SAP01",
+                  "address_space"   : "10.110.0.0/24"
                }
          }
       }
@@ -269,7 +271,7 @@ This step deploys the actual infrastructure for the SAP System (SID)
 
 The repository contains a folder [WORKSPACES](WORKSPACES) that has a set of sample parameter files that can be used to deploy the supporting components and the SAP System. The folder structure is documented here: [Deployment folder structure](Deployment_folder_structure.md)
 
-The name of the environment is **DEV** and it is deployed to West Europe. The SID of the application is ZZZ.
+The name of the environment is **DEV** and it is deployed to West Europe. The SID of the application is X00.
 
 The sample deployment will create a deployment environment, the shared library for state management, the workload virtual network and a SAP system.
 
