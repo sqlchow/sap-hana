@@ -1,5 +1,6 @@
 // AVAILABILITY SET
 resource "azurerm_availability_set" "hdb" {
+  provider                     = azurerm.main
   count                        = local.enable_deployment && local.use_avset && !local.availabilitysets_exist ? max(length(local.zones), 1) : 0
   name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.db_avset_names[count.index])
   location                     = var.resource_group[0].location

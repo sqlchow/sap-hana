@@ -12,22 +12,18 @@ output "sapbits_sa_resource_group_name" {
 }
 
 output "storagecontainer_tfstate" {
-  sensitive = true
   value     = module.sap_library.storagecontainer_tfstate
 }
 
 output "storagecontainer_sapbits_name" {
-  sensitive = true
   value     = module.sap_library.storagecontainer_sapbits_name
 }
 
 output "fileshare_sapbits_name" {
-  sensitive = true
   value     = module.sap_library.fileshare_sapbits_name
 }
 
 output "library_user_key_vault_name" {
-  sensitive = true
   value     = module.sap_library.library_user_key_vault_name
 }
 
@@ -56,7 +52,7 @@ output "saplibrary_environment" {
 }
 
 output "saplibrary_subscription_id" {
-  value = local.spn.subscription_id
+  value = local.use_deployer ? local.spn.subscription_id : local.account.subscription_id
 }
 
 output "tfstate_resource_id" {

@@ -3,6 +3,8 @@
       Import deployer resources
 */
 
+data "azurerm_client_config" "current" {}
+
 data "terraform_remote_state" "deployer" {
   backend = "azurerm"
   count   = length(var.deployer_tfstate_key) > 0 || local.use_deployer ? 1 : 0
@@ -16,7 +18,6 @@ data "terraform_remote_state" "deployer" {
 }
 
 data "azurerm_key_vault_secret" "subscription_id" {
-  count        = local.use_deployer ? 1 : 0
   provider     = azurerm.deployer
   name         = format("%s-subscription-id", upper(var.infrastructure.environment))
   key_vault_id = local.spn_key_vault_arm_id

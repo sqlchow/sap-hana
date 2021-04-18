@@ -3,6 +3,8 @@
   Set up key vault for sap library 
 */
 
+
+
 // Create private KV with access policy
 resource "azurerm_key_vault" "kv_prvt" {
   count                      = local.prvt_kv_exist ? 0 : 1

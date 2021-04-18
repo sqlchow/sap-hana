@@ -187,6 +187,7 @@ resource "azurerm_lb_rule" "fs" {
 
 # Create the SCS Availability Set
 resource "azurerm_availability_set" "scs" {
+  provider                     = azurerm.main
   count                        = local.enable_deployment && local.use_scs_avset ? max(length(local.scs_zones), 1) : 0
   name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.scs_avset_names[count.index])
   location                     = var.resource_group[0].location
@@ -240,10 +241,10 @@ resource "azurerm_lb" "web" {
 }
 
 resource "azurerm_lb_backend_address_pool" "web" {
-  provider            = azurerm.main
-  count               = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
-  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_bepool)
-  loadbalancer_id     = azurerm_lb.web[0].id
+  provider        = azurerm.main
+  count           = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
+  name            = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_bepool)
+  loadbalancer_id = azurerm_lb.web[0].id
 }
 
 //TODO: azurerm_lb_probe
@@ -274,6 +275,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "web" {
 
 # Create the Web dispatcher Availability Set
 resource "azurerm_availability_set" "web" {
+  provider                     = azurerm.main
   count                        = local.enable_deployment && local.use_web_avset ? max(length(local.web_zones), 1) : 0
   name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.web_avset_names[count.index])
   location                     = var.resource_group[0].location

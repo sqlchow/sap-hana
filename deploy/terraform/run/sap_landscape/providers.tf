@@ -14,10 +14,10 @@
 
 provider "azurerm" {
   features {}
-  subscription_id = !try(var.options.nospn, false) ? local.spn.subscription_id : null
-  client_id       = !try(var.options.nospn, false) ? local.spn.client_id : null
-  client_secret   = !try(var.options.nospn, false) ? local.spn.client_secret : null
-  tenant_id       = !try(var.options.nospn, false) ? local.spn.tenant_id : null
+  subscription_id = local.spn.subscription_id
+  client_id       = local.use_spn ? local.spn.client_id : null
+  client_secret   = local.use_spn ? local.spn.client_secret : null
+  tenant_id       = local.use_spn ? local.spn.tenant_id : null
   alias           = "main"
 }
 
@@ -27,9 +27,9 @@ provider "azurerm" {
 }
 
 provider "azuread" {
-  client_id     = local.spn.client_id
-  client_secret = local.spn.client_secret
-  tenant_id     = local.spn.tenant_id
+  client_id     = local.use_spn ? local.spn.client_id : null
+  client_secret = local.use_spn ? local.spn.client_secret : null
+  tenant_id     = local.use_spn ? local.spn.tenant_id : null
 }
 
 terraform {

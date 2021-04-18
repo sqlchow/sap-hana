@@ -15,7 +15,7 @@ Description:
 
 provider "azurerm" {
   features {}
-  subscription_id = local.use_deployer ? local.spn.subscription_id : null
+  subscription_id = local.spn.subscription_id 
   client_id       = local.use_deployer ? local.spn.client_id : null
   client_secret   = local.use_deployer ? local.spn.client_secret : null
   tenant_id       = local.use_deployer ? local.spn.tenant_id : null
