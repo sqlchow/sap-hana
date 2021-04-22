@@ -23,9 +23,9 @@ function showhelp {
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
-    echo "#   [REPO-ROOT]deploy/scripts/install_deployer.sh \                                     #"
+    echo "#   [REPO-ROOT]deploy/scripts/remover.sh \                                     #"
     echo "#      -p PROD-WEEU-DEP00-INFRASTRUCTURE.json \                                         #"
-    echo "#      -i true                                                                          #"
+    echo "#      -t deployer                                                                          #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
