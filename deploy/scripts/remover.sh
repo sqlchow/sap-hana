@@ -154,7 +154,7 @@ fi
 automation_config_directory=~/.sap_deployment_automation/
 generic_config_information="${automation_config_directory}"config
 system_config_information="${automation_config_directory}""${environment}""${region}"
-#Plugins
+#Plugins(This folder is not available)
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
 then
     mkdir "$HOME/.terraform.d/plugin-cache"
