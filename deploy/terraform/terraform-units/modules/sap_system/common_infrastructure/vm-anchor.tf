@@ -35,15 +35,15 @@ resource "azurerm_linux_virtual_machine" "anchor" {
   ]
   size = local.anchor_size
 
-  admin_username                  = var.sid_username
-  admin_password                  = var.deployment == "new" ? var.sid_password : (local.enable_auth_key ? null : var.sid_password)
-  disable_password_authentication = var.deployment == "new" ? false : !local.enable_auth_password
+  admin_username                  = local.sid_auth_username
+  admin_password                  = var.deployment == "new" ? local.sid_auth_password : (local.enable_anchor_auth_key ? null : local.sid_auth_password)
+  disable_password_authentication = var.deployment == "new" ? false : !local.enable_anchor_auth_password
 
   dynamic "admin_ssh_key" {
-    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_anchor_auth_password ? 0 : 1))
     content {
-      username   = var.sid_username
-      public_key = var.sdu_public_key
+      username   = local.sid_auth_username
+      public_key = local.sid_public_key
     }
   }
 
