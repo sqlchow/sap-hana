@@ -45,6 +45,8 @@ module "common_infrastructure" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   authentication             = var.authentication
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
 }
 
 // Create HANA database nodes
@@ -73,6 +75,8 @@ module "hdb_node" {
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   sap_sid                    = local.sap_sid
   db_asg_id                  = module.common_infrastructure.db_asg_id
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
 }
 
 // Create Application Tier nodes
@@ -102,6 +106,8 @@ module "app_tier" {
   firewall_id                = module.common_infrastructure.firewall_id
   sap_sid                    = local.sap_sid
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
 
 }
 

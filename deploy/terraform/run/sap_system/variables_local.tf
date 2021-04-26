@@ -51,6 +51,16 @@ variable "landscape_tfstate_key" {
 
 }
 
+variable "deployment" {
+  description = "The type of deployment"
+  default = "update"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+  default = ""
+}
+
 locals {
 
   version_label = trimspace(file("${path.module}/../../../configs/version.txt"))

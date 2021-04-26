@@ -423,6 +423,10 @@ then
     account_set=1
 fi
 
+# This is used to tell Terraform if this is a new deployment or an update
+deployment_parameter=""
+# This is used to tell Terraform the version information from the state file
+version_parameter=""
 if [ ! -d ./.terraform/ ];
 then
     terraform -chdir="${terraform_module_directory}" init -upgrade=true -force-copy \
@@ -431,6 +435,8 @@ then
     --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
     --backend-config "container_name=tfstate" \
     --backend-config "key=${key}.terraform.tfstate"
+    deployment_parameter=" -var deployment=new "
+
 else
     temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
     if [ ! -z "${temp}" ]
@@ -487,6 +493,11 @@ then
         echo "#                                   New deployment                                      #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
+        deployment_parameter=" -var deployment=new "
+
+        
+        
+
     else
         echo ""
         echo "#########################################################################################"
@@ -495,7 +506,6 @@ then
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
-
 
         deployed_using_version=$(terraform -chdir="${terraform_module_directory}" output automation_version)
 
@@ -520,7 +530,8 @@ then
                 exit 1
             fi
         else
-            
+            version_parameter=" -var terraform_template_version="${deployed_using_version}"" "
+                    
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
@@ -546,14 +557,7 @@ then
     rm plan_output.log
 fi
 
-
-echo "${tfstate_parameter}"
-echo "${landscape_tfstate_key_parameter}"
-echo "${deployer_tfstate_key_parameter}"
-echo "${extra_vars}"
-
-allParams=$(printf " -var-file=%s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}")
-echo $allParams
+allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
 
 terraform -chdir="$terraform_module_directory" plan -no-color $allParams  
 str1=$(grep "Error: " error.log)
@@ -646,8 +650,7 @@ if [ $ok_to_proceed ]; then
     echo "#########################################################################################"
     echo ""
 
-    allParams=$(printf " -var-file=%s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}")
-
+    allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
     
     terraform -chdir="${terraform_module_directory}" apply "${approve}" $allParams  2>error.log
  

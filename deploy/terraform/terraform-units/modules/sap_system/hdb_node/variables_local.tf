@@ -66,6 +66,13 @@ variable "db_asg_id" {
   description = "Database Application Security Group"
 }
 
+variable "deployment" {
+  description = "The type of deployment"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+}
 
 
 locals {

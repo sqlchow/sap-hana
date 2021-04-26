@@ -97,13 +97,25 @@ resource "azurerm_network_interface" "nics_dbnodes_storage" {
 
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm_dbnode" {
-  provider            = azurerm.main
-  depends_on          = [var.anchor_vm]
-  count               = local.enable_deployment ? length(local.hdb_vms) : 0
-  name                = local.hdb_vms[count.index].name
-  computer_name       = local.hdb_vms[count.index].computername
-  location            = var.resource_group[0].location
-  resource_group_name = var.resource_group[0].name
+  provider                        = azurerm.main
+  depends_on                      = [var.anchor_vm]
+  count                           = local.enable_deployment ? length(local.hdb_vms) : 0
+  name                            = local.hdb_vms[count.index].name
+  computer_name                   = local.hdb_vms[count.index].computername
+  resource_group_name             = var.resource_group[0].name
+  location                        = var.resource_group[0].location
+
+  admin_username                  = var.sid_username
+  admin_password                  = var.deployment == "new" ? var.sid_password : (local.enable_auth_key ? null : var.sid_password)
+  disable_password_authentication = var.deployment == "new" ? false : !local.enable_auth_password
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
 
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
 
@@ -123,10 +135,7 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     azurerm_network_interface.nics_dbnodes_db[count.index].id,
     azurerm_network_interface.nics_dbnodes_admin[count.index].id]
   )
-  size                            = lookup(try(local.sizes.db, local.sizes), local.hdb_vms[count.index].size).compute.vm_size
-  admin_username                  = var.sid_username
-  admin_password                  = local.enable_auth_key ? null : var.sid_password
-  disable_password_authentication = !local.enable_auth_password
+  size = lookup(try(local.sizes.db, local.sizes), local.hdb_vms[count.index].size).compute.vm_size
 
   dynamic "os_disk" {
     iterator = disk
@@ -149,15 +158,7 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
       publisher = local.hdb_vms[count.index].os.publisher
       offer     = local.hdb_vms[count.index].os.offer
       sku       = local.hdb_vms[count.index].os.sku
-      version   = try(local.hdb_vms[count.index].os.version,"latest")
-    }
-  }
-
-  dynamic "admin_ssh_key" {
-    for_each = range(local.enable_auth_password ? 0 : 1)
-    content {
-      username   = var.sid_username
-      public_key = var.sdu_public_key
+      version   = try(local.hdb_vms[count.index].os.version, "latest")
     }
   }
 

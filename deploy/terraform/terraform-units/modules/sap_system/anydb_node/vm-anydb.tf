@@ -61,13 +61,26 @@ resource "azurerm_network_interface" "anydb_admin" {
 
 // Section for Linux Virtual machine 
 resource "azurerm_linux_virtual_machine" "dbserver" {
-  provider            = azurerm.main
-  depends_on          = [var.anchor_vm]
-  count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? local.db_server_count : 0) : 0
-  name                = local.anydb_vms[count.index].name
-  computer_name       = local.anydb_vms[count.index].computername
-  resource_group_name = var.resource_group[0].name
-  location            = var.resource_group[0].location
+  provider                        = azurerm.main
+  depends_on                      = [var.anchor_vm]
+  count                           = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? local.db_server_count : 0) : 0
+  name                            = local.anydb_vms[count.index].name
+  computer_name                   = local.anydb_vms[count.index].computername
+  resource_group_name             = var.resource_group[0].name
+  location                        = var.resource_group[0].location
+
+  admin_username                  = var.sid_username
+  admin_password                  = var.deployment == "new" ? var.sid_password : (local.enable_auth_key ? null : var.sid_password)
+  disable_password_authentication = var.deployment == "new" ? false : !local.enable_auth_password
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
+
 
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
 
@@ -113,19 +126,6 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
       disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
-
-  admin_username                  = var.sid_username
-  admin_password                  = local.enable_auth_key ? null : var.sid_password
-  disable_password_authentication = !local.enable_auth_password
-
-  dynamic "admin_ssh_key" {
-    for_each = range(local.enable_auth_password ? 0 : 1)
-    content {
-      username   = var.sid_username
-      public_key = var.sdu_public_key
-    }
-  }
-
   additional_capabilities {
     ultra_ssd_enabled = local.enable_ultradisk
   }

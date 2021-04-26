@@ -55,6 +55,7 @@ function New-SAPAutomationRegion {
      -Client_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
      -Client_secret ************************
      -Tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz  
+     -Silent
                    
 
 
