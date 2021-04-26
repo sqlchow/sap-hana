@@ -136,6 +136,9 @@ module "anydb_node" {
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   sap_sid                    = local.sap_sid
   db_asg_id                  = module.common_infrastructure.db_asg_id
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
+
 }
 
 // Generate output files
