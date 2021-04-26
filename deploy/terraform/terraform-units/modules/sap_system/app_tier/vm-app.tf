@@ -85,8 +85,8 @@ resource "azurerm_linux_virtual_machine" "app" {
 
   size                            = length(local.app_size) > 0 ? local.app_size : local.app_sizing.compute.vm_size
   admin_username                  = var.sid_username
-  admin_password                  = var.deployment == "new" ? var.sid_password : (local.enable_auth_key ? null : var.sid_password)
-  disable_password_authentication = var.deployment == "new" ? false : !local.enable_auth_password
+  admin_password                  = local.enable_auth_key ? null : var.sid_password
+  disable_password_authentication = !local.enable_auth_password
 
   dynamic "admin_ssh_key" {
     for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))

@@ -287,18 +287,18 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
-        if !try(storage_type.growth, false)
+        if !try(storage_type.append, false)
       ]
       if storage_type.name != "os"
     ]
   ) : []
 
 
-  growth_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
+  append_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
     [
       for storage_type in local.db_sizing : [
         for idx, disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
+          suffix               = format("%s%02d", storage_type.name, storage_type.lun_start + disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -311,11 +311,11 @@ locals {
         }
 
       ]
-      if try(storage_type.growth, false)
+      if try(storage_type.append, false)
     ]
   ) : []
 
-  all_data_disk_per_dbnode = concat(local.data_disk_per_dbnode, local.growth_disk_per_dbnode)
+  all_data_disk_per_dbnode = concat(local.data_disk_per_dbnode, local.append_disk_per_dbnode)
 
   data_disk_list = flatten([
     for vm_counter, hdb_vm in local.hdb_vms : [

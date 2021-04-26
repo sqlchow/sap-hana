@@ -325,14 +325,11 @@ locals {
     try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")
   )
 
-  sid_auth_password = local.password_required ? (
-    coalesce(
+  sid_auth_password = coalesce(
       try(var.authentication.password, ""),
       try(data.azurerm_key_vault_secret.sid_password[0].value, local.use_local_credentials ? random_password.password[0].result : "")
-    )) : (
-    ""
-  )
-
+    )
+    
   sid_public_key  = local.use_local_credentials ? try(file(var.authentication.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
   sid_private_key = local.use_local_credentials ? try(file(var.authentication.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
 
