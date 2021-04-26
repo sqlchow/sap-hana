@@ -457,7 +457,7 @@ else
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
-        if [ ! -n "${approve}" ] 
+        if [ ! -n ${approve} ] 
         then
             read -p "Do you want to redeploy Y/N?"  ans
             answer=${ans^^}
@@ -654,7 +654,7 @@ if [ $ok_to_proceed ]; then
 
     allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
     
-    terraform -chdir="${terraform_module_directory}" apply "${approve}" $allParams  2>error.log
+    terraform -chdir="${terraform_module_directory}" apply ${approve} $allParams  2>error.log
  
     str1=$(grep "Error: " error.log)
     if [ -n "${str1}" ]
