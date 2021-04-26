@@ -23,7 +23,7 @@ variable "hdb_sid" {
 }
 
 variable "hana_database_info" {
-  sensitive=false
+  sensitive   = false
   description = "Updated hana database json"
 }
 
@@ -70,7 +70,7 @@ variable "anydb_loadbalancers" {
 }
 
 variable "any_database_info" {
-  sensitive= false
+  sensitive   = false
   description = "Updated anydb database json"
 }
 
@@ -130,21 +130,21 @@ locals {
   hdb_vms = flatten([
     for database in local.databases : flatten([
       [
-        
+
         for dbnode in database.dbnodes : {
-          role           = dbnode.role,
-          platform       = database.platform,
-          name           = dbnode.computername,
-          auth_type      = database.auth_type
+          role      = dbnode.role,
+          platform  = database.platform,
+          name      = dbnode.computername,
+          auth_type = try(database.auth_type, "key")
         }
         if try(database.platform, "NONE") == "HANA"
       ],
       [
         for dbnode in database.dbnodes : {
-          role           = dbnode.role,
-          platform       = database.platform,
-          name           = dbnode.computername,
-          auth_type      = database.auth_type
+          role      = dbnode.role,
+          platform  = database.platform,
+          name      = dbnode.computername,
+          auth_type = try(database.auth_type, "key")
         }
         if try(database.platform, "NONE") == "HANA" && database.high_availability
       ]
@@ -169,22 +169,22 @@ locals {
   anydb_vms = flatten([
     for adatabase in local.anydatabases : flatten([
       [
-        
+
         for dbnode in adatabase.dbnodes : {
-          role           = dbnode.role,
-          platform       = upper(adatabase.platform),
-          name           = dbnode.name,
-          auth_type      = dbnode.auth_type
-          
+          role      = dbnode.role,
+          platform  = upper(adatabase.platform),
+          name      = dbnode.name,
+          auth_type = try(adatabase.auth_type, "key")
+
         }
         if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(adatabase.platform, "NONE")))
       ],
       [
         for dbnode in adatabase.dbnodes : {
-          role           = dbnode.role,
-          platform       = upper(adatabase.platform),
-          name           = dbnode.name,
-          auth_type      = dbnode.auth_type
+          role      = dbnode.role,
+          platform  = upper(adatabase.platform),
+          name      = dbnode.name,
+          auth_type = try(adatabase.auth_type, "key")
         }
         if adatabase.high_availability && contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(adatabase.platform, "NONE")))
       ]
