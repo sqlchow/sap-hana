@@ -390,7 +390,7 @@ locals {
   base_app_data_disk_per_dbnode = (local.application_server_count > 0) ? flatten(
     [
       for storage_type in local.app_sizing.storage : [
-        for disk_count in range(storage_type.count) : {
+        for idx, disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
@@ -400,7 +400,7 @@ locals {
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
           type                      = storage_type.name
-          lun                       = try(storage_type.lun_start,0) + idx
+          lun                       = try(storage_type.lun_start, 0) + idx
         }
         if !try(storage_type.append, false)
       ]
@@ -412,7 +412,7 @@ locals {
   append_app_data_disk_per_dbnode = (local.application_server_count > 0) ? flatten(
     [
       for storage_type in local.app_sizing.storage : [
-        for disk_count in range(storage_type.count) : {
+        for idx, disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, storage_type.lun_start + disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
@@ -443,7 +443,7 @@ locals {
         write_accelerator_enabled = datadisk.write_accelerator_enabled
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
-        lun                       = idx
+        lun                       = datadisk.lun
         type                      = datadisk.type
       }
     ]
@@ -452,7 +452,7 @@ locals {
   base_scs_data_disk_per_dbnode = (local.enable_deployment) ? flatten(
     [
       for storage_type in local.scs_sizing.storage : [
-        for disk_count in range(storage_type.count) : {
+        for idx, disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
@@ -462,7 +462,7 @@ locals {
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
           type                      = storage_type.name
-          lun                       = try(storage_type.lun_start,0) + idx
+          lun                       = try(storage_type.lun_start, 0) + idx
         }
         if !try(storage_type.append, false)
       ]
@@ -473,7 +473,7 @@ locals {
   append_scs_data_disk_per_dbnode = (local.enable_deployment) ? flatten(
     [
       for storage_type in local.scs_sizing.storage : [
-        for disk_count in range(storage_type.count) : {
+        for idx, disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
@@ -503,9 +503,8 @@ locals {
         write_accelerator_enabled = datadisk.write_accelerator_enabled
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
-        lun                       = idx
         type                      = datadisk.type
-        lun                       = try(storage_type.lun_start,0) + idx
+        lun                       = datadisk.lun
 
       }
     ]
@@ -514,7 +513,7 @@ locals {
   base_web_data_disk_per_dbnode = (local.webdispatcher_count > 0) ? flatten(
     [
       for storage_type in local.web_sizing.storage : [
-        for disk_count in range(storage_type.count) : {
+        for idx, disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
@@ -524,7 +523,7 @@ locals {
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
           type                      = storage_type.name
-          lun                       = storage_type.lun_start + idx
+          lun                       = try(storage_type.lun_start, 0) + idx
 
         }
         if !try(storage_type.append, false)
@@ -536,7 +535,7 @@ locals {
   append_web_data_disk_per_dbnode = (local.webdispatcher_count > 0) ? flatten(
     [
       for storage_type in local.web_sizing.storage : [
-        for disk_count in range(storage_type.count) : {
+        for idx, disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
@@ -546,6 +545,7 @@ locals {
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
           type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
         }
       ]
       if try(storage_type.append, false)
@@ -564,7 +564,7 @@ locals {
         write_accelerator_enabled = datadisk.write_accelerator_enabled
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
-        lun                       = idx
+        lun                       = datadisk.lun
         type                      = datadisk.type
       }
     ]

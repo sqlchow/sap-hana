@@ -1193,6 +1193,7 @@ Licensed under the MIT license.
 
     Write-Host -ForegroundColor green "Running plan, please wait"
     $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars + $version_parameter + $deployment_parameter
+    Write-Host $Command
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
