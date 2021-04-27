@@ -47,13 +47,13 @@ Licensed under the MIT license.
         #Deployer state file
         [Parameter(Mandatory = $false)][string]$Deployerstatefile,
         [Parameter(Mandatory = $false)][string]$Deployerenvironment,
-        [Parameter(Mandatory = $true)][string]$Subscription,
+        [Parameter(Mandatory = $false)][string]$Subscription,
         #SPN App ID
-        [Parameter(Mandatory = $true)][string]$Client_id,
+        [Parameter(Mandatory = $false)][string]$Client_id,
         #SPN App secret
-        [Parameter(Mandatory = $true)][string]$Client_secret,
+        [Parameter(Mandatory = $false)][string]$Client_secret,
         #Tenant
-        [Parameter(Mandatory = $true)][string]$Tenant_id,
+        [Parameter(Mandatory = $false)][string]$Tenant_id,
         [Parameter(Mandatory = $false)][Switch]$Force,
         [Parameter(Mandatory = $false)][Switch]$Silent  
     )

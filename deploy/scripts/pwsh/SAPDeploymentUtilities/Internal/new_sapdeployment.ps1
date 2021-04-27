@@ -498,7 +498,7 @@ Licensed under the MIT license.
 
         Write-Host -ForegroundColor green "Running apply"
         
-        $Command = " apply " + $autoApprove + " -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars ++ $version_parameter + $deployment_parameter
+        $Command = " apply " + $autoApprove + " -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars + $version_parameter + $deployment_parameter
 
         $Cmd = "terraform -chdir=$terraform_module_directory $Command"
         Add-Content -Path "deployment.log" -Value $Cmd
