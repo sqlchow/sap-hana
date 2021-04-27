@@ -343,7 +343,7 @@ locals {
     ]
   ) : []
 
-  all_data_disk_per_dbnode = concat(local.data_disk_per_dbnode, local.append_data_disk_per_dbnode)
+  all_data_disk_per_dbnode = distinct(concat(local.data_disk_per_dbnode, local.append_data_disk_per_dbnode))
 
   anydb_disks = flatten([
     for vm_counter, anydb_vm in local.anydb_vms : [

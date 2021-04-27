@@ -2872,6 +2872,7 @@ Licensed under the MIT license.
         Out-IniFile -InputObject $iniContent -Path $filePath
     }
 
+    $sub = $tfstate_resource_id.Split("/")[2]
     
     $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"
     $Env:TF_DATA_DIR = (Join-Path -Path $curDir -ChildPath ".terraform")
@@ -2917,7 +2918,7 @@ Licensed under the MIT license.
     }
 
     Write-Host -ForegroundColor green "Running refresh"
-    $Command = " refresh -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+    $Command = " refresh -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
