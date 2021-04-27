@@ -149,6 +149,7 @@ Licensed under the MIT license.
         }
 
         if ($null -ne $iniContent[$deployercombined]) {
+            Write-Host "Reading the state information from the deployer"
             $rgName = $iniContent[$deployercombined]["REMOTE_STATE_RG"]
             $saName = $iniContent[$deployercombined]["REMOTE_STATE_SA"]
             $tfstate_resource_id = $iniContent[$deployercombined]["tfstate_resource_id"] 
@@ -190,14 +191,16 @@ Licensed under the MIT license.
     
     }
 
+     # Subscription
+     $sub = $iniContent[$combined]["subscription"]
+
     if ($null -ne $Subscription) {
+        $sub = $Subscription
         $iniContent[$combined]["subscription"] = $Subscription
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
 
-    # Subscription
-    $sub = $iniContent[$combined]["subscription"]
-
+   
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription for the deployment"
         $iniContent[$combined]["subscription"] = $sub
