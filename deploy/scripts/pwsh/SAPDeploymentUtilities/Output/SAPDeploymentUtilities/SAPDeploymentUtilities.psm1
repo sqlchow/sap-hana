@@ -87,10 +87,10 @@ function Out-IniFile {
 function New-SAPAutomationRegion {
     <#
     .SYNOPSIS
-        Deploys a new SAP Environment (Deployer, Library and Workload VNet)
+        Deploys a new SAP Environment (Deployer, Library)
 
     .DESCRIPTION
-        Deploys a new SAP Environment (Deployer, Library and Workload VNet)
+        Deploys a new SAP Environment (Deployer, Library)
 
     .PARAMETER DeployerParameterfile
         This is the parameter file for the Deployer
@@ -264,6 +264,9 @@ Licensed under the MIT license.
     if ($null -ne $Subscription) {
         $iniContent[$combined]["kvsubscription"] = $Subscription
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
+
+        $Env:ARM_SUBSCRIPTION_ID=$Subscription
+
     }
 
     if ($null -ne $iniContent[$combined]["step"]) {
@@ -1075,7 +1078,9 @@ Licensed under the MIT license.
     
     $Command = " init -upgrade=true -force-copy -backend-config ""subscription_id=$sub"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$key"""
 
-    $deployment_parameter=""
+    $bRunRefresh = $false
+
+    $deployment_parameter = ""
     if (Test-Path ".terraform" -PathType Container) {
         $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
         if ("azurerm" -eq $jsonData.backend.type) {
@@ -1089,11 +1094,13 @@ Licensed under the MIT license.
 
                     return
                 }
+
+                $bRunRefresh = $true
             }
         }
     } 
     else {
-        $deployment_parameter=" -var deployment=new "
+        $deployment_parameter = " -var deployment=new "
 
     }
 
@@ -1128,8 +1135,6 @@ Licensed under the MIT license.
         else {
             $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
         }
-   
-            
     }
 
     if ($Type -eq "sap_system") {
@@ -1138,13 +1143,28 @@ Licensed under the MIT license.
         $landscape_tfstate_key_parameter = " -var landscape_tfstate_key=" + $landscape_tfstate_key
     }
 
+    if($bRunRefresh)
+    {
+        Write-Host -ForegroundColor green "Running refresh, please wait"
+        $Command = " refresh -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars + $version_parameter + $deployment_parameter 
+    
+        $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+        Add-Content -Path "deployment.log" -Value $Cmd
+        $planResultsPlain = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+        
+        if ($LASTEXITCODE -ne 0) {
+            throw "Error executing command: $Cmd"
+        }
+    
+    }
+
     $Command = " output -no-color automation_version"
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     $versionLabel = & ([ScriptBlock]::Create($Cmd)) | Out-String 
 
     Write-Host $versionLabel
-    $version_parameter=" -var terraform_template_version="+ $versionLabel
+    $version_parameter = " -var terraform_template_version=" + $versionLabel
     if ("" -eq $versionLabel) {
         Write-Host ""
         Write-Host -ForegroundColor red "The environment was deployed using an older version of the Terrafrom templates"
@@ -2453,6 +2473,211 @@ Licensed under the MIT license.
             Read-KVNode -source "Workload keyvault" -kv $jsonData.key_vault -CheckIDs $CheckIDs
         }
     }
+}
+function Remove-SAPAutomationRegion {
+    <#
+    .SYNOPSIS
+        Removes a new SAP Environment (Deployer, Library)
+
+    .DESCRIPTION
+        Removes a new SAP Environment (Deployer, Library)
+
+    .PARAMETER DeployerParameterfile
+        This is the parameter file for the Deployer
+
+    .PARAMETER LibraryParameterfile
+        This is the parameter file for the library
+
+
+    .EXAMPLE 
+
+    #
+    #
+    # Import the module
+    Import-Module "SAPDeploymentUtilities.psd1"
+
+    Remove-SAPAutomationRegion -DeployerParameterfile .\DEPLOYER\PROD-WEEU-DEP00-INFRASTRUCTURE\PROD-WEEU-DEP00-INFRASTRUCTURE.json 
+     -LibraryParameterfile .\LIBRARY\PROD-WEEU-SAP_LIBRARY\PROD-WEEU-SAP_LIBRARY.json 
+    
+.LINK
+    https://github.com/Azure/sap-hana
+
+.NOTES
+    v0.1 - Initial version
+
+.
+
+    #>
+    <#
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT license.
+#>
+    [cmdletbinding()]
+    param(
+        #Parameter file
+        [Parameter(Mandatory = $true)][string]$DeployerParameterfile,
+        [Parameter(Mandatory = $true)][string]$LibraryParameterfile
+    )
+
+
+    Write-Host -ForegroundColor green ""
+    Write-Host -ForegroundColor green "Removes the deployer and library"
+
+    $Parameterfile = $DeployerParameterfile
+
+    $fInfo = Get-ItemProperty -Path $Parameterfile
+    if (!$fInfo.Exists ) {
+        Write-Error ("File " + $Parameterfile + " does not exist")
+        return
+    }
+
+    $DeployerParamFullFile = (Get-ItemProperty -Path $DeployerParameterfile -Name Fullname).Fullname
+    $LibraryParamFullFile = (Get-ItemProperty -Path $LibraryParameterfile -Name Fullname).Fullname
+
+    $CachePath = (Join-Path -Path $Env:APPDATA -ChildPath "terraform.d\plugin-cache")
+    if ( -not (Test-Path -Path $CachePath)) {
+        New-Item -Path $CachePath -ItemType Directory
+    }
+    $env:TF_PLUGIN_CACHE_DIR = $CachePath
+    $curDir = (Get-Location)
+    [IO.DirectoryInfo] $dirInfo = $curDir.ToString()
+
+    $fileDir = (Join-Path -Path $dirInfo.ToString() -ChildPath $DeployerParameterfile)
+    [IO.FileInfo] $fInfo = $fileDir
+
+    $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
+ 
+    Add-Content -Path "deployment.log" -Value ("Removing")
+    Add-Content -Path "deployment.log" -Value (Get-Date -Format "yyyy-MM-dd HH:mm")
+
+    $mydocuments = [environment]::getfolderpath("mydocuments")
+    $filePath = $mydocuments + "\sap_deployment_automation.ini"
+    $iniContent = Get-IniContent -Path $filePath
+
+    $repo = $iniContent["Common"]["repo"]
+
+
+    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
+
+    $ctx = Get-AzContext
+    if ($null -eq $ctx) {
+        Connect-AzAccount  
+    }
+
+    #////////////////////////////////////////////////////////////////////////////////////
+    #//
+    #//              Reinitializing the deployer to get the state file local
+    #//
+    #////////////////////////////////////////////////////////////////////////////////////
+    
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\bootstrap\sap_deployer"
+    $fileDir = (Join-Path -Path $dirInfo.ToString() -ChildPath $DeployerParameterfile)
+    [IO.FileInfo] $fInfo = $fileDir
+
+    $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
+
+    Write-Host -ForegroundColor green "Running init"
+
+    $statefile = (Join-Path -Path $fInfo.Directory.FullName -ChildPath "terraform.tfstate")
+    $Command = " init -upgrade=true -force-copy -backend-config ""path=$statefile"""
+
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
+    & ([ScriptBlock]::Create($Cmd))  
+    if ($LASTEXITCODE -ne 0) {
+        $Env:TF_DATA_DIR = $null
+        throw "Error executing command: $Cmd"
+    }
+
+
+    #////////////////////////////////////////////////////////////////////////////////////
+    #//
+    #//              Reinitializing the library to get the state file local
+    #//
+    #////////////////////////////////////////////////////////////////////////////////////
+
+
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\bootstrap\sap_library"
+    $fileDir = (Join-Path -Path $dirInfo.ToString() -ChildPath $LibraryParameterfile)
+    [IO.FileInfo] $fInfo = $fileDir
+
+    $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
+
+    Write-Host -ForegroundColor green "Running init"
+
+    $statefile = (Join-Path -Path $fInfo.Directory.FullName -ChildPath "terraform.tfstate")
+    $Command = " init -upgrade=true -force-copy -backend-config ""path=$statefile"""
+
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
+    & ([ScriptBlock]::Create($Cmd))  
+    if ($LASTEXITCODE -ne 0) {
+        $Env:TF_DATA_DIR = $null
+        throw "Error executing command: $Cmd"
+    }
+
+    #////////////////////////////////////////////////////////////////////////////////////
+    #//
+    #//              Removing the library
+    #//
+    #////////////////////////////////////////////////////////////////////////////////////
+
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\bootstrap\sap_library"
+    $fileDir = (Join-Path -Path $dirInfo.ToString() -ChildPath $LibraryParameterfile)
+    [IO.FileInfo] $fInfo = $fileDir
+
+    $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
+
+    Write-Host -ForegroundColor green "Running destroy of the library"
+    $Command = " destroy -var-file " + $LibraryParamFullFile 
+
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
+    & ([ScriptBlock]::Create($Cmd))  
+    if ($LASTEXITCODE -ne 0) {
+        $Env:TF_DATA_DIR = $null
+        throw "Error executing command: $Cmd"
+    }
+
+    #////////////////////////////////////////////////////////////////////////////////////
+    #//
+    #//              Removing the deployer
+    #//
+    #////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\bootstrap\sap_deployer"
+    $fileDir = (Join-Path -Path $dirInfo.ToString() -ChildPath $DeployerParameterfile)
+    [IO.FileInfo] $fInfo = $fileDir
+
+    $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
+
+    Write-Host -ForegroundColor green "Running destroy of the deployer"
+    $Command = " destroy -var-file " + $DeployerParamFullFile 
+
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
+    & ([ScriptBlock]::Create($Cmd))  
+    if ($LASTEXITCODE -ne 0) {
+        $Env:TF_DATA_DIR = $null
+        throw "Error executing command: $Cmd"
+    }
+
+
+    $iniContent[$combined]["REMOTE_STATE_RG"] = ""
+    $iniContent[$combined]["REMOTE_STATE_SA"] = ""
+    $iniContent[$combined]["tfstate_resource_id"] = ""
+    $iniContent[$combined]["kvsubscription"] = ""
+    $iniContent[$combined]["Deployer"] = ""
+    $iniContent[$combined]["kvsubscription"] = ""
+    $iniContent[$combined]["step"] = 0
+    Out-IniFile -InputObject $iniContent -Path $filePath
+    $Env:TF_DATA_DIR = $null
 }
 function Remove-SAPSystem {
     <#

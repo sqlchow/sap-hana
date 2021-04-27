@@ -290,7 +290,7 @@ locals {
   // Subnet IP Offsets
   // Note: First 4 IP addresses in a subnet are reserved by Azure
   linux_ip_offsets = {
-    scs_lb = 4 
+    scs_lb = 4
     scs_vm = 6
     app_vm = 10
     web_lb = local.sub_web_defined ? (4 + 1) : 6
@@ -298,8 +298,8 @@ locals {
   }
 
   windows_ip_offsets = {
-    scs_lb = 4 
-    scs_vm = 6 + 2  # Windows HA SCS may require 4 IPs
+    scs_lb = 4
+    scs_vm = 6 + 2 # Windows HA SCS may require 4 IPs
     app_vm = 10 + 2
     web_lb = local.sub_web_defined ? (4 + 1) : 6 + 2
     web_vm = local.sub_web_defined ? (10) : 50
@@ -387,7 +387,7 @@ locals {
     62100 + tonumber(local.ers_instance_number)
   ]
 
-  app_data_disk_per_dbnode = (local.application_server_count > 0) ? flatten(
+  base_app_data_disk_per_dbnode = (local.application_server_count > 0) ? flatten(
     [
       for storage_type in local.app_sizing.storage : [
         for disk_count in range(storage_type.count) : {
@@ -400,11 +400,37 @@ locals {
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
           type                      = storage_type.name
+          lun                       = try(storage_type.lun_start,0) + idx
         }
+        if !try(storage_type.append, false)
       ]
       if storage_type.name != "os"
     ]
   ) : []
+
+
+  append_app_data_disk_per_dbnode = (local.application_server_count > 0) ? flatten(
+    [
+      for storage_type in local.app_sizing.storage : [
+        for disk_count in range(storage_type.count) : {
+          suffix               = format("-%s%02d", storage_type.name, storage_type.lun_start + disk_count + local.offset)
+          storage_account_type = storage_type.disk_type,
+          disk_size_gb         = storage_type.size_gb,
+          //The following two lines are for Ultradisks only
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
+        }
+
+      ]
+      if try(storage_type.append, false)
+    ]
+  ) : []
+
+  app_data_disk_per_dbnode = concat(local.base_app_data_disk_per_dbnode, local.append_app_data_disk_per_dbnode)
 
   app_data_disks = flatten([
     for idx, datadisk in local.app_data_disk_per_dbnode : [
@@ -418,12 +444,12 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
-        type                      = "sap"
+        type                      = datadisk.type
       }
     ]
   ])
 
-  scs_data_disk_per_dbnode = (local.enable_deployment) ? flatten(
+  base_scs_data_disk_per_dbnode = (local.enable_deployment) ? flatten(
     [
       for storage_type in local.scs_sizing.storage : [
         for disk_count in range(storage_type.count) : {
@@ -436,11 +462,35 @@ locals {
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
           type                      = storage_type.name
+          lun                       = try(storage_type.lun_start,0) + idx
         }
+        if !try(storage_type.append, false)
       ]
       if storage_type.name != "os"
     ]
   ) : []
+
+  append_scs_data_disk_per_dbnode = (local.enable_deployment) ? flatten(
+    [
+      for storage_type in local.scs_sizing.storage : [
+        for disk_count in range(storage_type.count) : {
+          suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
+          storage_account_type = storage_type.disk_type,
+          disk_size_gb         = storage_type.size_gb,
+          //The following two lines are for Ultradisks only
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
+        }
+      ]
+      if try(storage_type.append, false)
+    ]
+  ) : []
+
+  scs_data_disk_per_dbnode = concat(local.base_scs_data_disk_per_dbnode, local.append_scs_data_disk_per_dbnode)
 
   scs_data_disks = flatten([
     for idx, datadisk in local.scs_data_disk_per_dbnode : [
@@ -454,12 +504,36 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
-        type                      = "sap"
+        type                      = datadisk.type
+        lun                       = try(storage_type.lun_start,0) + idx
+
       }
     ]
   ])
 
-  web_data_disk_per_dbnode = (local.webdispatcher_count > 0) ? flatten(
+  base_web_data_disk_per_dbnode = (local.webdispatcher_count > 0) ? flatten(
+    [
+      for storage_type in local.web_sizing.storage : [
+        for disk_count in range(storage_type.count) : {
+          suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
+          storage_account_type = storage_type.disk_type,
+          disk_size_gb         = storage_type.size_gb,
+          //The following two lines are for Ultradisks only
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
+
+        }
+        if !try(storage_type.append, false)
+      ]
+      if storage_type.name != "os"
+    ]
+  ) : []
+
+  append_web_data_disk_per_dbnode = (local.webdispatcher_count > 0) ? flatten(
     [
       for storage_type in local.web_sizing.storage : [
         for disk_count in range(storage_type.count) : {
@@ -474,10 +548,11 @@ locals {
           type                      = storage_type.name
         }
       ]
-      if storage_type.name != "os"
+      if try(storage_type.append, false)
     ]
   ) : []
 
+  web_data_disk_per_dbnode = concat(local.base_web_data_disk_per_dbnode, local.append_web_data_disk_per_dbnode)
   web_data_disks = flatten([
     for idx, datadisk in local.web_data_disk_per_dbnode : [
       for vm_counter in range(local.webdispatcher_count) : {
@@ -490,7 +565,7 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
-        type                      = "sap"
+        type                      = datadisk.type
       }
     ]
   ])

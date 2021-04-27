@@ -1,10 +1,10 @@
 function New-SAPAutomationRegion {
     <#
     .SYNOPSIS
-        Deploys a new SAP Environment (Deployer, Library and Workload VNet)
+        Deploys a new SAP Environment (Deployer, Library)
 
     .DESCRIPTION
-        Deploys a new SAP Environment (Deployer, Library and Workload VNet)
+        Deploys a new SAP Environment (Deployer, Library)
 
     .PARAMETER DeployerParameterfile
         This is the parameter file for the Deployer
@@ -178,6 +178,9 @@ Licensed under the MIT license.
     if ($null -ne $Subscription) {
         $iniContent[$combined]["kvsubscription"] = $Subscription
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
+
+        $Env:ARM_SUBSCRIPTION_ID=$Subscription
+
     }
 
     if ($null -ne $iniContent[$combined]["step"]) {

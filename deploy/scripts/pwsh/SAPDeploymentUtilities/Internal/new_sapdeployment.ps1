@@ -353,7 +353,9 @@ Licensed under the MIT license.
     
     $Command = " init -upgrade=true -force-copy -backend-config ""subscription_id=$sub"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$key"""
 
-    $deployment_parameter=""
+    $bRunRefresh = $false
+
+    $deployment_parameter = ""
     if (Test-Path ".terraform" -PathType Container) {
         $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
         if ("azurerm" -eq $jsonData.backend.type) {
@@ -367,11 +369,13 @@ Licensed under the MIT license.
 
                     return
                 }
+
+                $bRunRefresh = $true
             }
         }
     } 
     else {
-        $deployment_parameter=" -var deployment=new "
+        $deployment_parameter = " -var deployment=new "
 
     }
 
@@ -406,8 +410,6 @@ Licensed under the MIT license.
         else {
             $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
         }
-   
-            
     }
 
     if ($Type -eq "sap_system") {
@@ -416,13 +418,28 @@ Licensed under the MIT license.
         $landscape_tfstate_key_parameter = " -var landscape_tfstate_key=" + $landscape_tfstate_key
     }
 
+    if($bRunRefresh)
+    {
+        Write-Host -ForegroundColor green "Running refresh, please wait"
+        $Command = " refresh -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars + $version_parameter + $deployment_parameter 
+    
+        $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+        Add-Content -Path "deployment.log" -Value $Cmd
+        $planResultsPlain = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+        
+        if ($LASTEXITCODE -ne 0) {
+            throw "Error executing command: $Cmd"
+        }
+    
+    }
+
     $Command = " output -no-color automation_version"
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     $versionLabel = & ([ScriptBlock]::Create($Cmd)) | Out-String 
 
     Write-Host $versionLabel
-    $version_parameter=" -var terraform_template_version="+ $versionLabel
+    $version_parameter = " -var terraform_template_version=" + $versionLabel
     if ("" -eq $versionLabel) {
         Write-Host ""
         Write-Host -ForegroundColor red "The environment was deployed using an older version of the Terrafrom templates"

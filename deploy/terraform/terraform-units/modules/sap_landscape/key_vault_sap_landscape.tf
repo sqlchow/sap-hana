@@ -270,3 +270,17 @@ resource "azurerm_key_vault_secret" "witness_name" {
   value        = length(var.witness_storage_account.arm_id) > 0 ? data.azurerm_storage_account.witness_storage[0].name : azurerm_storage_account.witness_storage[0].name
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
+
+
+resource "azurerm_key_vault_access_policy" "kv_user_msi" {
+  count        = local.user_kv_exist && length(var.deployer_tfstate)>0 ? 0 :1
+  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
+
+  tenant_id = var.deployer_tfstate.deployer_uai.tenant_id
+  object_id = deployer_tfstate.deployer_uai.principal_id
+
+  secret_permissions = [
+    "Get",
+    "List"
+  ]
+}
