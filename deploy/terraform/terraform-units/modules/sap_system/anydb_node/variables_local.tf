@@ -338,8 +338,9 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
+        if try(storage_type.append, false)
       ]
-      if try(storage_type.append, false)
+      if storage_type.name != "os"
     ]
   ) : []
 

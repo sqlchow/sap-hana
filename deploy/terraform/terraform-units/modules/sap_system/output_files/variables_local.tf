@@ -173,7 +173,7 @@ locals {
         for dbnode in adatabase.dbnodes : {
           role      = dbnode.role,
           platform  = upper(adatabase.platform),
-          name      = dbnode.name,
+          name      = dbnode.computername,
           auth_type = try(adatabase.auth_type, "key")
 
         }
@@ -183,7 +183,7 @@ locals {
         for dbnode in adatabase.dbnodes : {
           role      = dbnode.role,
           platform  = upper(adatabase.platform),
-          name      = dbnode.name,
+          name      = dbnode.computername,
           auth_type = try(adatabase.auth_type, "key")
         }
         if adatabase.high_availability && contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(adatabase.platform, "NONE")))

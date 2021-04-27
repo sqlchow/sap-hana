@@ -424,13 +424,13 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
-
+        if try(storage_type.append, false)
       ]
-      if try(storage_type.append, false)
+      if storage_type.name != "os"
     ]
   ) : []
 
-  app_data_disk_per_dbnode = concat(local.base_app_data_disk_per_dbnode, local.append_app_data_disk_per_dbnode)
+  app_data_disk_per_dbnode = distinct(concat(local.base_app_data_disk_per_dbnode, local.append_app_data_disk_per_dbnode))
 
   app_data_disks = flatten([
     for idx, datadisk in local.app_data_disk_per_dbnode : [
@@ -485,12 +485,13 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
+        if try(storage_type.append, false)
       ]
-      if try(storage_type.append, false)
+      if storage_type.name != "os"
     ]
   ) : []
 
-  scs_data_disk_per_dbnode = concat(local.base_scs_data_disk_per_dbnode, local.append_scs_data_disk_per_dbnode)
+  scs_data_disk_per_dbnode = distinct(concat(local.base_scs_data_disk_per_dbnode, local.append_scs_data_disk_per_dbnode))
 
   scs_data_disks = flatten([
     for idx, datadisk in local.scs_data_disk_per_dbnode : [
@@ -547,12 +548,13 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
+        if try(storage_type.append, false)
       ]
-      if try(storage_type.append, false)
+      if storage_type.name != "os"
     ]
   ) : []
 
-  web_data_disk_per_dbnode = concat(local.base_web_data_disk_per_dbnode, local.append_web_data_disk_per_dbnode)
+  web_data_disk_per_dbnode = distinct(concat(local.base_web_data_disk_per_dbnode, local.append_web_data_disk_per_dbnode))
   web_data_disks = flatten([
     for idx, datadisk in local.web_data_disk_per_dbnode : [
       for vm_counter in range(local.webdispatcher_count) : {
