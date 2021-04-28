@@ -33,7 +33,7 @@ function showhelp {
 }
 
 
-INPUT_ARGUMENTS=$(getopt -n prepare_region -o e:r:v:s:c:p:t:i --longoptions environment:,region:,vault:,subscription:,spn_id:,spn_secret:,tenant_id:,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n set_secrets -o e:r:v:s:c:p:t:i --longoptions environment:,region:,vault:,subscription:,spn_id:,spn_secret:,tenant_id:,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
