@@ -118,7 +118,7 @@
 
   loop: "{{ LVM_data }}"
   when:
-    - item.pvs | bool
+    - item.pvs != ""
 
 - name: Volume Group creation (single disks)
   lvg:
@@ -145,7 +145,7 @@
     resizefs: no
   loop: "{{ LVM_data }}"
   when:
-    - item.pvs | bool
+    - item.pvs != ""
 
 - name: Logical Volume creation (single disks)
   lvol:
@@ -170,7 +170,7 @@
     fstype:    "{{ item.fstype }}"
   loop: "{{ LVM_data }}"
   when:
-    - item.dev | bool
+    - item.dev !=""
 
 - name: Filesystem creation (single disks)
   filesystem:
