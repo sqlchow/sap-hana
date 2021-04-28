@@ -366,10 +366,10 @@ locals {
   //Disks for Ansible
   // host: xxx, LUN: #, type: sapusr, size: #
 
-  db_disks_ansible = flatten([for idx, vm in local.anydb_vms : [
+  db_disks_ansible = distinct(flatten([for idx, vm in local.anydb_vms : [
     for idx, datadisk in local.anydb_disks :
     format("{ host: '%s', LUN: %d, type: '%s' }", vm.computername, datadisk.lun, datadisk.type)
-  ]])
+  ]]))
 
   enable_ultradisk = try(
     compact(
