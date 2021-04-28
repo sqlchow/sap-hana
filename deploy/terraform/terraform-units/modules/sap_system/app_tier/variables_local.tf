@@ -228,7 +228,7 @@ locals {
   scs_size = try(var.application.scs_sku, local.app_size)
   web_size = try(var.application.web_sku, local.app_size)
 
-  vm_sizing = length(local.app_size) > 0 ? "New" : "Default"
+  vm_sizing = try(var.application.vm_sizing, length(local.app_size) > 0 ? "New" : "Default")
 
   use_DHCP = try(var.application.use_DHCP, false)
 
@@ -402,9 +402,8 @@ locals {
           type                      = storage_type.name
           lun                       = try(storage_type.lun_start, 0) + idx
         }
-        if !try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && !try(storage_type.append, false)
     ]
   ) : []
 
@@ -424,9 +423,8 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
-        if try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && try(storage_type.append, false)
     ]
   ) : []
 
@@ -464,9 +462,8 @@ locals {
           type                      = storage_type.name
           lun                       = try(storage_type.lun_start, 0) + idx
         }
-        if !try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && !try(storage_type.append, false)
     ]
   ) : []
 
@@ -485,9 +482,8 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
-        if try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && try(storage_type.append, false)
     ]
   ) : []
 
@@ -527,9 +523,8 @@ locals {
           lun                       = try(storage_type.lun_start, 0) + idx
 
         }
-        if !try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && !try(storage_type.append, false)
     ]
   ) : []
 
@@ -548,9 +543,8 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
-        if try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && try(storage_type.append, false)
     ]
   ) : []
 
@@ -572,35 +566,35 @@ locals {
     ]
   ])
 
-  full_appserver_names = flatten([for vm in local.app_virtualmachine_names :
+  full_appserver_names = distinct(flatten([for vm in local.app_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
-  )
+  ))
 
-  full_scsserver_names = flatten([for vm in local.scs_virtualmachine_names :
+  full_scsserver_names = distinct(flatten([for vm in local.scs_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
-  )
+  ))
 
-  full_webserver_names = flatten([for vm in local.web_virtualmachine_names :
+  full_webserver_names = distinct(flatten([for vm in local.web_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
-  )
+  ))
 
   //Disks for Ansible
   // host: xxx, LUN: #, type: sapusr, size: #
 
-  app_disks_ansible = flatten([for vm in local.app_virtualmachine_names : [
+  app_disks_ansible = distinct(flatten([for vm in local.app_virtualmachine_names : [
     for idx, datadisk in local.app_data_disk_per_dbnode :
-    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, "sap")
-  ]])
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, datadisk.type)
+  ]]))
 
-  scs_disks_ansible = flatten([for vm in local.scs_virtualmachine_names : [
+  scs_disks_ansible = distinct(flatten([for vm in local.scs_virtualmachine_names : [
     for idx, datadisk in local.scs_data_disk_per_dbnode :
-    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, "sap")
-  ]])
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, datadisk.type)
+  ]]))
 
-  web_disks_ansible = flatten([for vm in local.web_virtualmachine_names : [
+  web_disks_ansible = distinct(flatten([for vm in local.web_virtualmachine_names : [
     for idx, datadisk in local.web_data_disk_per_dbnode :
-    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, "sap")
-  ]])
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, datadisk.type)
+  ]]))
 
 
   // Zones
