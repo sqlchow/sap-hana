@@ -33,24 +33,28 @@ function showhelp {
 }
 
 
-while getopts "e:c:s:t:h:v:r:x:w" option; do
-    case "${option}" in
-        e) environment=${OPTARG};;
-        c) client_id=${OPTARG};;
-        r) region=${OPTARG};;
-        s) client_secret=${OPTARG};;
-        t) tenant_id=${OPTARG};;
-        v) keyvault=${OPTARG};;
-        h) showhelp
-            exit 0
-        ;;
-        w) workload=1
-        ;;
-        ?) echo "Invalid option: -${OPTARG}."
-            exit 0
-        ;;
-        
-    esac
+INPUT_ARGUMENTS=$(getopt -n prepare_region -o e:r:v:s:c:p:t:i --longoptions environment:,region:,vault:,subscription:,spn_id:,spn_secret:,tenant_id:,help -- "$@")
+VALID_ARGUMENTS=$?
+
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -e | --environment)                        environment="$2"             ; shift 2 ;;
+    -r | --region)                             region="$2"                  ; shift 2 ;;
+    -v | --vault)                              keyvault="$2"                ; shift 2 ;;
+    -s | --subscription)                       subscription="$2"            ; shift 2 ;;
+    -c | --spn_id)                             client_id="$2"               ; shift 2 ;;
+    -p | --spn_secret)                         client_secret="$2"           ; shift 2 ;;
+    -t | --tenant_id)                          tenant_id="$2"               ; shift 2 ;;
+    -h | --help)                               showhelp 
+                                               exit 3                       ; shift ;;
+    --) shift; break ;;
+  esac
 done
 
 automation_config_directory=~/.sap_deployment_automation/
@@ -78,7 +82,10 @@ else
    
 fi
 
-load_config_vars "${environment_config_information}" "subscription"
+if [ ! -n "$subscription" ]; 
+then
+  load_config_vars "${environment_config_information}" "subscription"
+fi
 
 if [ "$workload" != 1 ] ;
 then

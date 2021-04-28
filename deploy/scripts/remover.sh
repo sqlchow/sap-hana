@@ -71,20 +71,24 @@ function missing {
 }
 
 #process inputs - may need to check the option i for auto approve as it is not used
-while getopts "p:t:ih" option; do
-    case "${option}" in
-    p) parameterfile=${OPTARG} ;;
-    t) deployment_system=${OPTARG} ;;
-    i) approve="--auto-approve" ;;
-    h)
-        showhelp
-        exit 3
-        ;;
-    ?)
-        echo "Invalid option: -${OPTARG}."
-        exit 2
-        ;;
-    esac
+INPUT_ARGUMENTS=$(getopt -n validate -o p:t:hi --longoptions type:,parameterfile:,auto-approve,help -- "$@")
+VALID_ARGUMENTS=$?
+
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -t | --type)                               deployment_system="$2"           ; shift 2 ;;
+    -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
+    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+    -h | --help)                               showhelp 
+                                               exit 3                           ; shift ;;
+    --) shift; break ;;
+  esac
 done
 
 #variables
@@ -169,7 +173,7 @@ if [ ! -f "${parameterfile}" ]; then
     echo "#               Parameter file does not exist: ${val} #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit 66 #cannot open input
+    exit 2 #No such file or directory
 fi
 
 #Persisting the parameters across executions

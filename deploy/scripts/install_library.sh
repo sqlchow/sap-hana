@@ -46,18 +46,26 @@ function showhelp {
     echo "#########################################################################################"
 }
 
-while getopts "p:d:ih" option; do
-    case "${option}" in
-        p) parameterfile=${OPTARG};;
-        i) approve="--auto-approve" ;;
-        d) deployer_statefile_foldername=${OPTARG};;
-        h) showhelp
-            exit 3
-        ;;
-        ?) echo "Invalid option: -${OPTARG}."
-            exit 2
-        ;;
-    esac
+#process inputs - may need to check the option i for auto approve as it is not used
+INPUT_ARGUMENTS=$(getopt -n validate -o p:d:ih --longoptions parameterfile:,deployer_statefile_foldername:,auto-approve,help -- "$@")
+VALID_ARGUMENTS=$?
+
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+  
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -p | --parameterfile)                      parameterfile="$2"                   ; shift 2 ;;
+    -d | --deployer_statefile_foldername)      deployer_statefile_foldername="$2"   ; shift 2 ;;
+    -i | --auto-approve)                       approve="--auto-approve"             ; shift ;;
+    -h | --help)                               showhelp 
+                                               exit 3                               ; shift ;;
+    --) shift; break ;;
+  esac
 done
 
 deployment_system=sap_library

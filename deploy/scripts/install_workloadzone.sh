@@ -67,23 +67,32 @@ function missing {
 
 show_help=false
 force=0
+INPUT_ARGUMENTS=$(getopt -n prepare_region -o p:d:e:s:c:p:t:ifh --longoptions parameter_file:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
+VALID_ARGUMENTS=$?
 
-while getopts "p:d:e:b:c:s:t:ifh" option; do
-    case "${option}" in
-        p) parameterfile=${OPTARG};;
-        d) deployer_tfstate_key=${OPTARG};;
-        e) deployer_environment=${OPTARG};;
-        b) subscription=${OPTARG};;
-        c) client_id=${OPTARG};;
-        s) spn_secret=${OPTARG};;
-        t) tenant_id=${OPTARG};;
-        i) approve="--auto-approve";;
-        f) force=1 ;;
-        h) showhelp
-            exit 3
-        ;;
-    esac
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -p | --parameter_file)                     parameterfile="$2"               ; shift 2 ;;
+    -d | --deployer_tfstate_key)               deployer_tfstate_key="$2"        ; shift 2 ;;
+    -e | --deployer_environment)               deployer_environment="$2"        ; shift 2 ;;
+    -s | --subscription)                       subscription="$2"                ; shift 2 ;;
+    -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
+    -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
+    -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
+    -f | --force)                              force=1                          ; shift ;;
+    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+    -h | --help)                               showhelp 
+                                               exit 3                           ; shift ;;
+    --) shift; break ;;
+  esac
 done
+
 tfstate_resource_id=""
 tfstate_parameter=""
 

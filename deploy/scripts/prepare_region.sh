@@ -105,26 +105,31 @@ function missing {
 
 force=0
 
-while getopts "d:l:s:c:p:t:ifh" option; do
-    case "${option}" in
-        d) deployer_parameter_file=${OPTARG};;
-        l) library_parameter_file=${OPTARG};;
-        s) subscription=${OPTARG};;
-        c) client_id=${OPTARG};;
-        p) spn_secret=${OPTARG};;
-        t) tenant_id=${OPTARG};;
-        i) approve="--auto-approve" ;;
-        f) force=1 ;;
-        h)
-            showhelp
-            exit 3
-        ;;
-        ?)
-            echo "Invalid option: -${OPTARG}."
-            exit 2
-        ;;
-    esac
+INPUT_ARGUMENTS=$(getopt -n prepare_region -o d:l:s:c:p:t:ifh --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
+VALID_ARGUMENTS=$?
+
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -d | --deployer_parameter_file)            deployer_parameter_file="$2"     ; shift 2 ;;
+    -l | --library_parameter_file)             library_parameter_file="$2"      ; shift 2 ;;
+    -s | --subscription)                       subscription="$2"                ; shift 2 ;;
+    -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
+    -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
+    -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
+    -f | --force)                              force=1                          ; shift ;;
+    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+    -h | --help)                               showhelp 
+                                               exit 3                           ; shift ;;
+    --) shift; break ;;
+  esac
 done
+
 
 if [ ! -z "$approve" ]; then
     approveparam=" -i"
@@ -169,8 +174,8 @@ if [ ! -n "${az}" ]; then
 fi
 
 # Helper variables
-environment=$(cat "${deployer_parameter_file}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${deployer_parameter_file}" | jq .infrastructure.region | tr -d \")
+environment=$(jq .infrastructure.environment "${deployer_parameter_file}" | tr -d \")
+region=$(jq .infrastructure.region "${deployer_parameter_file}" | tr -d \")
 
 if [ ! -n "${environment}" ]
 then
@@ -182,7 +187,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 64 #script usage wrong
 fi
 
 if [ ! -n "${region}" ]
@@ -195,7 +200,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 64 #script usage wrong
 fi
 
 automation_config_directory=~/.sap_deployment_automation/
@@ -251,7 +256,7 @@ if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit -1
+    exit 65 #data format error
 fi
 
 templen=$(echo "${ARM_SUBSCRIPTION_ID}" | wc -c)
@@ -272,7 +277,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit 3
+    exit 65 #data format error
 else
     if [ "{$arm_config_stored}" != 0 ]
     then
@@ -304,7 +309,7 @@ if [ -n "${temp}" ]; then
     then
         rm stdout.az
     fi
-    exit -1
+    exit 67 #addressee unknown
 else
     if [ -f stdout.az ]
     then

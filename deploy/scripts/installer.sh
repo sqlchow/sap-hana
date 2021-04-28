@@ -68,21 +68,27 @@ function missing {
 
 force=0
 
-while getopts "p:t:ihf" option; do
-    case "${option}" in
-        p) parameterfile=${OPTARG};;
-        t) deployment_system=${OPTARG};;
-        i) approve="--auto-approve";;
-        f) force=1
-        ;;
-        h) showhelp
-            exit 3
-        ;;
-        ?) echo "Invalid option: -${OPTARG}."
-            exit 2
-        ;;
-    esac
+INPUT_ARGUMENTS=$(getopt -n validate -o p:t:hif --longoptions type:,parameterfile:,auto-approve,force,help -- "$@")
+VALID_ARGUMENTS=$?
+
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -t | --type)                               deployment_system="$2"           ; shift 2 ;;
+    -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
+    -f | --force)                              force=1                          ; shift ;;
+    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+    -h | --help)                               showhelp 
+                                               exit 3                           ; shift ;;
+    --) shift; break ;;
+  esac
 done
+
 
 tfstate_resource_id=""
 tfstate_parameter=""
