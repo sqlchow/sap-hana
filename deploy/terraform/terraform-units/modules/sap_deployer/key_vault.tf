@@ -89,7 +89,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
   key_vault_id = azurerm_key_vault.kv_user[0].id
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id
-  object_id = data.azurerm_client_config.deployer.object_id != "" ? data.azurerm_client_config.deployer.object_id : "00000000-0000-0000-0000-000000000000"
+  object_id = data.azurerm_client_config.deployer.object_id
 
   secret_permissions = [
     "Get",
