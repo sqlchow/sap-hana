@@ -224,7 +224,7 @@ else
             fi
         fi
         
-        terraform -chdir="${terraform_module_directory}" init -upgrade=true  -backend-config "path=${param_dirname}"
+        terraform -chdir="${terraform_module_directory}" init -upgrade=true  -backend-config "path=${param_dirname}/terraform.tfstate"
         terraform -chdir="${terraform_module_directory}" refresh -var-file="${var_file}" 
     else
         unset TF_DATA_DIR

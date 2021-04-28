@@ -1,6 +1,10 @@
 // Create private KV with access policy
 data "azurerm_client_config" "deployer" {}
 
+data "azuread_service_principal" "deployer" {
+  application_id = data.azurerm_client_config.deployer.client_id
+}
+
 resource "azurerm_key_vault" "kv_prvt" {
   count                      = (local.enable_deployers && !local.prvt_kv_exist) ? 1 : 0
   name                       = local.prvt_kv_name
@@ -89,7 +93,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
   key_vault_id = azurerm_key_vault.kv_user[0].id
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id
-  object_id = data.azurerm_client_config.deployer.object_id
+  object_id = data.azuread_service_principal.deployer.id
 
   secret_permissions = [
     "Get",
