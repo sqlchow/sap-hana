@@ -135,8 +135,9 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     azurerm_network_interface.nics_dbnodes_db[count.index].id,
     azurerm_network_interface.nics_dbnodes_admin[count.index].id]
   )
-  size = lookup(try(local.sizes.db, local.sizes), local.hdb_vms[count.index].size).compute.vm_size
 
+  size = local.hdb_vms[count.index].size
+  
   dynamic "os_disk" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(try(local.sizes.db, local.sizes), local.hdb_vms[count.index].size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])

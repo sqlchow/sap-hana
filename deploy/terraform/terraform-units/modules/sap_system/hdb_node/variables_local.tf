@@ -143,8 +143,28 @@ locals {
   }
 
   hdb_size = try(local.hdb.size, "Default")
-  hdb_fs   = try(local.hdb.filesystem, "xfs")
-  hdb_ha   = try(local.hdb.high_availability, false)
+
+  db_sizing = local.enable_deployment ? (
+    local.custom_sizing ? (
+      lookup(try(local.sizes.db, local.sizes), local.hdb_size).storage) : (
+      lookup(local.sizes, local.hdb_size).storage
+    )) : (
+    []
+  )
+
+
+  db_size = local.enable_deployment ? (
+    local.custom_sizing ? (
+      lookup(try(local.sizes.db, local.sizes), local.hdb_size).compute) : (
+      lookup(local.sizes, local.hdb_size).compute
+    )) : (
+    []
+  )
+
+  hdb_vm_sku = try(local.db_size.vm_size, "Standard_E4s_v3")
+   
+  hdb_fs = try(local.hdb.filesystem, "xfs")
+  hdb_ha = try(local.hdb.high_availability, false)
 
   sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
@@ -205,7 +225,7 @@ locals {
     { platform = local.hdb_platform },
     { db_version = local.hdb_version },
     { os = local.hdb_os },
-    { size = local.hdb_size },
+    { size = local.hdb_vm_sku },
     { high_availability = local.hdb_ha },
     { auth_type = local.sid_auth_type },
     { dbnodes = local.dbnodes },
@@ -226,7 +246,7 @@ locals {
       admin_nic_ip   = dbnode.admin_nic_ip,
       db_nic_ip      = dbnode.db_nic_ip,
       storage_nic_ip = dbnode.storage_nic_ip,
-      size           = local.hdb_size,
+      size           = local.hdb_vm_sku,
       os             = local.hdb_os,
       auth_type      = local.sid_auth_type,
       sid            = local.hdb_sid
@@ -267,9 +287,6 @@ locals {
     }
   ])
 
-
-
-  db_sizing = local.enable_deployment ? local.custom_sizing ? lookup(try(local.sizes.db, local.sizes), local.hdb_size).storage : lookup(local.sizes, local.hdb_size).storage : []
 
   // List of data disks to be created for HANA DB nodes
   data_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(

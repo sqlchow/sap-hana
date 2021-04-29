@@ -72,10 +72,10 @@ locals {
   // Imports database sizing information
 
 
-  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0  ? format("%s/%s",path.cwd, var.custom_disk_sizes_filename) : format("%s%s",path.module,"/../../../../../configs/anydb_sizes.json")))
+  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : format("%s%s", path.module, "/../../../../../configs/anydb_sizes.json")))
   custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
-  faults = jsondecode(file(format("%s%s",path.module,"/../../../../../configs/max_fault_domain_count.json")))
+  faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))
 
   computer_names       = var.naming.virtualmachine_names.ANYDB_COMPUTERNAME
   virtualmachine_names = var.naming.virtualmachine_names.ANYDB_VMNAME
@@ -133,9 +133,27 @@ locals {
   anydb_ostype = upper(local.anydb_platform) == "SQLSERVER" ? "WINDOWS" : try(local.anydb.os.os_type, "LINUX")
   anydb_oscode = upper(local.anydb_ostype) == "LINUX" ? "l" : "w"
   anydb_size   = try(local.anydb.size, "Default")
-  anydb_sku    = try(lookup(local.sizes, local.anydb_size).compute.vm_size, "Standard_E4s_v3")
-  anydb_fs     = try(local.anydb.filesystem, "xfs")
-  anydb_ha     = try(local.anydb.high_availability, false)
+
+  db_sizing = local.enable_deployment ? (
+    local.custom_sizing ? (
+      lookup(try(local.sizes.db, local.sizes), local.anydb_size).storage) : (
+      lookup(local.sizes, local.anydb_size).storage
+    )) : (
+    []
+  )
+
+  db_size = local.enable_deployment ? (
+    local.custom_sizing ? (
+      lookup(try(local.sizes.db, local.sizes), local.anydb_size).compute) : (
+      lookup(local.sizes, local.anydb_size).compute
+    )) : (
+    []
+  )
+
+  anydb_sku = try(local.db_size.vm_size, "Standard_E4s_v3")
+
+  anydb_fs  = try(local.anydb.filesystem, "xfs")
+  anydb_ha  = try(local.anydb.high_availability, false)
 
   db_sid       = lower(substr(local.anydb_platform, 0, 3))
   loadbalancer = try(local.anydb.loadbalancer, {})
@@ -272,7 +290,7 @@ locals {
     anydb_lb       = 4
     anydb_admin_vm = 4
     anydb_db_vm    = 5 + 1
-    observer_db_vm = 5 
+    observer_db_vm = 5
   }
 
   // Ports used for specific DB Versions
@@ -299,8 +317,6 @@ locals {
       port = tonumber(port)
     }
   ])
-
-  db_sizing = local.enable_deployment ? local.custom_sizing ? lookup(try(local.sizes.db, local.sizes), local.anydb_size).storage : lookup(local.sizes, local.anydb_size).storage : []
 
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
