@@ -134,26 +134,13 @@ locals {
   anydb_oscode = upper(local.anydb_ostype) == "LINUX" ? "l" : "w"
   anydb_size   = try(local.anydb.size, "Default")
 
-  db_sizing = local.enable_deployment ? (
-    local.custom_sizing ? (
-      lookup(try(local.sizes.db, local.sizes), local.anydb_size).storage) : (
-      lookup(local.sizes, local.anydb_size).storage
-    )) : (
-    []
-  )
-
-  db_size = local.enable_deployment ? (
-    local.custom_sizing ? (
-      lookup(try(local.sizes.db, local.sizes), local.anydb_size).compute) : (
-      lookup(local.sizes, local.anydb_size).compute
-    )) : (
-    []
-  )
+  db_sizing = local.enable_deployment ? lookup(local.sizes.db, local.anydb_size).storage : []
+  db_size   = local.enable_deployment ? lookup(local.sizes.db, local.anydb_size).compute : {}
 
   anydb_sku = try(local.db_size.vm_size, "Standard_E4s_v3")
 
-  anydb_fs  = try(local.anydb.filesystem, "xfs")
-  anydb_ha  = try(local.anydb.high_availability, false)
+  anydb_fs = try(local.anydb.filesystem, "xfs")
+  anydb_ha = try(local.anydb.high_availability, false)
 
   db_sid       = lower(substr(local.anydb_platform, 0, 3))
   loadbalancer = try(local.anydb.loadbalancer, {})

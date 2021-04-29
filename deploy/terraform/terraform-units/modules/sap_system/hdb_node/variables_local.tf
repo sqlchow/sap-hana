@@ -144,25 +144,11 @@ locals {
 
   hdb_size = try(local.hdb.size, "Default")
 
-  db_sizing = local.enable_deployment ? (
-    local.custom_sizing ? (
-      lookup(try(local.sizes.db, local.sizes), local.hdb_size).storage) : (
-      lookup(local.sizes, local.hdb_size).storage
-    )) : (
-    []
-  )
-
-
-  db_size = local.enable_deployment ? (
-    local.custom_sizing ? (
-      lookup(try(local.sizes.db, local.sizes), local.hdb_size).compute) : (
-      lookup(local.sizes, local.hdb_size).compute
-    )) : (
-    []
-  )
+  db_sizing = local.enable_deployment ? lookup(local.sizes.db, local.hdb_size).storage : []
+  db_size   = local.enable_deployment ? lookup(local.sizes.db, local.hdb_size).compute : {}
 
   hdb_vm_sku = try(local.db_size.vm_size, "Standard_E4s_v3")
-   
+
   hdb_fs = try(local.hdb.filesystem, "xfs")
   hdb_ha = try(local.hdb.high_availability, false)
 
