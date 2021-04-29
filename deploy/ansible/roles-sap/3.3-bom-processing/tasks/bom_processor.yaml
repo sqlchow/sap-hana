@@ -56,6 +56,7 @@
     state:  directory
     mode:   0755
   loop:
+    - { path: '/usr/sap/install/CD_DBEXPORT' }
     - { path: '/usr/sap/install/downloads' }
     - { path: '/usr/sap/install/download_basket' }
 
@@ -150,12 +151,12 @@
 
 
 
-#   08) Purge BOM file from Ansible Controller
-- name:         "Ensure {{ bom_name }} is absent"
-  file:
-    path:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
-    state:      absent
-  delegate_to:  localhost
+# #   08) Purge BOM file from Ansible Controller
+# - name:         "Ensure {{ bom_name }} is absent"
+#   file:
+#     path:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
+#     state:      absent
+#   delegate_to:  localhost
 
 # -------------------------------------+---------------------------------------8
 
