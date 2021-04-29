@@ -67,7 +67,7 @@ function missing {
 
 show_help=false
 force=0
-INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:s:c:p:t:ifh --longoptions parameter_file:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:s:c:p:t:a:ifh --longoptions parameter_file:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -81,6 +81,7 @@ do
     -p | --parameter_file)                     parameterfile="$2"               ; shift 2 ;;
     -d | --deployer_tfstate_key)               deployer_tfstate_key="$2"        ; shift 2 ;;
     -e | --deployer_environment)               deployer_environment="$2"        ; shift 2 ;;
+    -1 | --state_subscription)                 STATE_SUBSCRIPTION="$2"          ; shift 2 ;;
     -s | --subscription)                       subscription="$2"                ; shift 2 ;;
     -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
     -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
@@ -196,17 +197,25 @@ param_dirname=$(pwd)
 export TF_DATA_DIR="${param_dirname}/.terraform"
 var_file="${param_dirname}"/"${parameterfile}"
 
-if [ ! -z "$subscription" ]
+if [ -z "$subscription" ]
 then
     save_config_var "subscription" "${workload_config_information}"
 fi
 
-if [ ! -z "$client_id" ]
+if [ -z "$STATE_SUBSCRIPTION" ]
+then
+    echo "Saving the state subscription"
+    save_config_var "STATE_SUBSCRIPTION" "${workload_config_information}"
+fi
+
+
+
+if [ -z "$client_id" ]
 then
     save_config_var "client_id" "${workload_config_information}"
 fi
 
-if [ ! -z "$tenant_id" ]
+if [ -z "$tenant_id" ]
 then
     save_config_var "tenant_id" "${workload_config_information}"
 fi
@@ -242,7 +251,7 @@ else
 fi
 account_set=0
 
-if [ ! -z "${STATE_SUBSCRIPTION}" ]
+if [ -z "${STATE_SUBSCRIPTION}" ]
 then
     $(az account set --sub "${STATE_SUBSCRIPTION}")
     account_set=1

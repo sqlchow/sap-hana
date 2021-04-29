@@ -232,6 +232,13 @@ else
     fi
 fi
 
+extra_vars=""
+
+if [ -f terraform.tfvars ]; then
+    extra_vars=" -var-file=${param_dirname}/terraform.tfvars "
+fi
+
+
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
@@ -240,7 +247,7 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform -chdir="${terraform_module_directory}"  plan -var-file="${var_file}" > plan_output.log 2>&1
+terraform -chdir="${terraform_module_directory}"  plan -var-file="${var_file}" $extra_vars > plan_output.log 2>&1
 str1=$(grep "Error: KeyVault " plan_output.log)
 
 if [ -n "${str1}" ]; then
@@ -269,7 +276,7 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform -chdir="${terraform_module_directory}"  apply ${approve} -var-file="${var_file}" 2>error.log
+terraform -chdir="${terraform_module_directory}"  apply ${approve} -var-file="${var_file}" $extra_vars 2>error.log
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]
 then
