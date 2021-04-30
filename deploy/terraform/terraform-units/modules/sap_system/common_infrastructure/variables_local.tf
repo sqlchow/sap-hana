@@ -161,8 +161,8 @@ locals {
   sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : local.default_filepath))
   custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
-  db_sizing = local.enable_sid_deployment ? local.custom_sizing ? lookup(try(local.sizes.db, local.sizes), var.databases[0].size).storage : lookup(local.sizes, var.databases[0].size).storage : []
-
+  db_sizing = local.enable_sid_deployment ? lookup(local.sizes.db, var.databases[0].size).storage : []
+  
   enable_ultradisk = try(
     compact(
       [
