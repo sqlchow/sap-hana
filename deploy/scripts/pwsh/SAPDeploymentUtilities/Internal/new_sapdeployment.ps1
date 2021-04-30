@@ -439,7 +439,7 @@ Licensed under the MIT license.
     $versionLabel = & ([ScriptBlock]::Create($Cmd)) | Out-String 
 
     Write-Host $versionLabel
-    $version_parameter = " -var terraform_template_version=" + $versionLabel
+    
     if ("" -eq $versionLabel) {
         Write-Host ""
         Write-Host -ForegroundColor red "The environment was deployed using an older version of the Terrafrom templates"
@@ -460,6 +460,7 @@ Licensed under the MIT license.
         }
     }
     else {
+        $version_parameter = " -var terraform_template_version=" + $versionLabel
         Write-Host ""
         Write-Host -ForegroundColor green "The environment was deployed using the $versionLabel version of the Terrafrom templates"
         Write-Host ""

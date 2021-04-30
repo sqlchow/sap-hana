@@ -1,37 +1,52 @@
 #!/bin/bash
 
-. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+#error codes include those from /usr/include/sysexits.h
+
+#colors for terminal
+boldreduscore="\e[1;4;31m"
+boldred="\e[1;31m"
+cyan="\e[1;36m"
+resetformatting="\e[0m"
+
+#External helper functions
+#. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+full_script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_directory="$(dirname "${full_script_path}")"
+
+#call stack has full scriptname when using source 
+source "${script_directory}/deploy_utils.sh"
 
 function showhelp {
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
     echo "#                                                                                       #"
-    echo "#   This file contains the logic to addd the SPN secrets to the keyvault.               #"
+    echo "#   This file contains the logic to add the SPN secrets to the keyvault.                #"
     echo "#                                                                                       #"
     echo "#                                                                                       #"
     echo "#   Usage: set_secret.sh                                                                #"
-    echo "#      -e environment name                                                              #"
-    echo "#      -r region short name                                                             #"
-    echo "#      -v vault name                                                                    #"
-    echo "#      -c SPN app id                                                                    #"
-    echo "#      -s SPN password                                                                  #"
-    echo "#      -t tenant id of SPN                                                              #"
-    echo "#      -h Show help                                                                     #"
+    echo "#      -e or --environment                   environment name                           #"
+    echo "#      -r or --region                        region name                                #"
+    echo "#      -v or --vault                         Azure keyvault name                        #"
+    echo "#      -s or --subscription                  subscription                               #"
+    echo "#      -c or --spn_id                        SPN application id                         #"
+    echo "#      -p or --spn_secret                    SPN password                               #"
+    echo "#      -t or --tenant_id                     SPN Tenant id                              #"
+    echo "#      -h or --help                          Show help                                  #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
     echo "#   [REPO-ROOT]deploy/scripts/set_secret.sh \                                           #"
-    echo "#      -e PROD  \                                                                       #"
-    echo "#      -r weeu  \                                                                       #"
-    echo "#      -v prodweeuusrabc  \                                                             #"
-    echo "#      -c 11111111-1111-1111-1111-111111111111 \                                        #"
-    echo "#      -s SECRETPassword \                                                              #"
-    echo "#      -t 222222222-2222-2222-2222-222222222222                                         #"
+    echo "#      --environment PROD  \                                                            #"
+    echo "#      --region weeu  \                                                                 #"
+    echo "#      --vault prodweeuusrabc  \                                                        #"
+    echo "#      --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \                            #"
+    echo "#      --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy \                                  #"
+    echo "#      --spn_secret ************************ \                                          #"  
+    echo "#      --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz \                               #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
-
 
 INPUT_ARGUMENTS=$(getopt -n set_secrets -o e:r:v:s:c:p:t:i --longoptions environment:,region:,vault:,subscription:,spn_id:,spn_secret:,tenant_id:,help -- "$@")
 VALID_ARGUMENTS=$?
@@ -64,7 +79,6 @@ then
     # No configuration directory exists
     mkdir "${automation_config_directory}"
 fi
-
 
 if [ ! -n "${environment}" ]; then
     read -p "Environment name:"  environment

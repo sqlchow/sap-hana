@@ -30,20 +30,22 @@ function showhelp {
     echo "#                                                                                       #"
     echo "#                                                                                       #"
     echo "#   Usage: installer.sh                                                                 #"
-    echo "#    -p parameter file                                                                  #"
-    echo "#    -t type of system to deploy                                                        #"
-    echo "#       valid options:                                                                  #"
-    echo "#         sap_deployer                                                                  #"
-    echo "#         sap_library                                                                   #"
-    echo "#         sap_landscape                                                                 #"
-    echo "#         sap_system                                                                    #"
-    echo "#    -h Show help                                                                       #"
+    echo "#    -p or --parameterfile                parameter file                                #"
+    echo "#    -t or --type                         type of system to remove                      #"
+    echo "#                                         valid options:                                #"
+    echo "#                                           sap_deployer                                #"
+    echo "#                                           sap_library                                 #"
+    echo "#                                           sap_landscape                               #"
+    echo "#                                           sap_system                                  #"
+    echo "#    -i or --auto-approve                  Silent install                               #"
+    echo "#    -h or --help                          Show help                                    #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
     echo "#   [REPO-ROOT]deploy/scripts/installer.sh \                                            #"
-    echo "#      -p PROD-WEEU-DEP00-INFRASTRUCTURE.json \                                         #"
-    echo "#      -t sap_deployer                                                                  #"
+    echo "#      --parameterfile DEV-WEEU-SAP01-X00 \                                             #"
+    echo "#      --type sap_system                                                                #"
+    echo "#      --auto-approve                                                                   #"  
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
@@ -82,7 +84,7 @@ do
     -t | --type)                               deployment_system="$2"           ; shift 2 ;;
     -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
     -f | --force)                              force=1                          ; shift ;;
-    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+    -i | --silent)                             approve="--auto-approve"         ; shift ;;
     -h | --help)                               showhelp 
                                                exit 3                           ; shift ;;
     --) shift; break ;;

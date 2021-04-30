@@ -35,20 +35,20 @@ function showhelp {
     echo "#                                                                                       #"
     echo "#                                                                                       #"
     echo "#   Usage: remover.sh                                                                   #"
-    echo "#    -p parameter file                                                                  #"
-    echo "#    -t type of system to remove                                                        #"
-    echo "#       valid options:                                                                  #"
-    echo "#         sap_deployer                                                                  #"
-    echo "#         sap_library                                                                   #"
-    echo "#         sap_landscape                                                                 #"
-    echo "#         sap_system                                                                    #"
-    echo "#    -h Show help                                                                       #"
+    echo "#    -p or --parameterfile                parameter file                                #"
+    echo "#    -t or --type                         type of system to remove                      #"
+    echo "#                                         valid options:                                #"
+    echo "#                                           sap_deployer                                #"
+    echo "#                                           sap_library                                 #"
+    echo "#                                           sap_landscape                               #"
+    echo "#                                           sap_system                                  #"
+    echo "#    -h or --help                    Show help                                          #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
     echo "#   [REPO-ROOT]deploy/scripts/remover.sh \                                              #"
-    echo "#      -p PROD-WEEU-DEP00-INFRASTRUCTURE.json \                                         #"
-    echo "#      -t sap_deployer                                                                  #"
+    echo "#      --parameterfile DEV-WEEU-SAP01-X00.json \                                        #"
+    echo "#      --type sap_system                                                                #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
@@ -64,8 +64,6 @@ function missing {
     echo "#   Please export the folloing variables:                                               #"
     echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
-    echo "#      REMOTE_STATE_RG (resource group name for storage account containing state files) #"
-    echo "#      REMOTE_STATE_SA (storage account for state file)                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
@@ -82,8 +80,8 @@ eval set -- "$INPUT_ARGUMENTS"
 while :
 do
   case "$1" in
-    -t | --type)                               deployment_system="$2"           ; shift 2 ;;
     -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
+    -t | --type)                               deployment_system="$2"           ; shift 2 ;;
     -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
     -h | --help)                               showhelp 
                                                exit 3                           ; shift ;;
