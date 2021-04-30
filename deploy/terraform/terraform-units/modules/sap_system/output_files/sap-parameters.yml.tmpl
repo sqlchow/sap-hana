@@ -5,9 +5,8 @@ sapbits_location_base_path:
 
 # TERRAFORM CREATED
 sap_sid:                       ${sid}
-environment:                   ${environment}
 kv_uri:                        ${kv_uri}
-secret_prefix:                 ${uname_secret}
+secret_prefix:                 ${secret_prefix}
 
 disks: 
 %{~ for disk in disks }
