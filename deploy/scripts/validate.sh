@@ -27,20 +27,20 @@ showhelp()
     echo "#                                                                                       #"
     echo "#                                                                                       #"
     echo "#   Usage: validate.sh                                                                  #"
-    echo "#    --parameterfile    parameter file                                                  #"
-    echo "#    --type             type of system to deploy                                        #"
-    echo "#                       valid options:                                                  #"
-    echo "#                         sap_deployer                                                  #"
-    echo "#                         sap_library                                                   #"
-    echo "#                         sap_landscape                                                 #"
-    echo "#                         sap_system                                                    #"
-    echo "#    --help             Show help                                                       #"
+    echo "#    -p or --parameterfile                        parameter file                        #"
+    echo "#    -t or --type                                 type of system to deploy              #"
+    echo "#                                                 valid options:                        #"
+    echo "#                                                   sap_deployer                        #"
+    echo "#                                                   sap_library                         #"
+    echo "#                                                   sap_landscape                       #"
+    echo "#                                                   sap_system                          #"
+    echo "#    -h or --help                                 Show help                             #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
     echo "#   [REPO-ROOT]deploy/scripts/validate.sh \                                             #"
-    echo "#      -parameterfile PROD-WEEU-DEP00-INFRASTRUCTURE.json \                             #"
-    echo "#      -type sap_deployer                                                               #"
+    echo "#      --parameterfile PROD-WEEU-DEP00-INFRASTRUCTURE.json \                            #"
+    echo "#      --type sap_deployer                                                              #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
 
@@ -73,8 +73,8 @@ eval set -- "$INPUT_ARGUMENTS"
 while :
 do
   case "$1" in
-    -t | --type)            deployment_system="$2"   ; shift 2 ;;
     -p | --parameterfile)   parameterfile="$2"       ; shift 2 ;;
+    -t | --type)            deployment_system="$2"   ; shift 2 ;;
     -h | --help)            showhelp                 ; shift ;;
     --) shift; break ;;
   esac

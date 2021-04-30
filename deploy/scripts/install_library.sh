@@ -82,19 +82,6 @@ then
     exit
 fi
 
-if [ ! -d "${deployer_statefile_foldername}" ]
-then
-    printf -v val %-40.40s "$deployer_statefile_foldername"
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                    Directory does not exist:  "${deployer_statefile_foldername}" #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    exit
-fi
-
-
 param_dirname=$(dirname "${parameterfile}")
 
 if [ $param_dirname != '.' ]; then
@@ -108,9 +95,11 @@ if [ $param_dirname != '.' ]; then
 fi
 
 # Read environment
-environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+environment=$(jq .infrastructure.environment "${parameterfile}" | tr -d \")
+region=$(jq .infrastructure.region "${parameterfile}" | tr -d \")
 key=$(echo "${parameterfile}" | cut -d. -f1)
+
+use_deployer=$(jq .deployer.use "${parameterfile}" | tr -d \")
 
 if [ ! -n "${environment}" ]
 then
@@ -137,6 +126,20 @@ then
     echo ""
     exit -1
 fi
+
+if [ ! -d "${deployer_statefile_foldername}" ]
+then
+    printf -v val %-40.40s "$deployer_statefile_foldername"
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                    Directory does not exist:  "${deployer_statefile_foldername}" #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    exit
+fi
+
+
 
 #Persisting the parameters across executions
 automation_config_directory=~/.sap_deployment_automation/

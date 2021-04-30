@@ -305,14 +305,37 @@ locals {
     }
   ])
 
+  // OS disk to be created for DB nodes
+  // disk_iops_read_write only apply for ultra
+  os_disk = flatten(
+    [
+      for storage_type in local.db_sizing : [
+        for idx, disk_count in range(storage_type.count) : {
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = try(storage_type.write_accelerator, false)
+        }
+        if !try(storage_type.append, false)
+      ]
+      if storage_type.name == "os"
+    ]
+  )
+
+
+
+  // List of data disks to be created for  DB nodes
+  // disk_iops_read_write only apply for ultra
+
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
       for storage_type in local.db_sizing : [
         for idx, disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
-          storage_account_type = storage_type.disk_type,
-          disk_size_gb         = storage_type.size_gb,
-          //The following two lines are for Ultradisks only
+          suffix                    = format("%s%02d", storage_type.name, disk_count + local.offset)
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
           disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
           disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
           caching                   = storage_type.caching,
@@ -330,10 +353,9 @@ locals {
     [
       for storage_type in local.db_sizing : [
         for idx, disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, storage_type.lun_start + disk_count + local.offset)
-          storage_account_type = storage_type.disk_type,
-          disk_size_gb         = storage_type.size_gb,
-          //The following two lines are for Ultradisks only
+          suffix                    = format("%s%02d", storage_type.name, storage_type.lun_start + disk_count + local.offset)
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
           disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
           disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
           caching                   = storage_type.caching,
