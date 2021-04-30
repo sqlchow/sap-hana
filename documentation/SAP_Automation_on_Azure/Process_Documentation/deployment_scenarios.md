@@ -63,18 +63,7 @@ The deployer and library can be deployed using the ***prepare_region.sh*** comma
 
 ```bash
 cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
-mkdir -p WORKSPACES/DEPLOYER
-cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
 
-mkdir -p WORKSPACES/LIBRARY
-cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
-
-mkdir -p WORKSPACES/LANDSCAPE
-cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
-
-mkdir -p WORKSPACES/SYSTEM
-cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00 WORKSPACES/SYSTEM/. -r
-cd WORKSPACES
 
 ```
 
