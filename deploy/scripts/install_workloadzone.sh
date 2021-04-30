@@ -1,7 +1,19 @@
 #!/bin/bash
-. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
 
-function showhelp {
+#colors for terminal
+boldreduscore="\e[1;4;31m"
+boldred="\e[1;31m"
+cyan="\e[1;36m"
+resetformatting="\e[0m"
+
+#External helper functions
+#. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+full_script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_directory="$(dirname "${full_script_path}")"
+
+#call stack has full scriptname when using source 
+source "${script_directory}/deploy_utils.sh"
+
 function showhelp {
     echo ""
     echo "#########################################################################################"
@@ -24,6 +36,7 @@ function showhelp {
     echo "#   Optional parameters                                                                 #"
     echo "#      -d or --deployer_tfstate_key          Deployer terraform state file name         #"
     echo "#      -e or --deployer_environment          Deployer environment, i.e. MGMT            #"
+    echo "#      -s or --subscription                  subscription                               #"
     echo "#      -s or --subscription                  subscription                               #"
     echo "#      -c or --spn_id                        SPN application id                         #"
     echo "#      -p or --spn_secret                    SPN password                               #"
@@ -68,8 +81,10 @@ function missing {
     echo "#   Optional parameters                                                                 #"
     echo "#      -d or deployer_tfstate_key            Deployer terraform state file name         #"
     echo "#      -e or deployer_environment            Deployer environment, i.e. MGMT            #"
+    echo "#      -k or --state_subscription            subscription of keyvault with SPN details  #"
     echo "#      -s or --subscription                  subscription                               #"
     echo "#      -c or --spn_id                        SPN application id                         #"
+    echo "#      -o or --storageaccountname            Storage account for terraform state files  #"
     echo "#      -p or --spn_secret                    SPN password                               #"
     echo "#      -t or --tenant_id                     SPN Tenant id                              #"
     echo "#      -f or --force                         Clean up the local Terraform files.        #"
@@ -80,9 +95,8 @@ function missing {
 
 show_help=false
 force=0
-INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:s:c:p:t:a:ifh --longoptions parameter_file:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:k:o:s:c:p:t:a:v:ifh --longoptions parameter_file:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,vault:,storageaccountname:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
-
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   showhelp
 fi
@@ -94,9 +108,11 @@ do
     -p | --parameter_file)                     parameterfile="$2"               ; shift 2 ;;
     -d | --deployer_tfstate_key)               deployer_tfstate_key="$2"        ; shift 2 ;;
     -e | --deployer_environment)               deployer_environment="$2"        ; shift 2 ;;
-    -1 | --state_subscription)                 STATE_SUBSCRIPTION="$2"          ; shift 2 ;;
+    -k | --state_subscription)                 STATE_SUBSCRIPTION="$2"          ; shift 2 ;;
+    -o | --storageaccountname)                 REMOTE_STATE_SA="$2"             ; shift 2 ;;
     -s | --subscription)                       subscription="$2"                ; shift 2 ;;
     -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
+    -v | --vault)                              keyvault="$2"                    ; shift 2 ;;
     -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
     -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
     -f | --force)                              force=1                          ; shift ;;
@@ -106,7 +122,6 @@ do
     --) shift; break ;;
   esac
 done
-
 tfstate_resource_id=""
 tfstate_parameter=""
 
@@ -203,6 +218,13 @@ then
     
 fi
 
+#Plugins
+if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
+then
+    mkdir "$HOME/.terraform.d/plugin-cache"
+fi
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+
 
 init "${automation_config_directory}" "${generic_config_information}" "${workload_config_information}"
 
@@ -219,7 +241,6 @@ if [ ! -z "$STATE_SUBSCRIPTION" ]
 then
     echo "Saving the state subscription"
     save_config_var "STATE_SUBSCRIPTION" "${workload_config_information}"
-    
 fi
 
 if [ ! -z "$client_id" ]
@@ -227,10 +248,21 @@ then
     save_config_var "client_id" "${workload_config_information}"
 fi
 
+if [ ! -z "$keyvault" ]
+then
+    save_config_var "keyvault" "${workload_config_information}"
+fi
+
 if [ ! -z "$tenant_id" ]
 then
     save_config_var "tenant_id" "${workload_config_information}"
 fi
+
+if [ ! -z "$REMOTE_STATE_SA" ]
+then
+    save_config_var "REMOTE_STATE_SA" "${workload_config_information}"
+fi
+
 
 load_config_vars "${workload_config_information}" "REMOTE_STATE_SA"
 load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
@@ -268,8 +300,6 @@ then
     $(az account set --sub "${STATE_SUBSCRIPTION}")
     account_set=1
 fi
-
-echo "${REMOTE_STATE_SA}"
 
 if [ ! -n "${REMOTE_STATE_SA}" ]
 then
@@ -319,25 +349,23 @@ then
 
     fi
 else
-    if [ -n "$REMOTE_STATE_RG" ]
+    if [ ! -n "$REMOTE_STATE_RG" ]
     then
         REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
         tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-        if [ ! -n "$REMOTE_STATE_RG" ]
+        if [ ! -n "$tfstate_resource_id" ]
         then
             STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
         fi
 
         save_config_vars "${workload_config_information}" \
             REMOTE_STATE_RG \
-            REMOTE_STATE_SA \
             tfstate_resource_id \
             STATE_SUBSCRIPTION
 
     fi
 
 fi
-
 if [ -n $keyvault ]
 then
     secretname="${environment}"-client-id
@@ -346,9 +374,9 @@ then
     then
         if [ ! -z "$spn_secret" ]
         then
-            allParams=$(printf " -e %s -r %s -v %s -s %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
+            allParams=$(printf " --workload --environment %s --region %s --vault %s --spn_secret %s --subscription %s" ${environment} ${region} ${keyvault} ${spn_secret} ${subscription})
                 
-            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams -w
+            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams 
             if [ $? -eq 255 ]
             then
                 exit $?
@@ -388,7 +416,6 @@ then
     fi
     
 fi
-
 if [ -z "${deployer_tfstate_key}" ]
 then
     load_config_vars "${workload_config_information}" "deployer_tfstate_key"
@@ -397,20 +424,6 @@ then
         # Deployer state was specified in ~/.sap_deployment_automation library config
         deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
         deployer_tfstate_key_exists=true
-    else
-        load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
-        if [ ! -z "${deployer_tfstate_key}" ]
-        then
-            # Deployer state was specified in ~/.sap_deployment_automation library config
-            deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
-            save_config_vars "${workload_config_information}" deployer_tfstate_key
-            deployer_tfstate_key_exists=true
-        else
-            read -p "Deployer state file name (empty for no deployer): "  deployer_tfstate_key
-            deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
-            save_config_vars "${workload_config_information}" deployer_tfstate_key
-        fi
-        
     fi
 else
     deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"

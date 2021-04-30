@@ -100,7 +100,7 @@ For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containi
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile DEV-WEEU-SAP01-X00.json --type sap_system --silect
+    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile DEV-WEEU-SAP01-X00.json --type sap_system --auto-approve
 ```
 
 <br>
@@ -123,6 +123,28 @@ A sample configuration for this is available here:
 
 <br>
 
+From the cloned repository copy the following folders to your root folder (*Azure_SAP_Automated_Deployment/WORKSPACES*) for parameter files
+
+- LIBRARY/MGMT-NOEU-SAP_LIBRARY
+- LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE
+- SYSTEM/DEV-NOEU-SAP01-X02
+
+The helper script below can be used to copy the folders.
+
+```bash
+cd ~/Azure_SAP_Automated_Deployment
+
+mkdir -p WORKSPACES/LIBRARY
+cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
+
+mkdir -p WORKSPACES/LANDSCAPE
+cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
+
+mkdir -p WORKSPACES/SYSTEM
+cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02 WORKSPACES/SYSTEM/. -r
+cd WORKSPACES
+```
+
 The scenario requires an existing key vault that contains the SPN credentials for the SPN that will be used to deploy the workload zone. This must be defined in the parameter file with the kv_spn_id parameter.
 
 ```json
@@ -141,22 +163,42 @@ By providing false in the "use" attribute in the deployer section, the automatio
 
 ### **Scenario 2 - Deploy the library** ###
 
-The deployer and library can be deployed using the ***install_library.sh*** command. .
+The deployer and library can be deployed using the ***install_library.sh*** command. Update the MGMT-NOEU-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
 
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY
 
-    $DEPLOYMENT_REPO_PATH/scripts/install_library.sh
-        --deployer_parameter_file DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json \
-        --library_parameter_file LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json
-        --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
-        --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy \
-        --spn_secret ************************ \
-        --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz \
-        --auto-approve
-
+    $DEPLOYMENT_REPO_PATH/deploy/scripts/install_library.sh -p MGMT-NOEU-SAP_LIBRARY.json 
 ```
 
+### **Scenario 2 - Deploy the workload** ###
+
+The deployer and library can be deployed using the ***install_library.sh*** command. Update the MGMT-NOEU-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
+
+```bash
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE
+
+     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameter_file DEV-NOEU-SAP02-INFRASTRUCTURE.json \
+     --state_subscription wwwwwwww-wwww-wwww-wwww-wwwwwwwwwwww \
+     --storageaccountname mgmtweeutfstate### \
+     --vault MGMTWEEUDEP00user### \
+     --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
+     --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy \
+     --spn_secret ************************ \
+     --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz 
+```
+
+### **Scenario 2 - Deploying the SAP system** ###
+
+For deploying the SAP system navigate to the folder(DEV-NOEU-SAP02-X02) containing the DEV-NOEU-SAP02-X02.json parameter file and use the installer.sh script.
+
+```bash
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02
+
+    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile DEV-NOEU-SAP02-X02.json --type sap_system --auto-approve
+```
+
+<br>
 
 # Brownfield deployment #
 

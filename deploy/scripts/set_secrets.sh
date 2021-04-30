@@ -48,13 +48,13 @@ function showhelp {
     echo "#########################################################################################"
 }
 
-INPUT_ARGUMENTS=$(getopt -n set_secrets -o e:r:v:s:c:p:t:i --longoptions environment:,region:,vault:,subscription:,spn_id:,spn_secret:,tenant_id:,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n set_secrets -o e:r:v:s:c:p:t:hw --longoptions environment:,region:,vault:,subscription:,spn_id:,spn_secret:,tenant_id:,workload,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   showhelp
 fi
-
+echo "$INPUT_ARGUMENTS"
 eval set -- "$INPUT_ARGUMENTS"
 while :
 do
@@ -66,8 +66,9 @@ do
     -c | --spn_id)                             client_id="$2"               ; shift 2 ;;
     -p | --spn_secret)                         client_secret="$2"           ; shift 2 ;;
     -t | --tenant_id)                          tenant_id="$2"               ; shift 2 ;;
+    -w | --workload)                           workload=1                   ; shift   ;;
     -h | --help)                               showhelp 
-                                               exit 3                       ; shift ;;
+                                               exit 3                       ; shift   ;;
     --) shift; break ;;
   esac
 done
@@ -80,12 +81,13 @@ then
     mkdir "${automation_config_directory}"
 fi
 
-if [ ! -n "${environment}" ]; then
+if [ -z "${environment}" ]; then
     read -p "Environment name:"  environment
 fi
 
 environment_config_information="${automation_config_directory}""${environment}""${region}"
 touch "${environment_config_information}"
+cat $environment_config_information
 
 if [ ! -d "${automation_config_directory}" ]
 then
@@ -93,69 +95,72 @@ then
     mkdir "${automation_config_directory}"
 else
     touch "${environment_config_information}"
-   
 fi
 
-if [ ! -n "$subscription" ]; 
+if [ -z "$subscription" ]; 
 then
   load_config_vars "${environment_config_information}" "subscription"
 fi
 
 if [ "$workload" != 1 ] ;
 then
-    load_config_vars "${environment_config_information}" "kvsubscription"
-    subscription=${kvsubscription}
+    load_config_vars "${environment_config_information}" "STATE_SUBSCRIPTION"
+    subscription=${STATE_SUBSCRIPTION}
 fi
 
-if [ ! -n "$keyvault" ]; then
+if [ -z "$keyvault" ]; then
     load_config_vars "${environment_config_information}" "keyvault"
     if [ ! -n "$keyvault" ]; then
         read -p "Keyvault name:"  keyvault
     fi
 fi
 
-if [ ! -n "$client_id" ]; then
+if [ -z "$client_id" ]; then
     load_config_vars "${environment_config_information}" "client_id"
-    if [ ! -n "$client_id" ]; then
+    if [ -z  "$client_id" ]; then
         read -p "SPN App ID:"  client_id
     fi
 fi
 
-if [ ! -n "$client_secret" ]; then
+if [ -z "$client_secret" ]; then
     read -p "SPN App Password:"  client_secret
 fi
 
-if [ ! -n "${tenant_id}" ]; then
+if [ -z "${tenant_id}" ]; then
     load_config_vars "${environment_config_information}" "tenant_id"
     if [ ! -n "${tenant_id}" ]; then
         read -p "SPN Tenant ID:"  tenant_id
     fi
 fi
 
-if [ ! -n "$subscription" ]; then
+if [ -z "$subscription" ]; then
     read -p "SPN Subscription:"  subscription
 fi
 
-if [ ! -n "${environment}" ]; then
+if [ -z "${environment}" ]; then
     read -p "Environment:"  environment
 fi
 
-if [ ! -n "${keyvault}" ]; then
+if [ -z "${keyvault}" ]; then
+    echo "Missing keyvault"
     showhelp
     exit -1
 fi
 
-if [ ! -n "${client_id}" ]; then
+if [ -z "${client_id}" ]; then
+    echo "Missing client_id"
     showhelp
     exit -1
 fi
 
-if [ ! -n "$client_secret" ]; then
+if [ -z "$client_secret" ]; then
+    echo "Missing client_secret"
     showhelp
     exit -1
 fi
 
-if [ ! -n "${tenant_id}" ]; then
+if [ -z "${tenant_id}" ]; then
+    echo "Missing tenant_id"
     showhelp
     exit -1
 fi
@@ -168,15 +173,16 @@ echo "##########################################################################
 echo ""
 
 save_config_vars "${environment_config_information}" \
-keyvault \
-environment \
-subscription \
-client_id \
-tenant_id
+    keyvault \
+    environment \
+    subscription \
+    client_id \
+    tenant_id \
+    STATE_SUBSCRIPTION
 
 secretname="${environment}"-subscription-id
 
-az keyvault secret set --name "${secretname}" --vault-name "${keyvault}" --value "${subscription}"  > stdout.az 2>&1
+az keyvault secret show --name "${secretname}" --vault-name "${keyvault}"   > stdout.az 2>&1
 result=$(grep "ERROR: The user, group or application" stdout.az)
 
 if [ -n "${result}" ]; then

@@ -124,7 +124,7 @@ then
     echo -e "#                 $boldred  Parameter file does not exist: ${val} $resetformatting #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit
+    exit 2 #No such file or directory
 fi
 
 if [ ! -n "${deployment_system}" ]
@@ -142,7 +142,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 64 #script usage wrong
 fi
 
 
@@ -177,7 +177,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 65 #data format error
 fi
 
 if [ ! -n "${region}" ]
@@ -190,7 +190,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 65 #data format error
 fi
 
 key=$(echo "${parameterfile_name}" | cut -d. -f1)
@@ -210,7 +210,6 @@ fi
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 
 param_dirname=$(pwd)
-root_dirname=$(pwd)
 
 init "${automation_config_directory}" "${generic_config_information}" "${system_config_information}"
 
@@ -221,7 +220,6 @@ extra_vars=""
 if [ -f terraform.tfvars ]; then
     extra_vars=" -var-file=${param_dirname}/terraform.tfvars "
 fi
-
 
 if [ "${deployment_system}" == sap_deployer ]
 then
@@ -235,16 +233,15 @@ load_config_vars "${system_config_information}" "deployer_tfstate_key"
 load_config_vars "${system_config_information}" "landscape_tfstate_key"
 load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
 
-echo "Terraform storage " $REMOTE_STATE_SA
+echo "Terraform storage " "${REMOTE_STATE_SA}"
 
 deployer_tfstate_key_parameter=''
 if [ "${deployment_system}" != sap_deployer ]
 then
-    if [ ! -n "$=${deployer_tfstate_key}" ]; then
+    if [ -z "${deployer_tfstate_key}" ]; then
         deployer_tfstate_key_parameter=" "
     else
         deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
-        deployer_tfstate_key_exists=true
     fi
 else
     STATE_SUBSCRIPTION=$ARM_SUBSCRIPTION_ID
