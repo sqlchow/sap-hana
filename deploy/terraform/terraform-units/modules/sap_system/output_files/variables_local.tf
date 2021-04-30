@@ -103,6 +103,10 @@ variable "disks" {
   description = "List of disks"
 }
 
+variable "use_local_credentials" {
+  description = "SDU has unique credentials"
+}
+
 locals {
 
   tfstate_resource_id          = try(var.tfstate_resource_id, "")
@@ -192,7 +196,5 @@ locals {
     if adatabase != {}
   ])
 
-  uname_secret = trimprefix(format("%s-sid-username", var.naming.prefix.VNET), "-")
-  pwd_secret   = trimprefix(format("%s-sid-password", var.naming.prefix.VNET), "-")
-  key_secret   = trimprefix(format("%s-sid-sshkey", var.naming.prefix.VNET), "-")
+  secret_prefix = var.use_local_credentials ? var.naming.prefix.SDU : var.naming.prefix.VNET
 }
