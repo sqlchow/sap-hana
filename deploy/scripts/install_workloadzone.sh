@@ -210,25 +210,24 @@ param_dirname=$(pwd)
 export TF_DATA_DIR="${param_dirname}/.terraform"
 var_file="${param_dirname}"/"${parameterfile}"
 
-if [ -z "$subscription" ]
+if [ ! -z "$subscription" ]
 then
     save_config_var "subscription" "${workload_config_information}"
 fi
 
-if [ -z "$STATE_SUBSCRIPTION" ]
+if [ ! -z "$STATE_SUBSCRIPTION" ]
 then
     echo "Saving the state subscription"
     save_config_var "STATE_SUBSCRIPTION" "${workload_config_information}"
+    
 fi
 
-
-
-if [ -z "$client_id" ]
+if [ ! -z "$client_id" ]
 then
     save_config_var "client_id" "${workload_config_information}"
 fi
 
-if [ -z "$tenant_id" ]
+if [ ! -z "$tenant_id" ]
 then
     save_config_var "tenant_id" "${workload_config_information}"
 fi
@@ -264,17 +263,19 @@ else
 fi
 account_set=0
 
-if [ -z "${STATE_SUBSCRIPTION}" ]
+if [ ! -z "${STATE_SUBSCRIPTION}" ]
 then
     $(az account set --sub "${STATE_SUBSCRIPTION}")
     account_set=1
 fi
 
-if [ -z "${REMOTE_STATE_SA}" ]
+echo "${REMOTE_STATE_SA}"
+
+if [ ! -n "${REMOTE_STATE_SA}" ]
 then
     # Ask for deployer environment name and try to read the deployer state file and resource group details from the configuration file
     
-    if [ -z "$deployer_environment" ]
+    if [ -n "$deployer_environment" ]
     then
         read -p "Deployer environment name: " deployer_environment
     fi
@@ -285,7 +286,18 @@ then
     load_config_vars "${deployer_config_information}" "REMOTE_STATE_SA"
     load_config_vars "${deployer_config_information}" "tfstate_resource_id"
     load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
-    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    if [ -z $STATE_SUBSCRIPTION]
+    then
+        STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    fi
+
+    
+    if [ -n $REMOTE_STATE_RG ]
+    then
+        REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
+        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
+    fi
+    
     tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
 
     save_config_vars "${workload_config_information}" \
@@ -306,6 +318,24 @@ then
         
 
     fi
+else
+    if [ -n "$REMOTE_STATE_RG" ]
+    then
+        REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
+        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
+        if [ ! -n "$REMOTE_STATE_RG" ]
+        then
+            STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+        fi
+
+        save_config_vars "${workload_config_information}" \
+            REMOTE_STATE_RG \
+            REMOTE_STATE_SA \
+            tfstate_resource_id \
+            STATE_SUBSCRIPTION
+
+    fi
+
 fi
 
 if [ -n $keyvault ]
