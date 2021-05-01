@@ -37,8 +37,12 @@ function showhelp {
     echo "#                                           sap_library                                 #"
     echo "#                                           sap_landscape                               #"
     echo "#                                           sap_system                                  #"
-    echo "#    -i or --auto-approve                  Silent install                               #"
-    echo "#    -h or --help                          Show help                                    #"
+    echo "#                                                                                       #"
+    echo "#   Optional parameters                                                                 #"
+    echo "#                                                                                       #"
+    echo "#    -o or --storageaccountname           Storage account name for state file           #"
+    echo "#    -i or --auto-approve                 Silent install                                #"
+    echo "#    -h or --help                         Show help                                     #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
@@ -70,7 +74,7 @@ function missing {
 
 force=0
 
-INPUT_ARGUMENTS=$(getopt -n installer -o p:t:hif --longoptions type:,parameterfile:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n installer -o p:t:o:hif --longoptions type:,parameterfile:,storageaccountname:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -83,6 +87,7 @@ do
   case "$1" in
     -t | --type)                               deployment_system="$2"           ; shift 2 ;;
     -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
+    -o | --storageaccountname)                 REMOTE_STATE_SA="$2"             ; shift 2 ;;
     -f | --force)                              force=1                          ; shift ;;
     -i | --silent)                             approve="--auto-approve"         ; shift ;;
     -h | --help)                               showhelp 
@@ -226,7 +231,11 @@ then
     deployer_tfstate_key=${key}.terraform.tfstate
 fi
 
-load_config_vars "${system_config_information}" "REMOTE_STATE_SA"
+if [ -z "$REMOTE_STATE_SA" ]; 
+then
+    load_config_vars "${system_config_information}" "REMOTE_STATE_SA"
+fi
+
 load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
 load_config_vars "${system_config_information}" "tfstate_resource_id"
 load_config_vars "${system_config_information}" "deployer_tfstate_key"
@@ -331,13 +340,13 @@ if [ ! -n "${REMOTE_STATE_SA}" ]; then
 fi
 
 
-if [ ! -n "${REMOTE_STATE_SA}" ]; then
+if [ -z "${REMOTE_STATE_SA}" ]; then
     option="REMOTE_STATE_SA"
     missing
     exit -1
 fi
 
-if [ ! -n "${REMOTE_STATE_RG}" ]; then
+if [ -z "${REMOTE_STATE_RG}" ]; then
     REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
     tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
     STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)

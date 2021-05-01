@@ -99,7 +99,7 @@ Licensed under the MIT license.
         $tfstate_resource_id = $rID.ResourceId
         $sub = $tfstate_resource_id.Split("/")[2]
 
-        $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id; "kvsubscription" = $sub }
+        $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id; STATE_SUBSCRIPTION = $sub }
         $iniContent += @{$combined = $Category1 }
         $changed = $true
     }
@@ -110,7 +110,7 @@ Licensed under the MIT license.
         $tfstate_resource_id = $iniContent[$combined]["tfstate_resource_id"] 
         $rgName = $iniContent[$combined]["REMOTE_STATE_RG"] 
         $saName = $iniContent[$combined]["REMOTE_STATE_SA"] 
-        $sub = $iniContent[$combined]["kvsubscription"] 
+        $sub = $iniContent[$combined]["STATE_SUBSCRIPTION"] 
 
             
     }
@@ -121,7 +121,7 @@ Licensed under the MIT license.
     }
     
      # Subscription
-     $sub = $iniContent[$combined]["kvsubscription"]
+     $sub = $iniContent[$combined]["STATE_SUBSCRIPTION"]
 
      if ($null -ne $sub -and "" -ne $sub) {
         Select-AzSubscription -SubscriptionId $sub
@@ -138,7 +138,7 @@ Licensed under the MIT license.
         $tfstate_resource_id = $rID.ResourceId
         $sub = $tfstate_resource_id.Split("/")[2]
 
-        $iniContent[$combined]["kvsubscription"] = $sub.Trim() 
+        $iniContent[$combined]["STATE_SUBSCRIPTION"] = $sub.Trim() 
         $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
         $iniContent[$combined]["REMOTE_STATE_SA"] = $saName
         $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
@@ -161,7 +161,7 @@ Licensed under the MIT license.
         $tfstate_resource_id = $rID.ResourceId
         $sub = $tfstate_resource_id.Split("/")[2]
 
-        $iniContent[$combined]["kvsubscription"] = $sub.Trim() 
+        $iniContent[$combined]["STATE_SUBSCRIPTION"] = $sub.Trim() 
         $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
         $iniContent[$combined]["REMOTE_STATE_SA"] = $saName
         $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
@@ -259,7 +259,7 @@ Licensed under the MIT license.
         $iniContent[$combined]["REMOTE_STATE_RG"] = "[DELETED]"
         $iniContent[$combined]["REMOTE_STATE_SA"] = "[DELETED]"
         $iniContent[$combined]["tfstate_resource_id"] = "[DELETED]"
-        $iniContent[$combined]["kvsubscription"] = "[DELETED]"
+        $iniContent[$combined]["STATE_SUBSCRIPTION"] = "[DELETED]"
         Out-IniFile -InputObject $iniContent -Path $filePath
     }
 
@@ -269,7 +269,7 @@ Licensed under the MIT license.
     }
     if ($Type -eq "sap_deployer") {
         $iniContent[$combined]["Deployer"] = "[DELETED]"
-        $iniContent[$combined]["kvsubscription"] = "[DELETED]"
+        $iniContent[$combined]["STATE_SUBSCRIPTION"] = "[DELETED]"
     }
     $Env:TF_DATA_DIR = $null
 }

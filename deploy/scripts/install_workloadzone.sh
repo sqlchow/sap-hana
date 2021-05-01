@@ -82,6 +82,7 @@ function missing {
     echo "#      -d or deployer_tfstate_key            Deployer terraform state file name         #"
     echo "#      -e or deployer_environment            Deployer environment, i.e. MGMT            #"
     echo "#      -k or --state_subscription            subscription of keyvault with SPN details  #"
+    echo "#      -v or --vault                         Name of Azure keyvault with SPN details    #"
     echo "#      -s or --subscription                  subscription                               #"
     echo "#      -c or --spn_id                        SPN application id                         #"
     echo "#      -o or --storageaccountname            Storage account for terraform state files  #"
@@ -154,7 +155,7 @@ then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#               Parameter file does not exist: ${val} #"
+    echo -e "#                 $boldreduscore Parameter file does not exist: ${val}$resetformatting #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     exit
@@ -170,7 +171,7 @@ if [ ! -n "${environment}" ]
 then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Incorrect parameter file.                                   #"
+    echo -e "#                          $boldreduscore Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
     echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
     echo "#                                                                                       #"
@@ -183,7 +184,7 @@ if [ ! -n "${region}" ]
 then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Incorrect parameter file.                                   #"
+    echo -e "#                          $boldreduscore Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
     echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
     echo "#                                                                                       #"
@@ -316,6 +317,7 @@ then
     load_config_vars "${deployer_config_information}" "REMOTE_STATE_SA"
     load_config_vars "${deployer_config_information}" "tfstate_resource_id"
     load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
+
     if [ -z $STATE_SUBSCRIPTION]
     then
         STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)

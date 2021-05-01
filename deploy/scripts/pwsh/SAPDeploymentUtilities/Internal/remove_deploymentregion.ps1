@@ -196,9 +196,9 @@ Licensed under the MIT license.
     $iniContent[$combined]["REMOTE_STATE_RG"] = ""
     $iniContent[$combined]["REMOTE_STATE_SA"] = ""
     $iniContent[$combined]["tfstate_resource_id"] = ""
-    $iniContent[$combined]["kvsubscription"] = ""
+    $iniContent[$combined]["STATE_SUBSCRIPTION"] = ""
     $iniContent[$combined]["Deployer"] = ""
-    $iniContent[$combined]["kvsubscription"] = ""
+    $iniContent[$combined]["STATE_SUBSCRIPTION"] = ""
     $iniContent[$combined]["step"] = 0
     Out-IniFile -InputObject $iniContent -Path $filePath
     $Env:TF_DATA_DIR = $null
