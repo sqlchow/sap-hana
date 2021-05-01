@@ -159,8 +159,8 @@ It is also possible to provide the Service Principal details as part of the scri
    New-SAPAutomationRegion -DeployerParameterfile .\DEPLOYER\MGMT-WEEU-DEP00-INFRASTRUCTURE\MGMT-WEEU-DEP00-INFRASTRUCTURE.json  
    -LibraryParameterfile .\LIBRARY\MGMT-WEEU-SAP_LIBRARY\MGMT-WEEU-SAP_LIBRARY.json 
    -Subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-   -Client_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-   -Client_secret ************************
+   -SPN_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+   -SPN_password ************************
    -Tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz  
    -Silent
 ```
@@ -189,8 +189,8 @@ It is also possible to provide the Service Principal details as part of the para
    New-SAPWorkloadZone -Parameterfile .\DEV-WEEU-SAP01-INFRASTRUCTURE.json 
    -Deployerenvironment MGMT
    -Subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-   -Client_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-   -Client_secret ************************
+   -SPN_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+   -SPN_password ************************
    -Tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz  
 
 ```

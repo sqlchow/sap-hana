@@ -238,7 +238,7 @@ locals {
   // OS image for all Application Tier VMs
   // If custom image is used, we do not overwrite os reference with default value
   app_custom_image = try(var.application.os.source_image_id, "") != "" ? true : false
-  app_ostype       = try(var.application.os.os_type, "Linux")
+  app_ostype       = upper(try(var.application.os.offer, "")) == "WINDOWSSERVER" ? "WINDOWS" : try(var.application.os.os_type, "LINUX")
 
   app_os = {
     "os_type"         = local.app_ostype
@@ -304,6 +304,8 @@ locals {
     web_lb = local.sub_web_defined ? (4 + 1) : 6 + 2
     web_vm = local.sub_web_defined ? (10) : 50
   }
+
+  win_ha_scs = local.scs_server_count > 0 && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS")
 
   ip_offsets = local.scs_ostype == "WINDOWS" ? local.windows_ip_offsets : local.linux_ip_offsets
 
