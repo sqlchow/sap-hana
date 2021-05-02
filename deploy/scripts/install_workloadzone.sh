@@ -31,7 +31,7 @@ function showhelp {
     echo "#   ~/.sap_deployment_automation folder                                                 #"
     echo "#                                                                                       #"
     echo "#   Usage: install_workloadzone.sh                                                      #"
-    echo "#      -p or --parameter_file                deployer parameter file                    #"
+    echo "#      -p or --parameterfile                deployer parameter file                    #"
     echo "#                                                                                       #"
     echo "#   Optional parameters                                                                 #"
     echo "#      -d or --deployer_tfstate_key          Deployer terraform state file name         #"
@@ -48,12 +48,12 @@ function showhelp {
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
     echo "#   [REPO-ROOT]deploy/scripts/install_workloadzone.sh \                                 #"
-    echo "#      --parameter_file PROD-WEEU-SAP01-INFRASTRUCTURE                                  #"
+    echo "#      --parameterfile PROD-WEEU-SAP01-INFRASTRUCTURE                                  #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
     echo "#   [REPO-ROOT]deploy/scripts/install_workloadzone.sh \                                 #"
-    echo "#      --parameter_file PROD-WEEU-SAP01-INFRASTRUCTURE \                                #"
+    echo "#      --parameterfile PROD-WEEU-SAP01-INFRASTRUCTURE \                                #"
     echo "#      --deployer_environment MGMT \                                                    #"
     echo "#      --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \                            #"
     echo "#      --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy \                                  #"
@@ -76,7 +76,7 @@ function missing {
     echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
     echo "#                                                                                       #"
     echo "#   Usage: install_workloadzone.sh                                                      #"
-    echo "#      -p or --parameter_file                deployer parameter file                    #"
+    echo "#      -p or --parameterfile                deployer parameter file                    #"
     echo "#                                                                                       #"
     echo "#   Optional parameters                                                                 #"
     echo "#      -d or deployer_tfstate_key            Deployer terraform state file name         #"
@@ -96,7 +96,7 @@ function missing {
 
 show_help=false
 force=0
-INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:k:o:s:c:p:t:a:v:ifh --longoptions parameter_file:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,vault:,storageaccountname:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:k:o:s:c:p:t:a:v:ifh --longoptions parameterfile:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,vault:,storageaccountname:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   showhelp
@@ -106,7 +106,7 @@ eval set -- "$INPUT_ARGUMENTS"
 while :
 do
   case "$1" in
-    -p | --parameter_file)                     parameterfile="$2"               ; shift 2 ;;
+    -p | --parameterfile)                     parameterfile="$2"               ; shift 2 ;;
     -d | --deployer_tfstate_key)               deployer_tfstate_key="$2"        ; shift 2 ;;
     -e | --deployer_environment)               deployer_environment="$2"        ; shift 2 ;;
     -k | --state_subscription)                 STATE_SUBSCRIPTION="$2"          ; shift 2 ;;
