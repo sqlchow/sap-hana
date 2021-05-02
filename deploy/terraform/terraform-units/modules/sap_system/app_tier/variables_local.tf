@@ -83,6 +83,8 @@ variable "terraform_template_version" {
 
 locals {
   // Imports Disk sizing sizing information
+
+  custom_sizing = length(var.custom_disk_sizes_filename) > 0
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? (
     format("%s/%s", path.cwd, var.custom_disk_sizes_filename)) : (
     format("%s%s", path.module, "/../../../../../configs/app_sizes.json")))
@@ -585,17 +587,17 @@ locals {
 
   app_disks_ansible = distinct(flatten([for vm in local.app_virtualmachine_names : [
     for idx, datadisk in local.app_data_disk_per_dbnode :
-    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, datadisk.type)
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, local.custom_sizing ? datadisk.type : "sap")
   ]]))
 
   scs_disks_ansible = distinct(flatten([for vm in local.scs_virtualmachine_names : [
     for idx, datadisk in local.scs_data_disk_per_dbnode :
-    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, datadisk.type)
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, local.custom_sizing ? datadisk.type : "sap")
   ]]))
 
   web_disks_ansible = distinct(flatten([for vm in local.web_virtualmachine_names : [
     for idx, datadisk in local.web_data_disk_per_dbnode :
-    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, datadisk.type)
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, local.custom_sizing ? datadisk.type : "sap")
   ]]))
 
 
