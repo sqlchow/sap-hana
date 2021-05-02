@@ -261,7 +261,7 @@ The workload deployed using the ***install_workloadzone.sh*** command. Update th
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE
 
-     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameter_file DEV-NOEU-SAP02-INFRASTRUCTURE.json \
+     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameterfile DEV-NOEU-SAP02-INFRASTRUCTURE.json \
      --state_subscription wwwwwwww-wwww-wwww-wwww-wwwwwwwwwwww \
      --storageaccountname mgmtweeutfstate### \
      --vault MGMTWEEUDEP00user### \
@@ -534,7 +534,7 @@ Update the PROD-WUS2-SAP04-INFRASTRUCTURE.json file and add the resource id for 
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE
 
-     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameter_file PROD-WUS2-SAP04-INFRASTRUCTURE.json \
+     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameterfile PROD-WUS2-SAP04-INFRASTRUCTURE.json \
      --state_subscription wwwwwwww-wwww-wwww-wwww-wwwwwwwwwwww \
      --storageaccountname mgmteus2tfstate### \
      --vault MGMTEUS2DEP02user### \
