@@ -746,7 +746,7 @@ function New-SAPSystem {
 
         This is the optional Landscape state file name
 
-    .PARAMETER TFStateStorageAccountName
+    .PARAMETER StorageAccountName
 
         This is the optional terraform state file storage account name
 
@@ -796,7 +796,7 @@ Licensed under the MIT license.
         [Parameter(Mandatory = $true)][SAP_Types]$Type,
         [Parameter(Mandatory = $false)][string]$DeployerStateFileKeyName,
         [Parameter(Mandatory = $false)][string]$LandscapeStateFileKeyName,
-        [Parameter(Mandatory = $false)][string]$TFStateStorageAccountName,
+        [Parameter(Mandatory = $false)][string]$StorageAccountName,
         [Parameter(Mandatory = $false)][Switch]$Force,
         [Parameter(Mandatory = $false)][Switch]$Silent
         
@@ -958,8 +958,8 @@ Licensed under the MIT license.
         }
     }
 
-    if ($null -ne $TFStateStorageAccountName -and "" -ne $TFStateStorageAccountName) {
-        $saName = $TFStateStorageAccountName
+    if ($null -ne $StorageAccountName -and "" -ne $StorageAccountName) {
+        $saName = $StorageAccountName
         $rID = Get-AzResource -Name $saName
         $rgName = $rID.ResourceGroupName
         $tfstate_resource_id = $rID.ResourceId
@@ -1741,47 +1741,54 @@ Licensed under the MIT license.
      
         }
         else {
-            
-            if ($null -ne $Deployerenvironment -and "" -ne $Deployerenvironment) {
-                $deployercombined = $Deployerenvironment + $region
+            if ($StorageAccountName.Length > 0) {
+
             }
             else {
-                $Deployerenvironment = Read-Host -Prompt "Please specify the environment name for the deployer"
-                $deployercombined = $Deployerenvironment + $region
+                
+
+                if ($null -ne $Deployerenvironment -and "" -ne $Deployerenvironment) {
+                    $deployercombined = $Deployerenvironment + $region
+                }
+                else {
+                    $Deployerenvironment = Read-Host -Prompt "Please specify the environment name for the deployer"
+                    $deployercombined = $Deployerenvironment + $region
             
-            }
+                }
 
-            if ($null -ne $iniContent[$deployercombined]) {
-                Write-Host "Reading the state information from the deployer"
-                $rgName = $iniContent[$deployercombined]["REMOTE_STATE_RG"]
-                $saName = $iniContent[$deployercombined]["REMOTE_STATE_SA"]
-                $tfstate_resource_id = $iniContent[$deployercombined]["tfstate_resource_id"] 
-                $deployer_tfstate_key = $iniContent[$deployercombined]["Deployer"]
-                $vault = $iniContent[$deployercombined]["Vault"]
-                $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key; "Deployer" = $deployer_tfstate_key; "Vault" = $Vault; }
-                $iniContent += @{$combined = $Category1 }
-                Out-IniFile -InputObject $iniContent -Path $fileINIPath
-                $iniContent = Get-IniContent -Path $fileINIPath
-         
-            }
-            else {
-                if ($null -eq $StorageAccountName -or "" -eq $StorageAccountName) {
-
-                    Write-Error "The Terraform state information is not available"
-
-                    $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
-                    $rID = Get-AzResource -Name $saName 
-                    $rgName = $rID.ResourceGroupName
-    
-                    $tfstate_resource_id = $rID.ResourceId
-    
-                    $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key }
+                if ($null -ne $iniContent[$deployercombined]) {
+                    Write-Host "Reading the state information from the deployer"
+                    $rgName = $iniContent[$deployercombined]["REMOTE_STATE_RG"]
+                    $saName = $iniContent[$deployercombined]["REMOTE_STATE_SA"]
+                    $tfstate_resource_id = $iniContent[$deployercombined]["tfstate_resource_id"] 
+                    $deployer_tfstate_key = $iniContent[$deployercombined]["Deployer"]
+                    $vault = $iniContent[$deployercombined]["Vault"]
+                    $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key; "Deployer" = $deployer_tfstate_key; "Vault" = $Vault; }
                     $iniContent += @{$combined = $Category1 }
                     Out-IniFile -InputObject $iniContent -Path $fileINIPath
                     $iniContent = Get-IniContent -Path $fileINIPath
+         
                 }
+                else {
+                    if ($null -eq $StorageAccountName -or "" -eq $StorageAccountName) {
+
+                        Write-Error "The Terraform state information is not available"
+
+                        $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
+                        $rID = Get-AzResource -Name $saName 
+                        $rgName = $rID.ResourceGroupName
+    
+                        $tfstate_resource_id = $rID.ResourceId
+    
+                        $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key }
+                        $iniContent += @{$combined = $Category1 }
+                        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+                        $iniContent = Get-IniContent -Path $fileINIPath
+                    }
                 
+                }
             }
+
 
         }
     }
@@ -1875,7 +1882,13 @@ Licensed under the MIT license.
         }
     }
 
-    $saName = $iniContent[$combined]["REMOTE_STATE_SA"].Trim()
+    if ($StorageAccountName.Length -eq 0) {
+        $saName = $StorageAccountName
+    }
+    else {
+        $saName = $iniContent[$combined]["REMOTE_STATE_SA"].Trim()    
+    }
+    
     if ($null -eq $saName -or "" -eq $saName) {
         $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
         $rID = Get-AzResource -Name $saName

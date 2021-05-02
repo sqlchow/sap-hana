@@ -84,7 +84,12 @@ locals {
   resource_suffixes    = var.naming.resource_suffixes
 
   // Imports database sizing information
-  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")))
+  file_name = length(var.custom_disk_sizes_filename) > 0 ? (
+    format("%s/%s", path.cwd, var.custom_disk_sizes_filename)) : (
+    format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")
+  )
+
+  sizes         = jsondecode(file(local.file_name))
   custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
   faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))

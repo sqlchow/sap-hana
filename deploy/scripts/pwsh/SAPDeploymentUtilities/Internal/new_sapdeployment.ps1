@@ -21,7 +21,7 @@ function New-SAPSystem {
 
         This is the optional Landscape state file name
 
-    .PARAMETER TFStateStorageAccountName
+    .PARAMETER StorageAccountName
 
         This is the optional terraform state file storage account name
 
@@ -71,7 +71,7 @@ Licensed under the MIT license.
         [Parameter(Mandatory = $true)][SAP_Types]$Type,
         [Parameter(Mandatory = $false)][string]$DeployerStateFileKeyName,
         [Parameter(Mandatory = $false)][string]$LandscapeStateFileKeyName,
-        [Parameter(Mandatory = $false)][string]$TFStateStorageAccountName,
+        [Parameter(Mandatory = $false)][string]$StorageAccountName,
         [Parameter(Mandatory = $false)][Switch]$Force,
         [Parameter(Mandatory = $false)][Switch]$Silent
         
@@ -233,8 +233,8 @@ Licensed under the MIT license.
         }
     }
 
-    if ($null -ne $TFStateStorageAccountName -and "" -ne $TFStateStorageAccountName) {
-        $saName = $TFStateStorageAccountName
+    if ($null -ne $StorageAccountName -and "" -ne $StorageAccountName) {
+        $saName = $StorageAccountName
         $rID = Get-AzResource -Name $saName
         $rgName = $rID.ResourceGroupName
         $tfstate_resource_id = $rID.ResourceId

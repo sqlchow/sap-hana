@@ -1,12 +1,22 @@
 # ![SAP Deployment Automation Framework](../assets/images/UnicornSAPBlack64x64.png)**SAP Deployment Automation Framework** #
 
-# Deployment Scenarios #
+## Table of Contents <!-- omit in toc --> ##
 
-The SAP Deployment Automation Framework support the following deployment models:
+- [Sample Deployments](#Sample-Deployments)
+  - [Greenfield](##Scenario-1:-Greenfield-including-deployer)
+  - [Greenfield (no deployer)](##Scenario-2:-Greenfield-without-deployer)
+  - [Brownfield](##Scenario-3:-Brownfield-including-deployer)
+  - [Brownfield (no deployer)](##Scenario-4:-Brownfield-without-deployer)
+  - [Brownfield with custom disk sizing (no deployer)](##Scenario-4:-Brownfield-without-deployer-using-a-custom-disk-configuration)
 
-## **Scenario 1 - Greenfield using the deployer** ##
+---
 
-In this scenario all Azure artifacts will be created by the automation framework. The deployment includes two environments "MGMT" and "DEV". Both environments need a Service Principal registered in the deployer key vault.
+This document describes 5 sample deployments, two greenfield deployments and 3 brownfield deployments
+
+## **Scenario 1: Greenfield including deployer** ##
+
+In this scenario all Azure artifacts will be created by the automation framework.
+The deployment includes two environments "MGMT" and "DEV" in the West Europe Azure region.
 
 This scenario contains the following deployments
 
@@ -14,6 +24,10 @@ This scenario contains the following deployments
 - Library
 - Workload
 - System: SID X00, with 2 Application Servers, a highly available Central Services instance, a single webdispatcher using a single node HANA backend using SUSE 12 SP5
+
+
+**Note** Both environments need a Service Principal registered in the deployer key vault.
+
 
 A sample configuration for this is available here:
 
@@ -59,8 +73,6 @@ The deployer and library can be deployed using the ***prepare_region.sh*** comma
 For Service Principal creation see [Service Principal Creation](./spn.md).
 Substitute the Service Principal values in the script below before running the script.
 
-**prepare_region.sh** bash script:
-
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
 
@@ -75,7 +87,7 @@ Substitute the Service Principal values in the script below before running the s
 
 ```
 
-**New-SAPAutomationRegion** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPAutomationRegion*** PowerShell cmdlet
 
 ```PowerShell
     New-SAPAutomationRegion 
@@ -90,12 +102,10 @@ Substitute the Service Principal values in the script below before running the s
 
 ### **Scenario 1 - Deploy the workload** ###
 
-Before the actual SAP system can be deployed a workload zone needs to be prepared. For deploying the DEV workload zone (vnet & keyvaults) navigate to the folder(LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE) containing the DEV-WEEU-SAP01-INFRASTRUCTURE.json parameter file and use the install_workloadzone script.
+Before the actual SAP system can be deployed a workload zone needs to be prepared. For deploying the DEV workload zone (vnet & keyvaults) navigate to the folder(LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE) containing the DEV-WEEU-SAP01-INFRASTRUCTURE.json parameter file and use the ***install_workloadzone.ssh*** script.
 
 For Service Principal creation see [Service Principal Creation](./spn.md).
 Substitute your Service Principal values in the script below before running the script.
-
-**install_workloadzone.sh** bash script:
 
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
@@ -109,7 +119,7 @@ Substitute your Service Principal values in the script below before running the 
     --auto-approve
 ```
 
-**New-SAPWorkloadZone** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPWorkloadZone*** PowerShell cmdlet:
 
 ```PowerShell
     cd \Azure_SAP_Automated_Deployment\WORKSPACES\LANDSCAPE\DEV-NOEU-SAP02-INFRASTRUCTURE
@@ -125,9 +135,7 @@ Substitute your Service Principal values in the script below before running the 
 
 ### **Scenario 1 - Deploying the SAP system** ###
 
-For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containing the DEV-WEEU-SAP01-X00.json parameter file and use the installer.sh script.
-
-**installer.sh** bash script:
+For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containing the DEV-WEEU-SAP01-X00.json parameter file and use the ***installer.sh*** script.
 
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00
@@ -135,7 +143,7 @@ For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containi
     ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile DEV-WEEU-SAP01-X00.json --type sap_system --auto-approve
 ```
 
-**New-SAPSystem** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPSystem*** PowerShell cmdlet.
 
 ```PowerShell
     cd \Azure_SAP_Automated_Deployment\WORKSPACES\SYSTEM\DEV-WEEU-SAP01-X00
@@ -145,16 +153,19 @@ For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containi
 
 ```
 
-
 <br>
 
-## **Scenario 2 - Greenfield deployment without the deployer** ##
+## **Scenario 2: Greenfield without deployer** ##
+
+In this scenario all Azure artifacts will be created by the automation framework. The deployment includes two environments "MGMT" and "DEV" in the North Europe Azure region.
 
 This scenario contains the following deployments:
 
 - Library
 - Workload
 - System: SID X00, with a single Application Server,  a Central Services instance and single node HANA backend all using Redhat 7.7
+
+**Note** Both environments need a Service Principal registered in the deployer key vault.
 
 A sample configuration for this is available here:
 
@@ -206,9 +217,7 @@ By providing false in the "use" attribute in the deployer section, the automatio
 
 ### **Scenario 2 - Deploy the library** ###
 
-The deployer and library can be deployed using the ***install_library.sh*** command. Update the MGMT-NOEU-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
-
-**install_library.sh** bash script:
+The deployer and library can be deployed using the ***install_library.sh*** and the ***installer.sh*** commands. Update the MGMT-NOEU-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
 
 ```bash
 
@@ -217,7 +226,7 @@ The deployer and library can be deployed using the ***install_library.sh*** comm
     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_library.sh --parameterfile MGMT-NOEU-SAP_LIBRARY.json 
 ```
 
-Capture the value for the remote_state_storage_account_name from the output of the previous command and migrate the terrraform state to Azure using:
+Capture the value for the remote_state_storage_account_name from the output of the previous command and migrate the terraform state to Azure using:
 
 ```bash
 
@@ -226,8 +235,7 @@ Capture the value for the remote_state_storage_account_name from the output of t
     $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh --parameterfile MGMT-NOEU-SAP_LIBRARY.json --type sap_library
 ```
 
-
-**New-SAPLibrary** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPLibrary*** and the ***New-SAPSystem** PowerShell cmdlets:
 
 ```PowerShell
 
@@ -237,23 +245,18 @@ Capture the value for the remote_state_storage_account_name from the output of t
 
 ```
 
-Capture the value for the remote_state_storage_account_name from the output of the previous command and migrate the terrraform state to Azure using:
-
-**New-SAPSystem** PowerShell cmdlet:
+Capture the value for the remote_state_storage_account_name from the output of the previous command and migrate the terraform state to Azure.
 
 ```PowerShell
-
     cd Azure_SAP_Automated_Deployment\WORKSPACES\LIBRARY\MGMT-NOEU-SAP_LIBRARY
 
-    New-SAPSystem --parameterfile .\MGMT-WUS2-SAP_LIBRARY.json -Type sap_library -TFStateStorageAccountName mgmtwus2tfstate###   
+    New-SAPSystem --parameterfile .\MGMT-WUS2-SAP_LIBRARY.json -Type sap_library -StorageAccountName mgmtwus2tfstate###   
 
 ```
 
 ### **Scenario 2 - Deploy the workload** ###
 
-The deployer and library can be deployed using the ***install_library.sh*** command. Update the MGMT-NOEU-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
-
-**install_workloadzone.sh** bash script:
+The workload deployed using the ***install_workloadzone.sh*** command. Update the MGMT-NOEU-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
 
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE
@@ -268,9 +271,10 @@ The deployer and library can be deployed using the ***install_library.sh*** comm
      --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz 
 ```
 
-**New-SAPWorkloadZone** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPWorkloadZone*** PowerShell cmdlet.
 
 ```PowerShell
+    
     cd \Azure_SAP_Automated_Deployment\WORKSPACES\LANDSCAPE\DEV-NOEU-SAP02-INFRASTRUCTURE
 
     New-SAPWorkloadZone --parameterfile .\DEV-NOEU-SAP02-INFRASTRUCTURE.json 
@@ -286,14 +290,15 @@ The deployer and library can be deployed using the ***install_library.sh*** comm
 
 ### **Scenario 2 - Deploying the SAP system** ###
 
-For deploying the SAP system navigate to the folder(DEV-NOEU-SAP02-X02) containing the DEV-NOEU-SAP02-X02.json parameter file and use the installer.sh script.
+For deploying the SAP system navigate to the folder(DEV-NOEU-SAP02-X02) containing the DEV-NOEU-SAP02-X02.json parameter file and use the ***installer.sh*** script.
 
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02
 
     ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile DEV-NOEU-SAP02-X02.json --type sap_system --auto-approve
 ```
-**New-SAPSystem** PowerShell cmdlet:
+
+When using PowerShell the same can be achieved with the ***New-SAPSystem*** PowerShell cmdlet:
 
 ```PowerShell
     cd \Azure_SAP_Automated_Deployment\WORKSPACES\SYSTEM\DEV-NOEU-SAP02-X02
@@ -305,13 +310,13 @@ For deploying the SAP system navigate to the folder(DEV-NOEU-SAP02-X02) containi
 
 <br>
 
-# Brownfield deployment #
+## **Scenario 3: Brownfield including deployer** ##
 
 In this scenario the deployment will be performed using existing resource groups, storage accounts, virtual networks, subnets and network security groups.
 
-## **Scenario 3 - Brownfield deployment using the deployer** ##
+In this scenario the Azure artifacts will be deployed into an existing Azure environment. The deployment includes two environments "MGMT" and "QA" in the East US 2 region.
 
-In this scenario the Azure artifacts will be deployed into an existing Azure environment. The deployment includes two environments "MGMT" and "QA". Both environments need a Service Principal registered in the deployer key vault.
+**Note** Both environments need a Service Principal registered in the deployer key vault.
 
 This scenario contains the following deployments
 
@@ -364,8 +369,6 @@ The deployer and library can be deployed using the ***prepare_region.sh*** comma
 For Service Principal creation see [Service Principal Creation](./spn.md).
 Substitute you Service Principal values in the script below before running the script.
 
-**prepare_region.sh** bash script:
-
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
 
@@ -380,7 +383,7 @@ Substitute you Service Principal values in the script below before running the s
 
 ```
 
-**New-SAPAutomationRegion** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPAutomationRegion*** PowerShell cmdlet:
 
 ```PowerShell
     New-SAPAutomationRegion 
@@ -412,12 +415,25 @@ Substitute you Service Principal values in the script below before running the s
     --auto-approve
 ```
 
+When using PowerShell the same can be achieved with the ***New-SAPWorkloadZone*** PowerShell cmdlet:
+
+```PowerShell
+    cd \Azure_SAP_Automated_Deployment\WORKSPACES\LANDSCAPE\QA-EUS2-SAP03-INFRASTRUCTURE
+
+    New-SAPWorkloadZone --parameterfile .\QA-EUS2-SAP03-INFRASTRUCTURE.json 
+        -DeployerEnvironment MGMT
+        -Subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+        -SPN_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy 
+        -SPN_password ************************ 
+        -Tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz 
+
+```
+
 ### **Scenario 3 - Deploying the SAP system** ###
 
-For deploying the SAP system navigate to the folder(QA-EUS2-SAP03-X01) containing the QA-EUS2-SAP03-X01.json parameter file and use the installer.sh script.
+For deploying the SAP system navigate to the folder(QA-EUS2-SAP03-X01) containing the QA-EUS2-SAP03-X01.json parameter file and use the ***installer.sh*** script.
 
 
-**installer.sh** bash script:
 
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01
@@ -425,7 +441,7 @@ For deploying the SAP system navigate to the folder(QA-EUS2-SAP03-X01) containin
     ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile QA-EUS2-SAP03-X01.json --type sap_system --auto-approve
 ```
 
-**New-SAPSystem** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPSystem*** PowerShell cmdlet
 
 ```PowerShell
     cd \Azure_SAP_Automated_Deployment\WORKSPACES\SYSTEM\QA-EUS2-SAP03-X01
@@ -435,21 +451,30 @@ For deploying the SAP system navigate to the folder(QA-EUS2-SAP03-X01) containin
 
 ```
 
-## Scenario 4 **Brownfield deployment without the deployer** ##
+## **Scenario 4: Brownfield without deployer** ##
+
+In this scenario the Azure artifacts will be deployed into an existing Azure environment. The deployment includes two environments "MGMT" and "PROD" in the West US 2 region.
+
+**Note** Both environments need a Service Principal registered in the deployer key vault.
 
 This scenario contains the following deployments:
 
 - Library
-- Workload(s)
-- System(s)
+- Workload
+- System: SID X03, with 2 Application Servers, a highly available Central Services instance, a single webdispatcher using a single node HANA backend using SUSE 12 SP5
+- System: SID X04, with 2 Application Servers, a highly available Central Services instance, a single webdispatcher using a single node HANA backend using SUSE 12 SP5 using a custom disk configuration
 
 A sample configuration for this is available here
 
-| Component                | Template |
-| :------------------------|  :----------------------------------------------------------------------- |
-| Library                  | [MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json](./WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json) |
-| Workload                 | [QA-WUS2-SAP04-INFRASTRUCTURE/QA-WUS2-SAP04-INFRASTRUCTURE.json](./WORKSPACES/LANDSCAPE/QA-WUS2-SAP04-INFRASTRUCTURE/QA-WUS2-SAP04-INFRASTRUCTURE.json) |
-| System                   | [QA-WUS2-SAP04-X03/QA-WUS2-SAP04-X03.json](./WORKSPACES/SYSTEM/QA-WUS2-SAP04-X03/QA-WUS2-SAP04-X03.json)
+| Component                  | Template |
+| :--------------------------|  :----------------------------------------------------------------------- |
+| Library                    | [MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json](./WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json) |
+| Workload                   | [PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json](./WORKSPACES/LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json) |
+| System                     | [PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json](./WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json) |
+| System (custom disk sizes) | [PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json](./WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json) |
+| Custom disk size file      | [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](./WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json) |
+
+<br>
 
 The scenario requires an existing key vault that contains the SPN credentials for the SPN that will be used to deploy the workload zone. This can be defined in the parameter file with the kv_spn_id parameter.
 
@@ -470,8 +495,6 @@ By providing false in the "use" attribute in the deployer section, the automatio
 
 The deployer and library can be deployed using the ***install_library.sh*** command. Update the MGMT-WUS2-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
 
-**install_library.sh** bash script:
-
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY
 
@@ -479,7 +502,16 @@ The deployer and library can be deployed using the ***install_library.sh*** comm
 
 ```
 
-**New-SAPLibrary** PowerShell cmdlet:
+Capture the value for the remote_state_storage_account_name from the output of the previous command and migrate the terraform state to Azure using:
+
+```bash
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY
+
+    $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh --parameterfile MGMT-WUS2-SAP_LIBRARY.json --type sap_library
+
+```
+
+When using PowerShell the same can be achieved with the ***New-SAPLibrary*** PowerShell cmdlet.
 
 ```PowerShell
 
@@ -487,26 +519,22 @@ The deployer and library can be deployed using the ***install_library.sh*** comm
 
 ```
 
-Capture the value for the remote_state_storage_account_name from the output of the previous command and migrate the terrraform state to Azure using:
-
-**New-SAPSystem** PowerShell cmdlet:
+Capture the value for the remote_state_storage_account_name from the output of the previous command and migrate the terraform state to Azure.
 
 ```PowerShell
 
-New-SAPSystem --parameterfile .\MGMT-WUS2-SAP_LIBRARY.json -Type sap_library -TFStateStorageAccountName mgmtwus2tfstate###   
+    New-SAPSystem --parameterfile .\MGMT-WUS2-SAP_LIBRARY.json -Type sap_library -StorageAccountName mgmtwus2tfstate###   
 
 ```
 
 ### **Scenario 4 - Deploy the workload** ###
 
-Update the QA-WUS2-SAP04-INFRASTRUCTURE.json file and add the resource id for the keyvault containing the service principal details.
-
-**install_workloadzone.sh** bash script:
+Update the PROD-WUS2-SAP04-INFRASTRUCTURE.json file and add the resource id for the keyvault containing the service principal details. Deploy the system with the ***install_workloadzone.sh*** bash script:
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/QA-WUS2-SAP04-INFRASTRUCTURE
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE
 
-     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameter_file QA-WUS2-SAP04-INFRASTRUCTURE.json \
+     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameter_file PROD-WUS2-SAP04-INFRASTRUCTURE.json \
      --state_subscription wwwwwwww-wwww-wwww-wwww-wwwwwwwwwwww \
      --storageaccountname mgmteus2tfstate### \
      --vault MGMTEUS2DEP02user### \
@@ -516,12 +544,12 @@ Update the QA-WUS2-SAP04-INFRASTRUCTURE.json file and add the resource id for th
      --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz 
 ```
 
-**New-SAPWorkloadZone** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPWorkloadZone*** PowerShell cmdlet:
 
 ```PowerShell
-    cd \Azure_SAP_Automated_Deployment\WORKSPACES\LANDSCAPE\QA-WUS2-SAP04-INFRASTRUCTURE
+    cd \Azure_SAP_Automated_Deployment\WORKSPACES\LANDSCAPE\PROD-WUS2-SAP04-INFRASTRUCTURE
 
-    New-SAPWorkloadZone --parameterfile .\QA-WUS2-SAP04-INFRASTRUCTURE.json 
+    New-SAPWorkloadZone --parameterfile .\PROD-WUS2-SAP04-INFRASTRUCTURE.json 
         -State_subscription wwwwwwww-wwww-wwww-wwww-wwwwwwwwwwww 
         -Vault MGMTEUS2DEP02user### \
         -StorageAccountName mgmteus2tfstate 
@@ -534,22 +562,67 @@ Update the QA-WUS2-SAP04-INFRASTRUCTURE.json file and add the resource id for th
 
 ### **Scenario 4 - Deploying the SAP system** ###
 
-For deploying the SAP system navigate to the folder(QA-WUS2-SAP04-X03) containing the QA-WUS2-SAP04-X03.json parameter file and use the installer.sh script.
+For deploying the SAP system navigate to the folder(PROD-WUS2-SAP04-X03) containing the PROD-WUS2-SAP04-X03.json parameter file and use the ***installer.sh*** script.
 
 ```bash
 
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/QA-WUS2-SAP04-X03
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X03
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile QA-WUS2-SAP04-X03.json --type sap_system --auto-approve
+    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile PROD-WUS2-SAP04-X03.json --type sap_system --auto-approve
 
 ```
 
-**New-SAPSystem** PowerShell cmdlet:
+When using PowerShell the same can be achieved with the ***New-SAPSystem*** PowerShell cmdlet.
 
 ```PowerShell
-    cd \Azure_SAP_Automated_Deployment\WORKSPACES\SYSTEM\QA-WUS2-SAP04-X03
+    cd \Azure_SAP_Automated_Deployment\WORKSPACES\SYSTEM\PROD-WUS2-SAP04-X03
 
-    New-SAPSystem --parameterfile .\QA-WUS2-SAP04-X03.json 
+    New-SAPSystem --parameterfile .\PROD-WUS2-SAP04-X03.json 
+        -Type sap_system
+
+```
+
+## **Scenario 4: Brownfield without deployer using a custom disk configuration** ##
+
+This deployment has a custom disk configuration for the HANA deployment.The custom disk sizing for the system is defined here: [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](./WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json)
+
+**Note** To match the disk sizes with the deployment the node beneath the "db" node needs to be the same as the database.size attribute in the configuration json
+
+```json
+{​​​​​​
+  "db": {​​​​​​
+    "X04": {​​​​​​
+           }
+        }
+}
+
+```
+
+```json
+    "databases": [
+      {
+        "size"                        : "X04",
+      }
+    ],
+
+```
+
+For deploying the SAP system navigate to the folder(PROD-WUS2-SAP04-X04) containing the PROD-WUS2-SAP04-X04.json parameter file and deploy the system using the ***installer.sh*** script.
+
+```bash
+
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04
+
+    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile PROD-WUS2-SAP04-X04.json --type sap_system --auto-approve
+
+```
+
+When using PowerShell the same can be achieved with the ***New-SAPSystem*** PowerShell cmdlet.
+
+```PowerShell
+    cd \Azure_SAP_Automated_Deployment\WORKSPACES\SYSTEM\PROD-WUS2-SAP04-X04
+
+    New-SAPSystem --parameterfile .\PROD-WUS2-SAP04-X04.json 
         -Type sap_system
 
 ```
