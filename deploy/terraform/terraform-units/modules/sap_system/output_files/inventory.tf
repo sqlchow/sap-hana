@@ -137,7 +137,7 @@ resource "local_file" "ansible_inventory_new_yml" {
     webservers        = length(local.ips_web) > 0 ? var.naming.virtualmachine_names.WEB_VMNAME : [],
     prefix            = var.naming.prefix.SDU,
     separator         = var.naming.separator,
-    platform          = length(local.hdb_vms) > 0 ? "HANA" : local.anydb_vms[0].platform
+    platform          = length(local.hdb_vms) > 0 ? "hana" : lower(local.anydb_vms[0].platform)
     dbconnection      = length(local.hdb_vms) > 0 ? "ssh" : upper(local.anydb_vms[0].platform) == "SQLSERVER" ? "winrm" : "ssh"
     scsconnection     = upper(var.app_tier_os_types["scs"]) == "LINUX" ? "ssh" : "winrm"
     appconnection     = upper(var.app_tier_os_types["app"]) == "LINUX" ? "ssh" : "winrm"
