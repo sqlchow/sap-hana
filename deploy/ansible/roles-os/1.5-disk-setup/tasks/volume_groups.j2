@@ -1,0 +1,19 @@
+[
+    {% for disk in disktypes %}
+        {% set disk_count = 0 %}
+        {% set pvslist = [] %}
+        {% for disk2 in disks if disk2.type == disk.type %}
+        {% set disk_count =  disk_count  + 1 %}
+        {% do pvslist.append('/dev/disk/azure/scsi1/lun' ~ disk2.LUN) %}
+
+        {% do disk.update({'host': disk2.host }) %}
+        {% do disk.update({'vg': 'vg_' ~ disk.type }) %}
+        {% do disk.update({'disk_count': loop.index }) %}
+        {% do disk.update({'pvs': pvslist | join(',') }) %}
+
+        {% endfor %}
+    {% endfor %}
+    {% for disk in disktypes %}
+        {{ disk }},
+    {% endfor %}
+]

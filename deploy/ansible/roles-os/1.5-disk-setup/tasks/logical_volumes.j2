@@ -1,0 +1,63 @@
+[
+        {% for disk in disktypes %}
+          {% set disk_count = 0 %}
+          {% for disk2 in disks if disk2.type == disk.type %}
+            {% set disk_count =  disk_count  + 1 %}
+
+            {% if disk2.type == 'data' %}
+              {% set opts = '-i ' ~ loop.index ~' -I 256' %}
+              {% set tier = 'hdb' %}
+            {% elif disk2.type == 'log' %}
+              {% set opts = '-i ' ~ loop.index ~' -I 64' %}
+              {% set tier = 'hdb' %}
+            {% elif disk2.type == 'shared' %}
+              {% set opts = '' %}
+              {% set tier = 'hdb' %}
+            {% elif disk2.type == 'backup' %}
+              {% if loop.index > 1 %}
+                {% set opts = '-i ' ~ loop.index ~' -I 256' %}
+                {% set tier = 'hdb' %}
+              {% else %} 
+                {% set opts = '' %}
+              {% endif %} 
+              {% set tier = 'hdb' %}
+            {% else %}
+              {% if loop.index > 1 %}
+                {% set opts = '-i ' ~ loop.index ~' -I 256' %}
+                {% set tier = 'hdb' %}
+              {% else %} 
+                {% set opts = '' %}
+                {% set tier = 'all' %}
+            {% endif %}
+            {% endif %}
+
+            {% if disk2.type == 'sap' %}
+              {% set size = '64g' %}
+            {% elif disk2.type == 'web' %}
+              {% set size = '4g' %}
+            {% else %}
+              {% set size = '100%FREE' %}
+            {% endif %}
+
+            {% do disk.update({'host': disk2.host }) %}
+            {% do disk.update({'tier': tier }) %}
+            {% do disk.update({'opts': opts }) %}
+            {% do disk.update({'vg': 'vg_' ~ disk.type }) %}
+            {% do disk.update({'lv': 'lv_' ~ disk.type }) %}
+            {% do disk.update({'size': size }) %}
+
+          {% endfor %}
+        {% endfor %}
+
+
+        {% for disk in disktypes %}
+          {% if disk.type == 'sap' %}
+            {{ disk }},
+            {{ { 'tier' : 'preparation',  'host' : disk.host, 'vg' : disk.vg, 'type' : disk.type, 'lv': 'lv_sapmnt',        'size' : '128g',      'opts' : '' } }},
+            {{ { 'tier' : 'preparation',  'host' : disk.host, 'vg' : disk.vg, 'type' : disk.type, 'lv': 'lv_usrsapinstall', 'size' : '100%FREE',  'opts' : '' } }},
+            {{ { 'tier' : 'web',          'host' : disk.host, 'vg' : disk.vg, 'type' : disk.type, 'lv': 'lv_sapmnt',        'size' : '1g',        'opts' : '' } }},
+          {% else %}
+            {{ disk }},
+          {% endif %}
+        {% endfor %}
+      ]
