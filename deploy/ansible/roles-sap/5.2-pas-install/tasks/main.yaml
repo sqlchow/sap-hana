@@ -57,7 +57,7 @@
     sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
     sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
     sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
-    sap_ciVirtualHostname:        x01app00lab3
+    sap_ciVirtualHostname:        "{{ inventory_hostname }}"
     sap_cd_package_hdbclient:     
     sap_cd_package_cd1:           
     sap_cd_package_cd2:           
@@ -75,8 +75,8 @@
       - "Product              : {{ bom.product_ids.scs }}"
       - "SAP SID              : {{ sap_sid }}"
       - "Instance Number - SCS: {{ scs_instance_number }}"
-      - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
-      - "DB Hostname          : {{ sap_db_hostname }}"
+      - "SCS Virtual Hostname : {{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+      - "DB Hostname          : {{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
       - "FQDN                 : {{ sap_fqdn }}"
       - "Master Password      : {{ password_master }}"
       - "sapadm UID           : {{ sapadm_uid }}"
@@ -103,3 +103,8 @@
 # *====================================4=======================================8
 
 
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/
