@@ -16,13 +16,13 @@
 #
 # -------------------------------------+---------------------------------------8
 
-#----------------------------------------
+# ----------------------------------------
 # BEGIN
-#----------------------------------------
+# ----------------------------------------
 
-#----------------------------------------
+# ----------------------------------------
 # END
-#----------------------------------------
+# ----------------------------------------
 
 # # Prepare disks and mount points
 
@@ -63,54 +63,61 @@
 
 # Get all the unique disk types from sap-parameters
 
-- name: Get the unique disk types
+- name:                           Get the unique disk types
   set_fact:
-    disktypes: "{{ (disktypes|default([]) +  [ { 'type': item.type }])|unique }}"
-    cacheable: yes
-  loop: "{{ disks }}"
+    disktypes:                    "{{ 
+                                      (disktypes|default([])
+                                      +
+                                      [ { 'type': item.type }])|unique
+                                    }}"
+    cacheable:                    yes
+  loop:                           "{{ disks }}"
 
-- name: Define volume groups
+- name:                           "Define volume groups"
   set_fact:
-    volume_groups: "{{ lookup ('template', 'volume_groups.j2') }}"
+    volume_groups:                "{{ lookup ('template', 'volume_groups.j2') }}"
 
-- name: "Define Logical Volumes"
+- name:                           "Define Logical Volumes"
   set_fact:
-    logical_volumes: "{{ lookup ('template', 'logical_volumes.j2') }}"
+    logical_volumes:              "{{ lookup ('template', 'logical_volumes.j2') }}"
 
-- name: "Define Filesystems"
+- name:                           "Define Filesystems"
   set_fact:
-    file_systems: "{{ lookup ('template', 'file_systems.j2') }}"
+    file_systems:                 "{{ lookup ('template', 'file_systems.j2') }}"
 
-- name: Volume Group creation
+- name:                           "Volume Group creation"
   lvg:
-    vg: "{{ item.vg }}"
-    pvs: "{{ item.pvs }}"
-    pesize: 4M
-    state: present
-
-  loop: "{{ volume_groups }}"
+    vg:                           "{{ item.vg }}"
+    pvs:                          "{{ item.pvs }}"
+    pesize:                       4M
+    state:                        present
+  loop:                           "{{ volume_groups }}"
   when:
-    - item.host == inventory_hostname
+                                  - item.host is defined
+                                  - item.host == inventory_hostname
 
-- name: "Logical Volume creation"
+- name:                           "Logical Volume creation"
   lvol:
-    lv: "{{ item.lv }}"
-    vg: "{{ item.vg }}"
-    size: "{{ item.size }}"
-    opts: "{{ item.opts }}"
-    active: yes
-    state: present
-    shrink: no
-    resizefs: no
-  loop: "{{ logical_volumes }}"
+    lv:                           "{{ item.lv }}"
+    vg:                           "{{ item.vg }}"
+    size:                         "{{ item.size }}"
+    opts:                         "{{ item.opts }}"
+    active:                       yes
+    state:                        present
+    shrink:                       no
+    resizefs:                     no
+  loop:                           "{{ logical_volumes }}"
   when:
-    - item.host == inventory_hostname
+                                  - item.host is defined
+                                  - item.host == inventory_hostname
 
-- name: "Filesystem creation"
+- name:                           "Filesystem creation"
   filesystem:
-    dev: "{{ item.dev }}"
-    fstype: "{{ item.fstype }}"
-  loop: "{{ file_systems }}"
+    dev:                          "{{ item.dev }}"
+    fstype:                       "{{ item.fstype }}"
+  loop:                           "{{ file_systems }}"
   when:
-    - item.host == inventory_hostname
+                                  - item.host is defined
+                                  - item.host == inventory_hostname
 
+...

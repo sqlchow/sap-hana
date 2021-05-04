@@ -1,19 +1,19 @@
 [
-        {% for disk in disktypes %}
+        {% for disktype in disktypes %}
           {% set disk_count = 0 %}
-          {% for disk2 in disks if disk2.type == disk.type %}
+          {% for disk in disks if disk.type == disktype.type %}
             {% set disk_count =  disk_count  + 1 %}
 
-            {% if disk2.type == 'data' %}
+            {% if disk.type == 'data' %}
               {% set opts = '-i ' ~ loop.index ~' -I 256' %}
               {% set tier = 'hdb' %}
-            {% elif disk2.type == 'log' %}
+            {% elif disk.type == 'log' %}
               {% set opts = '-i ' ~ loop.index ~' -I 64' %}
               {% set tier = 'hdb' %}
-            {% elif disk2.type == 'shared' %}
+            {% elif disk.type == 'shared' %}
               {% set opts = '' %}
               {% set tier = 'hdb' %}
-            {% elif disk2.type == 'backup' %}
+            {% elif disk.type == 'backup' %}
               {% if loop.index > 1 %}
                 {% set opts = '-i ' ~ loop.index ~' -I 256' %}
                 {% set tier = 'hdb' %}
@@ -31,33 +31,33 @@
             {% endif %}
             {% endif %}
 
-            {% if disk2.type == 'sap' %}
+            {% if disk.type == 'sap' %}
               {% set size = '64g' %}
-            {% elif disk2.type == 'web' %}
+            {% elif disk.type == 'web' %}
               {% set size = '4g' %}
             {% else %}
               {% set size = '100%FREE' %}
             {% endif %}
 
-            {% set dummy = disk.update({'host': disk2.host }) %}
-            {% set dummy =  disk.update({'tier': tier }) %}
-            {% set dummy =  disk.update({'opts': opts }) %}
-            {% set dummy =  disk.update({'vg': 'vg_' ~ disk.type }) %}
-            {% set dummy =  disk.update({'lv': 'lv_' ~ disk.type }) %}
-            {% set dummy =  disk.update({'size': size }) %}
+            {% set dummy =  disktype.update({'host': disk.host }) %}
+            {% set dummy =  disktype.update({'tier': tier }) %}
+            {% set dummy =  disktype.update({'opts': opts }) %}
+            {% set dummy =  disktype.update({'vg': 'vg_' ~ disktype.type }) %}
+            {% set dummy =  disktype.update({'lv': 'lv_' ~ disktype.type }) %}
+            {% set dummy =  disktype.update({'size': size }) %}
 
           {% endfor %}
         {% endfor %}
 
 
-        {% for disk in disktypes %}
-          {% if disk.type == 'sap' %}
-            {{ disk }},
-            {{ { 'tier' : 'preparation',  'host' : disk.host, 'vg' : disk.vg, 'type' : disk.type, 'lv': 'lv_sapmnt',        'size' : '128g',      'opts' : '' } }},
-            {{ { 'tier' : 'preparation',  'host' : disk.host, 'vg' : disk.vg, 'type' : disk.type, 'lv': 'lv_usrsapinstall', 'size' : '100%FREE',  'opts' : '' } }},
-            {{ { 'tier' : 'web',          'host' : disk.host, 'vg' : disk.vg, 'type' : disk.type, 'lv': 'lv_sapmnt',        'size' : '1g',        'opts' : '' } }},
+        {% for disktype in disktypes %}
+          {% if disktype.type == 'sap' %}
+            {{ disktype }},
+            {{ { 'tier' : 'preparation',  'host' : disktype.host, 'vg' : disktype.vg, 'type' : disktype.type, 'lv': 'lv_sapmnt',        'size' : '128g',      'opts' : '' } }},
+            {{ { 'tier' : 'preparation',  'host' : disktype.host, 'vg' : disktype.vg, 'type' : disktype.type, 'lv': 'lv_usrsapinstall', 'size' : '100%FREE',  'opts' : '' } }},
+            {{ { 'tier' : 'web',          'host' : disktype.host, 'vg' : disktype.vg, 'type' : disktype.type, 'lv': 'lv_sapmnt',        'size' : '1g',        'opts' : '' } }},
           {% else %}
-            {{ disk }},
+            {{ disktype }},
           {% endif %}
         {% endfor %}
-      ]
+]
