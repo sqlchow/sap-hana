@@ -21,6 +21,18 @@ ${sid}_SCS:
   vars:
     node_tier             : SCS
 
+${sid}_ERS:
+  hosts:
+%{~ for idx,ip_ers in ips_ers }
+    ${ersservers[idx]}:
+      ansible_host        : ${ip_ers}
+      ansible_connection  : ${ersconnection} 
+      connection_type     : ${ersconnectiontype} 
+%{~ endfor }
+  vars:
+    node_tier             : ERS
+
+
 ${sid}_PAS:
   hosts:
 %{~ for idx,ip_pas in ips_pas }
