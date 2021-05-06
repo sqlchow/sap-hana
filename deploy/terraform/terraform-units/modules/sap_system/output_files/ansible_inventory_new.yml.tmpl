@@ -19,7 +19,7 @@ ${sid}_SCS:
       connection_type     : ${scsconnectiontype} 
 %{~ endfor }
   vars:
-    node_tier             : SCS
+    node_tier             : scs
 
 ${sid}_ERS:
   hosts:
@@ -30,7 +30,7 @@ ${sid}_ERS:
       connection_type     : ${ersconnectiontype} 
 %{~ endfor }
   vars:
-    node_tier             : ERS
+    node_tier             : ers
 
 
 ${sid}_PAS:
@@ -43,7 +43,7 @@ ${sid}_PAS:
 
 %{~ endfor }
   vars:
-    node_tier             : PAS
+    node_tier             : pas
 
 ${sid}_APP:
   hosts:
@@ -55,7 +55,7 @@ ${sid}_APP:
 
 %{~ endfor }
   vars:
-    node_tier             : APP
+    node_tier             : app
 
 ${sid}_WEB:
   hosts:
@@ -67,4 +67,4 @@ ${sid}_WEB:
 
 %{~ endfor }
   vars:
-    node_tier             : WEB
+    node_tier             : web
