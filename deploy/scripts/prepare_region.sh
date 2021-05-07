@@ -398,15 +398,15 @@ unset TF_DATA_DIR
 if [ 1 == $step ]
 then
     load_config_vars "${deployer_config_information}" "keyvault"
-    
+    echo "Using the keyvault: " $keyvault
     secretname="${environment}"-client-id
     az keyvault secret show --name "$secretname" --vault "$keyvault" --only-show-errors 2>error.log
     if [ -s error.log ]
     then
         if [ ! -z "$spn_secret" ]
         then
-            allParams=$(printf " -e %s -r %s -v %s -s %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
-
+            allParams=$(printf " -e %s -r %s -v %s --spn_secret %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
+            
             "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
             if [ $? -eq 255 ]
             then
