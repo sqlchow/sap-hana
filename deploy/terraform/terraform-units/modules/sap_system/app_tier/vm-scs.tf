@@ -68,7 +68,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "scs" {
 # Create the SCS Linux VM(s)
 resource "azurerm_linux_virtual_machine" "scs" {
   provider            = azurerm.main
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment && (upper(local.scs_ostype) == "LINUX") ? local.scs_server_count : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.scs_computer_names[count.index]
@@ -93,9 +93,16 @@ resource "azurerm_linux_virtual_machine" "scs" {
 
   size                            = length(local.scs_size) > 0 ? local.scs_size : local.scs_sizing.compute.vm_size
   admin_username                  = var.sid_username
-  disable_password_authentication = !local.enable_auth_password
   admin_password                  = local.enable_auth_key ? null : var.sid_password
+  disable_password_authentication = !local.enable_auth_password
 
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
   dynamic "os_disk" {
     iterator = disk
     for_each = flatten(
@@ -135,14 +142,6 @@ resource "azurerm_linux_virtual_machine" "scs" {
     }
   }
 
-  dynamic "admin_ssh_key" {
-    for_each = range(local.enable_auth_password ? 0 : 1)
-    content {
-      username   = var.sid_username
-      public_key = var.sdu_public_key
-    }
-  }
-
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
@@ -153,7 +152,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
 # Create the SCS Windows VM(s)
 resource "azurerm_windows_virtual_machine" "scs" {
   provider            = azurerm.main
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment && (upper(local.scs_ostype) == "WINDOWS") ? local.scs_server_count : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.scs_computer_names[count.index]

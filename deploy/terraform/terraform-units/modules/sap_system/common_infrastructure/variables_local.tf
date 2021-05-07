@@ -37,6 +37,15 @@ variable "custom_disk_sizes_filename" {
   default     = ""
 }
 
+variable "deployment" {
+  description = "The type of deployment"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+}
+
+
 locals {
   // Resources naming
   vnet_prefix                 = trimspace(var.naming.prefix.VNET)
@@ -128,7 +137,11 @@ locals {
 
   enable_hdb_deployment = (length(local.hdb_list) > 0) ? true : false
 
-  default_filepath = local.enable_hdb_deployment ? "${path.module}/../../../../../configs/hdb_sizes.json" : "${path.module}/../../../../../configs/anydb_sizes.json"
+  default_filepath = local.enable_hdb_deployment ? (
+    format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")) : (
+    format("%s%s", path.module, "/../../../../../configs/anydb_sizes.json")
+  )
+
 
   //Enable xDB deployment 
   xdb_list = [
@@ -145,9 +158,11 @@ locals {
   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
-  sizes     = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : local.default_filepath))
-  db_sizing = local.enable_db_deployment ? lookup(local.sizes, var.databases[0].size).storage : []
+  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : local.default_filepath))
+  custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
+  db_sizing = local.enable_sid_deployment ? lookup(local.sizes.db, var.databases[0].size).storage : []
+  
   enable_ultradisk = try(
     compact(
       [
@@ -244,9 +259,10 @@ locals {
   sub_admin_nsg_name   = local.sub_admin_nsg_exists ? try(split("/", local.sub_admin_nsg_arm_id)[8], "") : try(local.var_sub_admin_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet_nsg))
 
   //DB subnet
-  var_sub_db    = try(local.var_vnet_sap.subnet_db, {})
-  sub_db_arm_id = try(local.var_sub_db.arm_id, try(var.landscape_tfstate.db_subnet_id, ""))
-  sub_db_exists = length(trimspace(try(local.var_sub_db.prefix, ""))) > 0 ? false : length(local.sub_db_arm_id) > 0 ? true : false
+  sub_db_defined = try(var.infrastructure.vnets.sap.subnet_db, null) == null ? false : true
+  var_sub_db     = try(local.var_vnet_sap.subnet_db, {})
+  sub_db_arm_id  = try(local.var_sub_db.arm_id, try(var.landscape_tfstate.db_subnet_id, ""))
+  sub_db_exists  = length(trimspace(try(local.var_sub_db.prefix, ""))) > 0 ? false : length(local.sub_db_arm_id) > 0 ? true : false
 
   sub_db_name   = local.sub_db_exists ? try(split("/", local.sub_db_arm_id)[10], "") : try(local.var_sub_db.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet))
   sub_db_prefix = local.sub_db_exists ? data.azurerm_subnet.db[0].address_prefixes[0] : try(local.var_sub_db.prefix, "")
@@ -309,14 +325,11 @@ locals {
     try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")
   )
 
-  sid_auth_password = local.password_required ? (
-    coalesce(
+  sid_auth_password = coalesce(
       try(var.authentication.password, ""),
       try(data.azurerm_key_vault_secret.sid_password[0].value, local.use_local_credentials ? random_password.password[0].result : "")
-    )) : (
-    ""
-  )
-
+    )
+    
   sid_public_key  = local.use_local_credentials ? try(file(var.authentication.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
   sid_private_key = local.use_local_credentials ? try(file(var.authentication.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
 

@@ -59,7 +59,7 @@ resource "azurerm_network_interface" "app_admin" {
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "app" {
   provider            = azurerm.main
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.app_ostype) == "LINUX" ? local.application_server_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.app_computer_names[count.index]
@@ -85,8 +85,17 @@ resource "azurerm_linux_virtual_machine" "app" {
 
   size                            = length(local.app_size) > 0 ? local.app_size : local.app_sizing.compute.vm_size
   admin_username                  = var.sid_username
-  disable_password_authentication = !local.enable_auth_password
   admin_password                  = local.enable_auth_key ? null : var.sid_password
+  disable_password_authentication = !local.enable_auth_password
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
+
 
   dynamic "os_disk" {
     iterator = disk
@@ -127,14 +136,6 @@ resource "azurerm_linux_virtual_machine" "app" {
     }
   }
 
-  dynamic "admin_ssh_key" {
-    for_each = range(local.enable_auth_password ? 0 : 1)
-    content {
-      username   = var.sid_username
-      public_key = var.sdu_public_key
-    }
-  }
-
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
@@ -146,7 +147,7 @@ resource "azurerm_linux_virtual_machine" "app" {
 # Create the Windows Application VM(s)
 resource "azurerm_windows_virtual_machine" "app" {
   provider            = azurerm.main
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.app_ostype) == "WINDOWS" ? local.application_server_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.app_computer_names[count.index]

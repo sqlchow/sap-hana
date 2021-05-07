@@ -21,7 +21,7 @@ function New-SAPSystem {
 
         This is the optional Landscape state file name
 
-    .PARAMETER TFStateStorageAccountName
+    .PARAMETER StorageAccountName
 
         This is the optional terraform state file storage account name
 
@@ -71,20 +71,27 @@ Licensed under the MIT license.
         [Parameter(Mandatory = $true)][SAP_Types]$Type,
         [Parameter(Mandatory = $false)][string]$DeployerStateFileKeyName,
         [Parameter(Mandatory = $false)][string]$LandscapeStateFileKeyName,
-        [Parameter(Mandatory = $false)][string]$TFStateStorageAccountName,
-        [Parameter(Mandatory=$false)][Switch]$Force
+        [Parameter(Mandatory = $false)][string]$StorageAccountName,
+        [Parameter(Mandatory = $false)][Switch]$Force,
+        [Parameter(Mandatory = $false)][Switch]$Silent
         
     )
 
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Deploying the" $Type
 
-    if($true -eq $Force)
-    {
-        Remove-Item ".terraform" -ErrorAction SilentlyContinue
+    if ($true -eq $Force) {
+        Remove-Item ".terraform" -ErrorAction SilentlyContinue -Recurse
         Remove-Item "terraform.tfstate" -ErrorAction SilentlyContinue
         Remove-Item "terraform.tfstate.backup" -ErrorAction SilentlyContinue
     }
+
+    $autoApprove = ""
+    
+    if ($Silent) {
+        $autoApprove = " --auto-approve "
+    }
+
 
     $CachePath = (Join-Path -Path $Env:APPDATA -ChildPath "terraform.d\plugin-cache")
     if ( -not (Test-Path -Path $CachePath)) {
@@ -120,17 +127,23 @@ Licensed under the MIT license.
         }
     }
 
+    $extra_vars = " "
+    if (  (Test-Path -Path "terraform.tfvars")) {
+        $extra_vars = " -var-file=" + (Join-Path -Path $curDir -ChildPath "terraform.tfvars")
+    }
+
     $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
     $landscapeKey = ""
     if ($Type -eq "sap_landscape") {
         $landscapeKey = $key
     }
 
-    
-    $ctx= Get-AzContext
-    if($null -eq $ctx) {
+    $ctx = Get-AzContext
+    if ($null -eq $ctx) {
         Connect-AzAccount 
     }
+
+    $sub = $env:ARM_SUBSCRIPTION_ID
     
     $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
 
@@ -143,6 +156,8 @@ Licensed under the MIT license.
     $changed = $false
 
     if ($null -eq $iniContent[$combined]) {
+        Select-AzSubscription -SubscriptionId $env:ARM_SUBSCRIPTION_ID
+    
         Write-Error "The Terraform state information is not available"
 
         $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
@@ -159,8 +174,6 @@ Licensed under the MIT license.
 
                 $landscape_tfstate_key = Read-Host -Prompt "Please enter the landscape statefile for the deployment"
             }
-            $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key }
-            $iniContent += @{$combined = $Category1 }
             if ($Type -eq "sap_landscape") {
                 $iniContent[$combined].Landscape = $landscapeKey
             }
@@ -177,6 +190,11 @@ Licensed under the MIT license.
         }
     }
     else {
+        $tfstate_resource_id = $iniContent[$combined]["tfstate_resource_id"]
+        $saName = $iniContent[$combined]["REMOTE_STATE_SA"] 
+        $rgName = $iniContent[$combined]["REMOTE_STATE_RG"] 
+        $sub = $iniContent[$combined]["STATE_SUBSCRIPTION"]
+        
         if ($Type -eq "sap_system") {
             if ($null -ne $LandscapeStateFileKeyName -and "" -ne $LandscapeStateFileKeyName) {
                 $landscape_tfstate_key = $LandscapeStateFileKeyName
@@ -187,6 +205,16 @@ Licensed under the MIT license.
                 $landscape_tfstate_key = $iniContent[$combined].Landscape
             }
         }
+    }
+
+    if ($null -ne $sub -and "" -ne $sub) {
+        if ( $sub -ne $env:ARM_SUBSCRIPTION_ID) {
+            Select-AzSubscription -SubscriptionId $sub
+        }
+        
+    }
+    else {
+        $sub = $env:ARM_SUBSCRIPTION_ID
     }
 
     if ("sap_deployer" -eq $Type) {
@@ -204,16 +232,9 @@ Licensed under the MIT license.
             $deployer_tfstate_key = $iniContent[$combined]["Deployer"]
         }
     }
-    if (!$spn_kvSpecified) {
-        if ($null -eq $deployer_tfstate_key -or "" -eq $deployer_tfstate_key) {
-            $deployer_tfstate_key = Read-Host -Prompt "Please specify the deployer state file name"
-            $iniContent[$combined]["Deployer"] = $deployer_tfstate_key.Trim()
-            $changed = $true
-        }
-    }
 
-    if ($null -ne $TFStateStorageAccountName -and "" -ne $TFStateStorageAccountName) {
-        $saName = $TFStateStorageAccountName
+    if ($null -ne $StorageAccountName -and "" -ne $StorageAccountName) {
+        $saName = $StorageAccountName
         $rID = Get-AzResource -Name $saName
         $rgName = $rID.ResourceGroupName
         $tfstate_resource_id = $rID.ResourceId
@@ -225,19 +246,32 @@ Licensed under the MIT license.
 
     }
     else {
-        $saName = $iniContent[$combined]["REMOTE_STATE_SA"]
+        $saName = $iniContent[$combined]["REMOTE_STATE_SA"].trim()
+        $rgName = $iniContent[$combined]["REMOTE_STATE_RG"]
+        $tfstate_resource_id = $iniContent[$combined]["tfstate_resource_id"]
     }
     
     if ($null -eq $saName -or "" -eq $saName) {
+        Select-AzSubscription -SubscriptionId $env:ARM_SUBSCRIPTION_ID
+    
         $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
         $rID = Get-AzResource -Name $saName
         $rgName = $rID.ResourceGroupName
         $tfstate_resource_id = $rID.ResourceId
+        if ($null -ne $tfstate_resource_id) {
+            $sub = $tfstate_resource_id.Split("/")[2]
+        }
 
-        $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
         $iniContent[$combined]["REMOTE_STATE_SA"] = $saName
+        $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
         $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
+        $iniContent[$combined]["STATE_SUBSCRIPTION"] = $sub
         $changed = $true
+        if ($changed) {
+            Out-IniFile -InputObject $iniContent -Path $filePath
+        }
+        $changed = $false
+
     }
     else {
         $rgName = $iniContent[$combined]["REMOTE_STATE_RG"]
@@ -248,16 +282,28 @@ Licensed under the MIT license.
         $rID = Get-AzResource -Name $saName
         $rgName = $rID.ResourceGroupName
         $tfstate_resource_id = $rID.ResourceId
+        if ($null -ne $tfstate_resource_id) {
+            $sub = $tfstate_resource_id.Split("/")[2]
+        }
 
-        $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
         $iniContent[$combined]["REMOTE_STATE_SA"] = $saName
+        $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
         $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
+        $iniContent[$combined]["STATE_SUBSCRIPTION"] = $sub
         $changed = $true
 
+        if ($changed) {
+            Out-IniFile -InputObject $iniContent -Path $filePath
+        }
+        $changed = $false
+
+    }
+    else {
+        if ($null -ne $tfstate_resource_id) {
+            $sub = $tfstate_resource_id.Split("/")[2]
+        }
     }
 
-    # Subscription
-    $sub = $iniContent[$combined]["kvsubscription"]
     
     $repo = $iniContent["Common"]["repo"]
 
@@ -274,7 +320,7 @@ Licensed under the MIT license.
 
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = $tfstate_resource_id.Split("/")[2]
-        $iniContent[$combined]["kvsubscription"] = $sub.Trim() 
+        $iniContent[$combined]["STATE_SUBSCRIPTION"] = $sub.Trim() 
         $changed = $true
 
     }
@@ -295,34 +341,40 @@ Licensed under the MIT license.
     Write-Host -ForegroundColor green "Initializing Terraform"
 
     if ($tfstate_resource_id.Length -gt 0) {
-        $Command = " account set --sub " + $tfstate_resource_id.Split("/")[2]
-        $Cmd = "az $Command"
-        Add-Content -Path "deployment.log" -Value $Cmd
-        & ([ScriptBlock]::Create($Cmd)) 
-        if ($LASTEXITCODE -ne 0) {
-            throw "Error executing command: $Cmd"
-        }
         $sub = $tfstate_resource_id.Split("/")[2]
     }
     
     $Command = " init -upgrade=true -force-copy -backend-config ""subscription_id=$sub"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$key"""
 
+    $bRunRefresh = $false
+
+    $deployment_parameter = " "
     if (Test-Path ".terraform" -PathType Container) {
         $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
         if ("azurerm" -eq $jsonData.backend.type) {
             $Command = " init -upgrade=true -force-copy -backend-config ""subscription_id=$sub"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$key"""
 
-            $ans = Read-Host -Prompt "The system has already been deployed and the statefile is in Azure, do you want to redeploy Y/N?"
-            if ("Y" -ne $ans) {
-                $Env:TF_DATA_DIR = $null
+            if ($false -eq $Silent) {
 
-                return
+                $ans = Read-Host -Prompt "The system has already been deployed and the statefile is in Azure, do you want to redeploy Y/N?"
+                if ("Y" -ne $ans) {
+                    $Env:TF_DATA_DIR = $null
+
+                    return
+                }
+
+                $bRunRefresh = $true
             }
         }
     } 
+    else {
+        $deployment_parameter = " -var deployment=new "
+
+    }
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
+    Write-Verbose $Cmd
 
     & ([ScriptBlock]::Create($Cmd)) 
     if ($LASTEXITCODE -ne 0) {
@@ -350,62 +402,108 @@ Licensed under the MIT license.
             $deployer_tfstate_key_parameter = ""
         }
         else {
-            $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
-        }
-   
+            if ($deployer_tfstate_key.Length -gt 0) {
+                $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
+            }
+            else {
+                $deployer_tfstate_key_parameter = ""
+            }
             
+        }
     }
 
     if ($Type -eq "sap_system") {
         $tfstate_parameter = " -var tfstate_resource_id=" + $tfstate_resource_id
-        $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key
+        
+        if ($deployer_tfstate_key.Length -gt 0) {
+            $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
+        }
+        else {
+            $deployer_tfstate_key_parameter = ""
+        }
         $landscape_tfstate_key_parameter = " -var landscape_tfstate_key=" + $landscape_tfstate_key
+    }
+
+    if ($bRunRefresh) {
+        Write-Host -ForegroundColor green "Running refresh, please wait"
+        $Command = " refresh -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars + $version_parameter + $deployment_parameter 
+        
+    
+        $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+        Write-Verbose $Cmd
+        Add-Content -Path "deployment.log" -Value $Cmd
+        
+        $planResultsPlain = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+        
+        if ($LASTEXITCODE -ne 0) {
+            throw "Error executing command: $Cmd"
+        }
+    
     }
 
     $Command = " output -no-color automation_version"
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+
+    Write-Verbose $Cmd
+
     $versionLabel = & ([ScriptBlock]::Create($Cmd)) | Out-String 
 
-    Write-Host $versionLabel
-    if ("" -eq $versionLabel) {
-        Write-Host ""
-        Write-Host -ForegroundColor red "The environment was deployed using an older version of the Terrafrom templates"
-        Write-Host ""
-        Write-Host -ForegroundColor red "!!! Risk for Data loss !!!"
-        Write-Host ""
-        Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
-        Write-Host ""
-        if ($PSCmdlet.ShouldProcess($Parameterfile , $Type)) {
-            $ans = Read-Host -Prompt "Do you want to continue Y/N?"
-            if ("Y" -eq $ans) {
+
+    $version_parameter = " "
     
-            }
-            else {
-                $Env:TF_DATA_DIR = $null
-                return 
-            }        
-        }
+    if ($versionLabel.Contains("Warning: No outputs found")) {
+        $deployment_parameter = " -var deployment=new "
     }
     else {
-        Write-Host ""
-        Write-Host -ForegroundColor green "The environment was deployed using the $versionLabel version of the Terrafrom templates"
-        Write-Host ""
-        Write-Host ""
+
+        Write-Host $versionLabel
+    
+        if ($versionLabel.Length -eq 0 ) {
+            Write-Host ""
+            Write-Host -ForegroundColor red "The environment was deployed using an older version of the Terrafrom templates"
+            Write-Host ""
+            Write-Host -ForegroundColor red "!!! Risk for Data loss !!!"
+            Write-Host ""
+            Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
+            Write-Host ""
+            if ($PSCmdlet.ShouldProcess($Parameterfile , $Type)) {
+                $ans = Read-Host -Prompt "Do you want to continue Y/N?"
+                if ("Y" -eq $ans) {
+    
+                }
+                else {
+                    $Env:TF_DATA_DIR = $null
+                    return 
+                }        
+            }
+        }
+        else {
+            $version_parameter = " -var terraform_template_version=" + $versionLabel
+            Write-Host ""
+            Write-Host -ForegroundColor green "The environment was deployed using the $versionLabel version of the Terrafrom templates"
+            Write-Host ""
+            Write-Host ""
+        }
     }
 
     Write-Host -ForegroundColor green "Running plan, please wait"
-    $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter 
+    if ($deployer_tfstate_key_parameter.Length -gt 0) {
+        $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars + $version_parameter + $deployment_parameter
+    }
+    else {
+        $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $extra_vars + $version_parameter + $deployment_parameter
+    }
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
-    $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+    Write-Verbose $Cmd
+
+    $planResultsPlain = & ([ScriptBlock]::Create($Cmd)) | Out-String 
     
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
     }
-
-    $planResultsPlain = $planResults -replace '\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]', ''
 
     if ( $planResultsPlain.Contains('No changes')) {
         Write-Host ""
@@ -444,10 +542,12 @@ Licensed under the MIT license.
     if ($PSCmdlet.ShouldProcess($Parameterfile , $Type)) {
 
         Write-Host -ForegroundColor green "Running apply"
-        $Command = " apply -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+        
+        $Command = " apply " + $autoApprove + " -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars + $version_parameter + $deployment_parameter
 
         $Cmd = "terraform -chdir=$terraform_module_directory $Command"
         Add-Content -Path "deployment.log" -Value $Cmd
+        Write-Verbose $Cmd
         & ([ScriptBlock]::Create($Cmd))  
         if ($LASTEXITCODE -ne 0) {
             throw "Error executing command: $Cmd"

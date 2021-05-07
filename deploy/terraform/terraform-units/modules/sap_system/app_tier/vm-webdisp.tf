@@ -22,7 +22,6 @@ resource "azurerm_network_interface" "web" {
 }
 
 resource "azurerm_network_interface_application_security_group_association" "web" {
-  provider                      = azurerm.main
   count                         = local.enable_deployment ? local.webdispatcher_count : 0
   network_interface_id          = azurerm_network_interface.web[count.index].id
   application_security_group_id = azurerm_application_security_group.web[0].id
@@ -54,7 +53,7 @@ resource "azurerm_network_interface" "web_admin" {
 # Create the Linux Web dispatcher VM(s)
 resource "azurerm_linux_virtual_machine" "web" {
   provider            = azurerm.main
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.web_ostype) == "LINUX" ? local.webdispatcher_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.web_computer_names[count.index]
@@ -80,8 +79,17 @@ resource "azurerm_linux_virtual_machine" "web" {
 
   size                            = length(local.web_size) > 0 ? local.web_size : local.web_sizing.compute.vm_size
   admin_username                  = var.sid_username
-  disable_password_authentication = !local.enable_auth_password
   admin_password                  = local.enable_auth_key ? null : var.sid_password
+  disable_password_authentication = !local.enable_auth_password
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
+
 
   dynamic "os_disk" {
     iterator = disk
@@ -122,14 +130,6 @@ resource "azurerm_linux_virtual_machine" "web" {
     }
   }
 
-  dynamic "admin_ssh_key" {
-    for_each = range(local.enable_auth_password ? 0 : 1)
-    content {
-      username   = var.sid_username
-      public_key = var.sdu_public_key
-    }
-  }
-
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
@@ -140,7 +140,7 @@ resource "azurerm_linux_virtual_machine" "web" {
 # Create the Windows Web dispatcher VM(s)
 resource "azurerm_windows_virtual_machine" "web" {
   provider            = azurerm.main
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.web_ostype) == "WINDOWS" ? local.webdispatcher_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.web_computer_names[count.index]

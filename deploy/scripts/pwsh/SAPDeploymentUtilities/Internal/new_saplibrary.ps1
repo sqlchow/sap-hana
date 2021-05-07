@@ -40,13 +40,21 @@ Licensed under the MIT license.
         #Parameter file
         [Parameter(Mandatory = $true)][string]$Parameterfile,
         #Deployer parameterfile
-        [Parameter(Mandatory = $true)][string]$DeployerFolderRelativePath
+        [Parameter(Mandatory = $false)][string]$DeployerFolderRelativePath,
+        [Parameter(Mandatory = $false)][Switch]$Silent
     )
 
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Bootstrap the library"
     $curDir = Get-Location 
-    Write-Host $DeployerFolderRelativePath
+
+    $autoApprove=""
+    
+    if($Silent) {
+        $autoApprove=" --auto-approve "
+    }
+
+    Write-Host "Using the Deployer state file:"  $DeployerFolderRelativePath
 
     $fInfo = Get-ItemProperty -Path $Parameterfile
     if (!$fInfo.Exists ) {
@@ -61,7 +69,6 @@ Licensed under the MIT license.
     $env:TF_PLUGIN_CACHE_DIR = $CachePath
 
     $ParamFullFile = (Get-ItemProperty -Path $Parameterfile -Name Fullname).Fullname
-
 
     Add-Content -Path "deployment.log" -Value "Bootstrap the library"
     Add-Content -Path "deployment.log" -Value (Get-Date -Format "yyyy-MM-dd HH:mm")
@@ -78,11 +85,16 @@ Licensed under the MIT license.
 
     # Subscription & repo path
 
-    $sub = $null
+    $sub = $env:ARM_SUBSCRIPTION_ID
     if ($null -ne $iniContent[$combined]) {
-        $sub = $iniContent[$combined]["subscription"]
+        $sub = $iniContent[$combined]["STATE_SUBSCRIPTION"]
     }
-     
+
+    $ctx = Get-AzContext
+    if ($null -eq $ctx) {
+        Connect-AzAccount 
+    }
+
     $repo = $iniContent["Common"]["repo"]
 
     $changed = $false
@@ -92,6 +104,13 @@ Licensed under the MIT license.
         $iniContent[$combined]["subscription"] = $sub
         $changed = $true
     }
+
+    Select-AzSubscription -SubscriptionId $sub
+    $Cmd = "az account set --sub $sub"
+    Add-Content -Path "deployment.log" -Value $Cmd
+    Write-Verbose $Cmd
+
+    & ([ScriptBlock]::Create($Cmd)) 
 
     if ($null -eq $repo -or "" -eq $repo) {
         $repo = Read-Host -Prompt "Please enter the path to the repository"
@@ -139,6 +158,8 @@ Licensed under the MIT license.
     
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
+    Write-Verbose $Cmd
+
     & ([ScriptBlock]::Create($Cmd)) 
     if ($LASTEXITCODE -ne 0) {
         $Env:TF_DATA_DIR = $null
@@ -147,15 +168,16 @@ Licensed under the MIT license.
 
     Write-Host -ForegroundColor green "Running plan"
     if ($DeployerFolderRelativePath -eq "") {
-        $Command = " plan -var-file " + $ParamFullFile
+        $Command = " plan -no-color -var-file " + $ParamFullFile
     }
     else {
-        $Command = " plan -var-file " + $ParamFullFile + " -var deployer_statefile_foldername=" + $DeployerFolderRelativePath
+        $Command = " plan -no-color -var-file " + $ParamFullFile + " -var deployer_statefile_foldername=" + $DeployerFolderRelativePath
     }
-
     
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
+    Write-Verbose $Cmd
+
     $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
     
     if ($LASTEXITCODE -ne 0) {
@@ -187,20 +209,28 @@ Licensed under the MIT license.
     
         Write-Host -ForegroundColor green "Running apply"
         if ($DeployerFolderRelativePath -eq "") {
-            $Command = " apply -var-file " + $ParamFullFile  
+            $Command = " apply " +$autoApprove +" -var-file " + $ParamFullFile
         }
         else {
-            $Command = " apply -var-file " + $ParamFullFile + " -var deployer_statefile_foldername=" + $DeployerFolderRelativePath  
+            $Command = " apply " +$autoApprove +" -var-file " + $ParamFullFile + " -var deployer_statefile_foldername=" + $DeployerFolderRelativePath
         }
-
+        
         $Cmd = "terraform -chdir=$terraform_module_directory $Command"
         Add-Content -Path "deployment.log" -Value $Cmd
+        Write-Verbose $Cmd
+        
         & ([ScriptBlock]::Create($Cmd))  
         if ($LASTEXITCODE -ne 0) {
             $Env:TF_DATA_DIR = $null
             throw "Error executing command: $Cmd"
         }
 
+        if ($null -eq $iniContent[$combined] ) {
+            $Category1 = @{"subscription" = "" }
+            $iniContent += @{$combined = $Category1 }
+            Out-IniFile -InputObject $iniContent -Path $fileINIPath
+        }
+        
         $Command = " output remote_state_resource_group_name"
         $Cmd = "terraform -chdir=$terraform_module_directory $Command"
         $rgName = & ([ScriptBlock]::Create($Cmd)) | Out-String 

@@ -16,7 +16,7 @@ resource "azurerm_public_ip" "deployer" {
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   allocation_method   = "Static"
-  sku                 = "Basic"
+  sku                 = "Standard"
 }
 
 resource "azurerm_network_interface" "deployer" {
@@ -148,6 +148,8 @@ resource "null_resource" "prepare-deployer" {
       "sudo sh -c \"echo export PATH=$PATH:/opt/terraform/bin > /etc/profile.d/deploy_server.sh\"",
       // Set env for MSI
       "sudo sh -c \"echo export ARM_USE_MSI=true >> /etc/profile.d/deploy_server.sh\"",
+      "sudo sh -c \"echo export ARM_MSI_ENDPOINT=\"http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01\" >> /etc/profile.d/deploy_server.sh\"",
+      "sudo sh -c \"echo export ARM_CLIENT_ID=${azurerm_user_assigned_identity.deployer.client_id} >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo export ARM_SUBSCRIPTION_ID=${data.azurerm_subscription.primary.subscription_id} >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo export ARM_TENANT_ID=${data.azurerm_subscription.primary.tenant_id} >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo export DEPLOYMENT_REPO_PATH=$HOME/Azure_SAP_Automated_Deployment/sap-hana/ >> /etc/profile.d/deploy_server.sh\"",
@@ -157,28 +159,26 @@ resource "null_resource" "prepare-deployer" {
       // Install az cli
       "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
       "sudo apt update",
-      // Install Git
-      "sudo apt-get install git=1:2.17.1-1ubuntu0.7",
       // install jq
       "sudo apt -y install jq",
-      "sudo -H pip3 pip install setuptools-rust",
+      "sudo pip3 pip install setuptools-rust",
       // Install pip
       "sudo apt -y install python3-pip",
-      "sudo -H pip3 install --upgrade pip",
-      "sudo -H pip3 pip install msal",
+      "sudo pip3 install --upgrade pip",
+      "sudo pip3 pip install msal",
       // Installs Ansible
-      "sudo -H pip3 install \"ansible>=2.9,<2.10\"",
-      "sudo -H pip3 install ansible[azure]",
+      "sudo pip3 install \"ansible>=2.9,<2.10\"",
+      "sudo pip3 install ansible[azure]",
       "sudo wget -nv -q https://raw.githubusercontent.com/ansible-collections/azure/dev/requirements-azure.txt",
-      "sudo -H pip3 install -r requirements-azure.txt",
+      "sudo pip3 install -r requirements-azure.txt",
       "sudo ansible-galaxy collection install azure.azcollection --force",
       // Install pywinrm
-      "sudo -H pip3 install \"pywinrm>=0.3.0\"",     
+      "sudo pip3 install \"pywinrm>=0.3.0\"",     
       // Install yamllint
-      "sudo -H pip3 install yamllint",
+      "sudo pip3 install yamllint",
       // Install ansible-lint
-      "sudo -H pip3 install ansible-lint \"ansible>=2.9,<2.10\"",
-      "sudo -H pip3 install argcomplete",
+      "sudo pip3 install ansible-lint \"ansible>=2.9,<2.10\"",
+      "sudo pip3 install argcomplete",
       "sudo activate-global-python-argcomplete"
     ]
   }

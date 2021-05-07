@@ -46,7 +46,5 @@
     "use_DHCP": true
   },
   "options": {
-    "enable_secure_transfer": true,
-    "enable_prometheus": true
   }
 }

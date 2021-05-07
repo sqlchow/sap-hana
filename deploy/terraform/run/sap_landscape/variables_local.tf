@@ -69,6 +69,8 @@ locals {
 
   use_spn = !try(var.options.nospn, false)
 
+  deployer_subscription_id = length(local.spn_key_vault_arm_id) > 0 ? split("/", local.spn_key_vault_arm_id)[2] : ""
+
   spn = {
     subscription_id = data.azurerm_key_vault_secret.subscription_id.value,
     client_id       = local.use_spn ? data.azurerm_key_vault_secret.client_id[0].value : null,

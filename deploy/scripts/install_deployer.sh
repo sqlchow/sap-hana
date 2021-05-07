@@ -1,6 +1,21 @@
 #!/bin/bash
-. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+#error codes include those from /usr/include/sysexits.h
 
+#colors for terminal
+boldreduscore="\e[1;4;31m"
+boldred="\e[1;31m"
+cyan="\e[1;36m"
+resetformatting="\e[0m"
+
+#External helper functions
+#. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+full_script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_directory="$(dirname "${full_script_path}")"
+
+#call stack has full scriptname when using source 
+source "${script_directory}/deploy_utils.sh"
+
+#Internal helper functions
 function showhelp {
     echo ""
     echo "#########################################################################################"
@@ -31,17 +46,26 @@ function showhelp {
     echo "#########################################################################################"
 }
 
-while getopts ":p:i:h" option; do
-    case "${option}" in
-        p) parameterfile=${OPTARG};;
-        i) interactive=${OPTARG};;
-        h) showhelp
-            exit 3
-        ;;
-        ?) echo "Invalid option: -${OPTARG}."
-            exit 2
-        ;;
-    esac
+
+#process inputs - may need to check the option i for auto approve as it is not used
+INPUT_ARGUMENTS=$(getopt -n install_deployer -o p:ih --longoptions parameterfile:,auto-approve,help -- "$@")
+VALID_ARGUMENTS=$?
+
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
+    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+    -h | --help)                               showhelp 
+                                               exit 3                           ; shift ;;
+    --) shift; break ;;
+  esac
 done
 
 deployment_system=sap_deployer
@@ -57,7 +81,51 @@ then
     echo "#               Parameter file does not exist: ${val} #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit
+    exit 2 #No such file or directory
+fi
+
+if [ $param_dirname != '.' ]; then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#   Please run this command from the folder containing the parameter file               #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    exit 3
+fi
+
+
+
+
+# Read environment
+environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
+region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+key=$(echo "${parameterfile}" | cut -d. -f1)
+
+if [ ! -n "${environment}" ]
+then
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                           Incorrect parameter file.                                   #"
+    echo "#                                                                                       #"
+    echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit -1
+fi
+
+if [ ! -n "${region}" ]
+then
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                           Incorrect parameter file.                                   #"
+    echo "#                                                                                       #"
+    echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit -1
 fi
 
 if [ $param_dirname != '.' ]; then
@@ -116,7 +184,6 @@ param_dirname=$(pwd)
 
 init "${automation_config_directory}" "${generic_config_information}" "${deployer_config_information}"
 
-export TF_DATA_DIR="${param_dirname}"/.terraform
 var_file="${param_dirname}"/"${parameterfile}" 
 
 if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
@@ -168,6 +235,7 @@ else
 fi
 
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/"${deployment_system}"/
+export TF_DATA_DIR="${param_dirname}"/.terraform
 
 ok_to_proceed=false
 new_deployment=false
@@ -200,12 +268,20 @@ else
             fi
         fi
         
-        terraform -chdir="${terraform_module_directory}" init -upgrade=true  -backend-config "path=${param_dirname}"
+        terraform -chdir="${terraform_module_directory}" init -upgrade=true  -backend-config "path=${param_dirname}/terraform.tfstate"
         terraform -chdir="${terraform_module_directory}" refresh -var-file="${var_file}" 
     else
+        unset TF_DATA_DIR
         exit 0
     fi
 fi
+
+extra_vars=""
+
+if [ -f terraform.tfvars ]; then
+    extra_vars=" -var-file=${param_dirname}/terraform.tfvars "
+fi
+
 
 echo ""
 echo "#########################################################################################"
@@ -215,7 +291,7 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform -chdir="${terraform_module_directory}"  plan -var-file="${var_file}" > plan_output.log 2>&1
+terraform -chdir="${terraform_module_directory}"  plan -var-file="${var_file}" $extra_vars > plan_output.log 2>&1
 str1=$(grep "Error: KeyVault " plan_output.log)
 
 if [ -n "${str1}" ]; then
@@ -228,6 +304,7 @@ if [ -n "${str1}" ]; then
     echo ""
     echo $str1
     rm plan_output.log
+    unset TF_DATA_DIR
     exit -1
 fi
 
@@ -243,7 +320,23 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform -chdir="${terraform_module_directory}"  apply ${approve} -var-file="${var_file}"
+terraform -chdir="${terraform_module_directory}"  apply ${approve} -var-file="${var_file}" $extra_vars 2>error.log
+str1=$(grep "Error: " error.log)
+if [ -n "${str1}" ]
+then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#                          $boldreduscore Errors during the apply phase $resetformatting                              #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    cat error.log
+    rm error.log
+    unset TF_DATA_DIR
+    exit -1
+fi
+
 
 keyvault=$(terraform -chdir="${terraform_module_directory}"  output deployer_kv_user_name | tr -d \")
 
@@ -261,5 +354,5 @@ then
         return_value=-1
     fi
 fi
-
+unset TF_DATA_DIR
 exit $return_value

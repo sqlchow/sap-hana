@@ -48,7 +48,16 @@ variable "landscape_tfstate_key" {
     )
     error_message = "The Landscape state file name must be specified."
   }
+}
 
+variable "deployment" {
+  description = "The type of deployment"
+  default     = "update"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+  default     = ""
 }
 
 locals {
@@ -112,9 +121,16 @@ locals {
   landscape_tfstate_key        = var.landscape_tfstate_key
 
   // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
-  spn_key_vault_arm_id = try(var.key_vault.kv_spn_id, try(data.terraform_remote_state.deployer[0].outputs.deployer_kv_user_arm_id, ""))
 
   use_spn = !try(var.options.nospn, false)
+
+  spn_key_vault_arm_id = try(var.key_vault.kv_spn_id,
+    try(data.terraform_remote_state.landscape.outputs.landscape_key_vault_spn_arm_id,
+      try(data.terraform_remote_state.deployer[0].outputs.deployer_kv_user_arm_id, "")
+    )
+  )
+
+  deployer_subscription_id = length(local.spn_key_vault_arm_id) > 0 ? split("/", local.spn_key_vault_arm_id)[2] : ""
 
   spn = {
     subscription_id = data.azurerm_key_vault_secret.subscription_id.value,

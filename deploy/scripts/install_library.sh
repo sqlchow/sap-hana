@@ -1,5 +1,21 @@
 #!/bin/bash
-. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+#error codes include those from /usr/include/sysexits.h
+
+#colors for terminal
+boldreduscore="\e[1;4;31m"
+boldred="\e[1;31m"
+cyan="\e[1;36m"
+resetformatting="\e[0m"
+
+#External helper functions
+#. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+full_script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_directory="$(dirname "${full_script_path}")"
+
+#call stack has full scriptname when using source 
+source "${script_directory}/deploy_utils.sh"
+
+#Internal helper functions
 function showhelp {
     echo ""
     echo "#########################################################################################"
@@ -30,20 +46,26 @@ function showhelp {
     echo "#########################################################################################"
 }
 
-interactive=true
+#process inputs - may need to check the option i for auto approve as it is not used
+INPUT_ARGUMENTS=$(getopt -n install_library -o p:d:ih --longoptions parameterfile:,deployer_statefile_foldername:,auto-approve,help -- "$@")
+VALID_ARGUMENTS=$?
 
-while getopts ":p:i:d:h" option; do
-    case "${option}" in
-        p) parameterfile=${OPTARG};;
-        i) interactive=${OPTARG};;
-        d) deployer_statefile_foldername=${OPTARG};;
-        h) showhelp
-            exit 3
-        ;;
-        ?) echo "Invalid option: -${OPTARG}."
-            exit 2
-        ;;
-    esac
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+  
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -p | --parameterfile)                      parameterfile="$2"                   ; shift 2 ;;
+    -d | --deployer_statefile_foldername)      deployer_statefile_foldername="$2"   ; shift 2 ;;
+    -i | --auto-approve)                       approve="--auto-approve"             ; shift ;;
+    -h | --help)                               showhelp 
+                                               exit 3                               ; shift ;;
+    --) shift; break ;;
+  esac
 done
 
 deployment_system=sap_library
@@ -60,19 +82,6 @@ then
     exit
 fi
 
-if [ ! -d "${deployer_statefile_foldername}" ]
-then
-    printf -v val %-40.40s "$deployer_statefile_foldername"
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                    Directory does not exist:  "${deployer_statefile_foldername}" #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    exit
-fi
-
-
 param_dirname=$(dirname "${parameterfile}")
 
 if [ $param_dirname != '.' ]; then
@@ -86,9 +95,11 @@ if [ $param_dirname != '.' ]; then
 fi
 
 # Read environment
-environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+environment=$(jq .infrastructure.environment "${parameterfile}" | tr -d \")
+region=$(jq .infrastructure.region "${parameterfile}" | tr -d \")
 key=$(echo "${parameterfile}" | cut -d. -f1)
+
+use_deployer=$(jq .deployer.use "${parameterfile}" | tr -d \")
 
 if [ ! -n "${environment}" ]
 then
@@ -116,13 +127,40 @@ then
     exit -1
 fi
 
+
+echo $use_deployer
+
+if [ false != $use_deployer ]
+then
+    if [ ! -d "${deployer_statefile_foldername}" ]
+    then
+        printf -v val %-40.40s "$deployer_statefile_foldername"
+        echo ""
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo "#                    Directory does not exist:  "${deployer_statefile_foldername}" #"
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        exit
+    fi
+fi
+
 #Persisting the parameters across executions
 automation_config_directory=~/.sap_deployment_automation/
 generic_config_information="${automation_config_directory}"config
 library_config_information="${automation_config_directory}""${environment}""${region}"
 
+#Plugins
+if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
+then
+    mkdir "$HOME/.terraform.d/plugin-cache"
+fi
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+
+param_dirname=$(pwd)
+
+
 arm_config_stored=false
-config_stored=false
 
 param_dirname=$(pwd)
 
@@ -166,10 +204,6 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     exit 3
 fi
 
-if [ $interactive == false ]; then
-    approve="--auto-approve"
-fi
-
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/"${deployment_system}"/
 
 if [ ! -d ${terraform_module_directory} ]
@@ -184,14 +218,6 @@ then
     echo "#########################################################################################"
     echo ""
     exit -1
-fi
-
-ok_to_proceed=false
-new_deployment=false
-
-if [ -f backend.tf ]
-then
-    rm backend.tf
 fi
 
 reinitialized=0
@@ -258,19 +284,18 @@ echo "##########################################################################
 echo ""
 
 if [ -n "${deployer_statefile_foldername}" ]; then
-    echo "Deployer folder specified: "${deployer_statefile_foldername}
+    echo "Deployer folder specified:" "${deployer_statefile_foldername}"
     terraform -chdir="${terraform_module_directory}" plan -no-color -var-file="${var_file}" -var deployer_statefile_foldername="${deployer_statefile_foldername}" > plan_output.log 2>&1
 else
     terraform -chdir="${terraform_module_directory}" plan -no-color -var-file="${var_file}"  > plan_output.log 2>&1
 fi
-
 str1=$(grep "Error: KeyVault " plan_output.log)
 
 if [ -n "${str1}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Errors during the plan phase                                #"
+    echo -e "#                          $boldreduscore Errors during the plan phase $resetformatting                                #"    
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -291,12 +316,29 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-if [ -n "${deployer_statefile_foldername}" ]; then
-    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" -var deployer_statefile_foldername="${deployer_statefile_foldername}"
+if [ -n "${deployer_statefile_foldername}" ]; 
+then
+    echo "Deployer folder specified:" "${deployer_statefile_foldername}"
+    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" -var deployer_statefile_foldername="${deployer_statefile_foldername}" 2>error.log
 else
-    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}"
+    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" 2>error.log
 fi
-
+ 
+str1=$(grep "Error: " error.log)
+if [ -n "${str1}" ]
+then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#                          $boldreduscore Errors during the apply phase $resetformatting                              #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    cat error.log
+    rm error.log
+    unset TF_DATA_DIR
+    exit -1
+fi
 return_value=-1
 
 REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")

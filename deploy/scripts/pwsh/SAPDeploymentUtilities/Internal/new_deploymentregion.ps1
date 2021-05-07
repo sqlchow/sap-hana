@@ -1,10 +1,10 @@
 function New-SAPAutomationRegion {
     <#
     .SYNOPSIS
-        Deploys a new SAP Environment (Deployer, Library and Workload VNet)
+        Deploys a new SAP Environment (Deployer, Library)
 
     .DESCRIPTION
-        Deploys a new SAP Environment (Deployer, Library and Workload VNet)
+        Deploys a new SAP Environment (Deployer, Library)
 
     .PARAMETER DeployerParameterfile
         This is the parameter file for the Deployer
@@ -12,14 +12,52 @@ function New-SAPAutomationRegion {
     .PARAMETER LibraryParameterfile
         This is the parameter file for the library
 
+    .PARAMETER Subscription
+        This is the subscription into which the deployment is performed
+
+    .PARAMETER SPN_id
+        This is the Service Principal App ID
+
+    .PARAMETER SPN_password
+        This is the Service Principal password
+
+    .PARAMETER Tenant
+        This is the Tenant ID of the Service Principal
+
+    .PARAMETER Force
+        Performs a cleanup of local configuration before deployment
+
+    .PARAMETER Silent
+        Performs a silent deployment
+
     .EXAMPLE 
 
     #
     #
     # Import the module
     Import-Module "SAPDeploymentUtilities.psd1"
-     New-SAPAutomationRegion -DeployerParameterfile .\DEPLOYER\PROD-WEEU-DEP00-INFRASTRUCTURE\PROD-WEEU-DEP00-INFRASTRUCTURE.json \
-     -LibraryParameterfile .\LIBRARY\PROD-WEEU-SAP_LIBRARY\PROD-WEEU-SAP_LIBRARY.json \
+     New-SAPAutomationRegion -DeployerParameterfile .\DEPLOYER\PROD-WEEU-DEP00-INFRASTRUCTURE\PROD-WEEU-DEP00-INFRASTRUCTURE.json 
+     -LibraryParameterfile .\LIBRARY\PROD-WEEU-SAP_LIBRARY\PROD-WEEU-SAP_LIBRARY.json 
+
+
+    .EXAMPLE 
+
+    #
+    # Import the module
+
+    Import-Module "SAPDeploymentUtilities.psd1"
+
+    # Provide the subscription and SPN details as parameters
+
+     New-SAPAutomationRegion -DeployerParameterfile .\DEPLOYER\PROD-WEEU-DEP00-INFRASTRUCTURE\PROD-WEEU-DEP00-INFRASTRUCTURE.json 
+     -LibraryParameterfile .\LIBRARY\PROD-WEEU-SAP_LIBRARY\PROD-WEEU-SAP_LIBRARY.json 
+     -Subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+     -SPN_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+     -SPN_password ************************
+     -Tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz  
+     -Silent
+                   
+
 
     
 .LINK
@@ -40,7 +78,15 @@ Licensed under the MIT license.
         #Parameter file
         [Parameter(Mandatory = $true)][string]$DeployerParameterfile,
         [Parameter(Mandatory = $true)][string]$LibraryParameterfile,
-        [Parameter(Mandatory = $false)][Switch]$Force
+        [Parameter(Mandatory = $false)][string]$Subscription,
+        #SPN App ID
+        [Parameter(Mandatory = $false)][string]$SPN_id,
+        #SPN App secret
+        [Parameter(Mandatory = $false)][string]$SPN_password,
+        #Tenant
+        [Parameter(Mandatory = $false)][string]$Tenant_id,
+        [Parameter(Mandatory = $false)][Switch]$Force,
+        [Parameter(Mandatory = $false)][Switch]$Silent
     )
 
     Write-Host -ForegroundColor green ""
@@ -63,7 +109,6 @@ Licensed under the MIT license.
     $fileDir = Join-Path -Path $dirInfo.ToString() -ChildPath $DeployerParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     
-
     $fInfo = Get-ItemProperty -Path $DeployerParameterfile
     if ($false -eq $fInfo.Exists ) {
         Write-Error ("File " + $DeployerParameterfile + " does not exist")
@@ -95,19 +140,13 @@ Licensed under the MIT license.
 
     $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
     
-    try {
-        if ($null -ne $iniContent[$region] ) {
-            $iniContent[$region]["Deployer"] = $key
-        }
-        else {
-            $Category1 = @{"Deployer" = $key }
-            $iniContent += @{$region = $Category1 }
-            Out-IniFile -InputObject $iniContent -Path $fileINIPath                    
-        }
-                
+    if ($null -ne $iniContent[$region] ) {
+        $iniContent[$region]["Deployer"] = $key
     }
-    catch {
-        
+    else {
+        $Category1 = @{"Deployer" = $key }
+        $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath                    
     }
 
     if ($true -eq $Force) {
@@ -115,6 +154,7 @@ Licensed under the MIT license.
             $iniContent.Remove($combined)
             Out-IniFile -InputObject $iniContent -Path $fileINIPath
             $iniContent = Get-IniContent -Path $fileINIPath
+            
         }
     }
 
@@ -123,14 +163,24 @@ Licensed under the MIT license.
             $iniContent[$combined]["Deployer"] = $key
         }
         else {
-            $Category1 = @{"Deployer" = $key }
+            $Category1 = @{"Deployer" = $key}
             $iniContent += @{$combined = $Category1 }
             Out-IniFile -InputObject $iniContent -Path $fileINIPath                    
+            $iniContent = Get-IniContent -Path $fileINIPath
+            
         }
                 
     }
     catch {
         
+    }
+
+    if ($null -ne $Subscription) {
+        $iniContent[$combined]["STATE_SUBSCRIPTION"] = $Subscription
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+
+        $Env:ARM_SUBSCRIPTION_ID=$Subscription
+
     }
 
     if ($null -ne $iniContent[$combined]["step"]) {
@@ -165,7 +215,13 @@ Licensed under the MIT license.
         }
 
         try {
-            New-SAPDeployer -Parameterfile $fInfo.Name 
+            if ($Silent) {
+                New-SAPDeployer -Parameterfile $fInfo.Name -Silent 
+            }
+            else {
+                New-SAPDeployer -Parameterfile $fInfo.Name 
+            }
+            
             $iniContent = Get-IniContent -Path $fileINIPath
             $step = 1
             $iniContent[$combined]["step"] = $step
@@ -191,9 +247,16 @@ Licensed under the MIT license.
         if ($null -ne $vault -and "" -ne $vault) {
             if ($null -eq (Get-AzKeyVaultSecret -VaultName $vault -Name ($Environment + "-client-id") )) {
                 $bAsk = $true
-            }
-            else {
-                $bAsk = $false
+                if (($null -ne $SPN_id) -and ($null -ne $SPN_password) -and ($null -ne $Tenant_id)) {
+                    Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault -SPN_id $SPN_id -SPN_password $SPN_password -Tenant_id $Tenant_id
+                    $iniContent = Get-IniContent -Path $fileINIPath
+                    $iniContent = Get-IniContent -Path $fileINIPath
+            
+                    $step = 2
+                    $iniContent[$combined]["step"] = $step
+                    Out-IniFile -InputObject $iniContent -Path $fileINIPath
+                    $bAsk = $false
+                }
             }
         }
         if ($bAsk) {
@@ -246,7 +309,12 @@ Licensed under the MIT license.
 
         try {
             Write-Host $$DeployerParameterPath
-            New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerParameterPath
+            if ($Silent) {
+                New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerParameterPath  -Silent
+            }
+            else {
+                New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerParameterPath  
+            }
             $iniContent = Get-IniContent -Path $fileINIPath
             
             $step = 3
@@ -273,7 +341,12 @@ Licensed under the MIT license.
 
         Set-Location -Path $fInfo.Directory.FullName
         try {
-            New-SAPSystem -Parameterfile $fInfo.Name -Type sap_deployer
+            if ($Silent) {
+                New-SAPSystem -Parameterfile $fInfo.Name -Type sap_deployer -Silent
+            }
+            else {
+                New-SAPSystem -Parameterfile $fInfo.Name -Type sap_deployer 
+            }
             $iniContent = Get-IniContent -Path $fileINIPath
             
             $step = 4
@@ -301,7 +374,12 @@ Licensed under the MIT license.
 
         Set-Location -Path $fInfo.Directory.FullName
         try {
-            New-SAPSystem -Parameterfile $fInfo.Name -Type sap_library
+            if ($Silent) {
+                New-SAPSystem -Parameterfile $fInfo.Name -Type sap_library -Silent
+            }
+            else {
+                New-SAPSystem -Parameterfile $fInfo.Name -Type sap_library 
+            }
             $iniContent = Get-IniContent -Path $fileINIPath
             
             $step = 5
@@ -315,6 +393,11 @@ Licensed under the MIT license.
 
         Set-Location -Path $curDir
     }
+
+    # Reset the state to after bootstrap, this allows for re-running if the templates have changed
+    $step = 3
+    $iniContent[$combined]["step"] = $step
+    Out-IniFile -InputObject $iniContent -Path $fileINIPath
 
     $Env:TF_DATA_DIR = $null
     return

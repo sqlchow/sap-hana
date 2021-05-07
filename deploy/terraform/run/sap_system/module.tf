@@ -28,9 +28,9 @@ module "sap_namegenerator" {
 }
 
 module "common_infrastructure" {
-  source                     = "../../terraform-units/modules/sap_system/common_infrastructure"
+  source = "../../terraform-units/modules/sap_system/common_infrastructure"
   providers = {
-    azurerm.main = azurerm
+    azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
   }
   is_single_node_hana        = "true"
@@ -45,13 +45,15 @@ module "common_infrastructure" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   authentication             = var.authentication
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
 }
 
 // Create HANA database nodes
 module "hdb_node" {
-  source                     = "../../terraform-units/modules/sap_system/hdb_node"
+  source = "../../terraform-units/modules/sap_system/hdb_node"
   providers = {
-    azurerm.main = azurerm
+    azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
   }
   databases                  = var.databases
@@ -73,13 +75,15 @@ module "hdb_node" {
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   sap_sid                    = local.sap_sid
   db_asg_id                  = module.common_infrastructure.db_asg_id
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
 }
 
 // Create Application Tier nodes
 module "app_tier" {
-  source                     = "../../terraform-units/modules/sap_system/app_tier"
+  source = "../../terraform-units/modules/sap_system/app_tier"
   providers = {
-    azurerm.main = azurerm
+    azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
   }
   application                = var.application
@@ -93,8 +97,8 @@ module "app_tier" {
   naming                     = module.sap_namegenerator.naming
   admin_subnet               = module.common_infrastructure.admin_subnet
   custom_disk_sizes_filename = var.app_disk_sizes_filename
-  anydb_vms                  = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
-  hdb_vms                    = module.hdb_node.hdb_vms
+  anydb_vm_ids               = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
+  hdb_vm_ids                 = module.hdb_node.hdb_vms
   sid_password               = module.common_infrastructure.sid_password
   sid_username               = module.common_infrastructure.sid_username
   sdu_public_key             = module.common_infrastructure.sdu_public_key
@@ -102,14 +106,16 @@ module "app_tier" {
   firewall_id                = module.common_infrastructure.firewall_id
   sap_sid                    = local.sap_sid
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
-  
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
+
 }
 
 // Create anydb database nodes
 module "anydb_node" {
-  source                     = "../../terraform-units/modules/sap_system/anydb_node"
+  source = "../../terraform-units/modules/sap_system/anydb_node"
   providers = {
-    azurerm.main = azurerm
+    azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
   }
   databases                  = var.databases
@@ -130,13 +136,16 @@ module "anydb_node" {
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   sap_sid                    = local.sap_sid
   db_asg_id                  = module.common_infrastructure.db_asg_id
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
+
 }
 
 // Generate output files
 module "output_files" {
-  source                    = "../../terraform-units/modules/sap_system/output_files"
+  source = "../../terraform-units/modules/sap_system/output_files"
   providers = {
-    azurerm.main = azurerm
+    azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
   }
   application               = module.app_tier.application
@@ -169,6 +178,7 @@ module "output_files" {
   naming                    = module.sap_namegenerator.naming
   app_tier_os_types         = module.app_tier.app_tier_os_types
   sid_kv_user_id            = module.common_infrastructure.sid_kv_user_id
-  disks                     = distinct(compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks))) 
+  disks                     = distinct(compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks)))
+  use_local_credentials     = module.common_infrastructure.use_local_credentials
 
 }

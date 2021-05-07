@@ -12,19 +12,19 @@ output "sapbits_sa_resource_group_name" {
 }
 
 output "storagecontainer_tfstate" {
-  value     = module.sap_library.storagecontainer_tfstate
+  value = module.sap_library.storagecontainer_tfstate
 }
 
 output "storagecontainer_sapbits_name" {
-  value     = module.sap_library.storagecontainer_sapbits_name
+  value = module.sap_library.storagecontainer_sapbits_name
 }
 
 output "fileshare_sapbits_name" {
-  value     = module.sap_library.fileshare_sapbits_name
+  value = module.sap_library.fileshare_sapbits_name
 }
 
 output "library_user_key_vault_name" {
-  value     = module.sap_library.library_user_key_vault_name
+  value = module.sap_library.library_user_key_vault_name
 }
 
 output "library_user_key_vault_id" {

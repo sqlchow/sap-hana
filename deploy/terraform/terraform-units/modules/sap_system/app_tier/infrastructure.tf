@@ -157,7 +157,7 @@ resource "azurerm_lb_rule" "ers" {
 
 resource "azurerm_lb_rule" "clst" {
   provider                       = azurerm.main
-  count                          = local.enable_deployment && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? 1 : 0
+  count                          = local.enable_deployment && local.win_ha_scs  ? 1 : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.scs[0].id
   name                           = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_clst_rule)
@@ -172,7 +172,7 @@ resource "azurerm_lb_rule" "clst" {
 
 resource "azurerm_lb_rule" "fs" {
   provider                       = azurerm.main
-  count                          = local.enable_deployment && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? 1 : 0
+  count                          = local.enable_deployment && local.win_ha_scs  ? 1 : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.scs[0].id
   name                           = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_fs_rule)
@@ -187,7 +187,6 @@ resource "azurerm_lb_rule" "fs" {
 
 # Create the SCS Availability Set
 resource "azurerm_availability_set" "scs" {
-  provider                     = azurerm.main
   count                        = local.enable_deployment && local.use_scs_avset ? max(length(local.scs_zones), 1) : 0
   name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.scs_avset_names[count.index])
   location                     = var.resource_group[0].location
@@ -241,10 +240,10 @@ resource "azurerm_lb" "web" {
 }
 
 resource "azurerm_lb_backend_address_pool" "web" {
-  provider        = azurerm.main
-  count           = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
-  name            = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_bepool)
-  loadbalancer_id = azurerm_lb.web[0].id
+  provider            = azurerm.main
+  count               = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
+  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_bepool)
+  loadbalancer_id     = azurerm_lb.web[0].id
 }
 
 //TODO: azurerm_lb_probe
@@ -275,7 +274,6 @@ resource "azurerm_network_interface_backend_address_pool_association" "web" {
 
 # Create the Web dispatcher Availability Set
 resource "azurerm_availability_set" "web" {
-  provider                     = azurerm.main
   count                        = local.enable_deployment && local.use_web_avset ? max(length(local.web_zones), 1) : 0
   name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.web_avset_names[count.index])
   location                     = var.resource_group[0].location
@@ -300,10 +298,10 @@ resource "random_integer" "app_priority" {
   }
 }
 
-# Create a Azure Firewall Network Rule for Azure Management API
+# Create a Azure Firewall Network Rule for Azure Management API and Outbound Internet
 resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
   provider            = azurerm.deployer
-  count               = local.firewall_exists && !local.sub_app_exists ? 1 : 0
+  count               = local.firewall_exists && local.sub_app_defined && !local.sub_app_exists ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_app)
   azure_firewall_name = local.firewall_name
   resource_group_name = local.firewall_rgname
@@ -314,6 +312,13 @@ resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
     source_addresses      = local.sub_web_defined ? [local.sub_app_prefix, local.sub_web_prefix] : [local.sub_app_prefix]
     destination_ports     = ["*"]
     destination_addresses = [local.firewall_service_tags]
+    protocols             = ["Any"]
+  }
+  rule {
+    name                  = "ToInternet"
+    source_addresses      = local.sub_web_defined ? [local.sub_app_prefix, local.sub_web_prefix] : [local.sub_app_prefix]
+    destination_ports     = ["*"]
+    destination_addresses = ["*"]
     protocols             = ["Any"]
   }
 }
