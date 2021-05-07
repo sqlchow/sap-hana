@@ -436,7 +436,7 @@ then
     fi
 fi
 unset TF_DATA_DIR
-
+cd $root_dirname
 if [ 2 == $step ]
 then
     
@@ -491,6 +491,7 @@ else
 fi
 
 unset TF_DATA_DIR
+cd $root_dirname
 
 if [ 3 == $step ]
 then
@@ -522,6 +523,7 @@ then
 fi
 
 unset TF_DATA_DIR
+cd $root_dirname
 
 if [ 4 == $step ]
 then
