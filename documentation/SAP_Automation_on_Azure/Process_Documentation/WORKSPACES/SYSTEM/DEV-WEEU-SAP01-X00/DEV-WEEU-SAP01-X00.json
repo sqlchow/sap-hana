@@ -1,6 +1,6 @@
 {
   "application": {
-    "application_server_count"      : 2,
+    "application_server_count"      : 3,
     "enable_deployment"             : true,
     "ers_instance_number"           : "02",
     "os": {
@@ -9,7 +9,7 @@
       "sku"                         : "gen2",
       "version"                     : "latest"
     },
-    "scs_high_availability"         : true,
+    "scs_high_availability"         : false,
     "scs_server_count"              : 1,
     "scs_instance_number"           : "01",
     "sid"                           : "X00",
