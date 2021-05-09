@@ -87,7 +87,6 @@ fi
 
 environment_config_information="${automation_config_directory}""${environment}""${region}"
 touch "${environment_config_information}"
-cat $environment_config_information
 
 if [ ! -d "${automation_config_directory}" ]
 then
@@ -122,7 +121,7 @@ if [ -z "$client_id" ]; then
     fi
 fi
 
-if [ -z "$client_secret" ]; then
+if [ ! -n "$client_secret" ]; then
     read -p "SPN App Password:"  client_secret
 fi
 

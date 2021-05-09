@@ -89,7 +89,7 @@ do
     -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
     -o | --storageaccountname)                 REMOTE_STATE_SA="$2"             ; shift 2 ;;
     -f | --force)                              force=1                          ; shift ;;
-    -i | --silent)                             approve="--auto-approve"         ; shift ;;
+    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
     -h | --help)                               showhelp 
                                                exit 3                           ; shift ;;
     --) shift; break ;;
