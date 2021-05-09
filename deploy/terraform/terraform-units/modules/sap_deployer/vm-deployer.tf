@@ -129,7 +129,7 @@ resource "null_resource" "prepare-deployer" {
   provisioner "remote-exec" {
     inline = local.deployers[count.index].os.source_image_id != "" ? [] : [
       // Prepare folder structure
-      "mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${azurerm_resource_group.deployer[0].name}",
+      "mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${local.rg_name}",
       "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY",
       "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM",
       "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE",
