@@ -119,25 +119,6 @@ if [ -z "$client_id" ]; then
     if [ -z  "$client_id" ]; then
         read -p "SPN App ID:"  client_id
     fi
-<<<<<<< HEAD
-fi
-
-if [ -z "$client_secret" ]; then
-    read -p "SPN App Password:"  client_secret
-fi
-
-if [ -z "${tenant_id}" ]; then
-    load_config_vars "${environment_config_information}" "tenant_id"
-    if [ ! -n "${tenant_id}" ]; then
-        read -p "SPN Tenant ID:"  tenant_id
-    fi
-fi
-
-if [ -z "$subscription" ]; then
-    read -p "SPN Subscription:"  subscription
-fi
-
-=======
 fi
 
 if [ ! -n "$client_secret" ]; then
@@ -155,7 +136,6 @@ if [ -z "$subscription" ]; then
     read -p "SPN Subscription:"  subscription
 fi
 
->>>>>>> 3f6b9b35b709701bb9dfe0aedd5e2361011194a0
 if [ -z "${environment}" ]; then
     read -p "Environment:"  environment
 fi
