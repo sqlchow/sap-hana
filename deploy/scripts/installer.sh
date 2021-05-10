@@ -401,6 +401,8 @@ then
     if [ "${deployment_system}" != sap_deployer ]
     then
         tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
+    else
+        tfstate_parameter=" "
     fi
 fi
 
