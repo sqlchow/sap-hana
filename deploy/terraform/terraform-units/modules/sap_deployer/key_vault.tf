@@ -1,9 +1,9 @@
 // Create private KV with access policy
 data "azurerm_client_config" "deployer" {}
 
-data "azuread_service_principal" "deployer" {
-  application_id = data.azurerm_client_config.deployer.client_id
-}
+# data "azuread_service_principal" "deployer" {
+#   application_id = data.azurerm_client_config.deployer.client_id
+# }
 
 resource "azurerm_key_vault" "kv_prvt" {
   count                      = (local.enable_deployers && !local.prvt_kv_exist) ? 1 : 0
@@ -94,7 +94,9 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id
   # If running as a normal user use the object ID of the user otherwise use the object_id from AAD
-  object_id = data.azuread_service_principal.deployer.display_name == "Microsoft Azure CLI" ? data.azurerm_client_config.deployer.object_id : data.azuread_service_principal.deployer.id
+  #object_id = data.azuread_service_principal.deployer.display_name == "Microsoft Azure CLI" ? data.azurerm_client_config.deployer.object_id : data.azuread_service_principal.deployer.id
+  
+  object_id = data.azurerm_client_config.deployer.object_id
 
   secret_permissions = [
     "Get",
