@@ -96,11 +96,11 @@ then
 fi
 
 # Read environment
-environment=$(jq .infrastructure.environment "${parameterfile}" | tr -d \")
-region=$( jq .infrastructure.region "${parameterfile}" | tr -d \")
+environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+region=$(jq --raw-output .infrastructure.region "${parameterfile}")
 
-rg_name=$( jq .infrastructure.resource_group.name "${parameterfile}" | tr -d \")
-rg_arm_id=$( jq .infrastructure.resource_group.arm_id "${parameterfile}" | tr -d \")
+rg_name=$(jq --raw-output .infrastructure.resource_group.name "${parameterfile}")
+rg_arm_id=$(jq --raw-output .infrastructure.resource_group.arm_id "${parameterfile}")
 
 if [ -n "${rg_arm_id}" ]
 then
@@ -126,9 +126,9 @@ fi
 if [ "${deployment_system}" == sap_system ] ; then
 
     db_zone_count=$(jq '.databases[0].zones  | length' "${parameterfile}")
-    app_zone_count=$(jq ' .application.app_zones | length' "${parameterfile}")
-    scs_zone_count=$(jq ' .application.scs_zones | length' "${parameterfile}")
-    web_zone_count=$(jq ' .application.web_zones | length' "${parameterfile}")
+    app_zone_count=$(jq '.application.app_zones | length' "${parameterfile}")
+    scs_zone_count=$(jq '.application.scs_zones | length' "${parameterfile}")
+    web_zone_count=$(jq '.application.web_zones | length' "${parameterfile}")
 
     ppg_count=$(max -g $db_zone_count $app_zone_count $scs_zone_count $web_zone_count)
 
@@ -137,8 +137,8 @@ if [ "${deployment_system}" == sap_system ] ; then
     echo -e " $cyan Networking$resetformatting"
     echo "----------------------------------------------------------------------------"
 
-    vnet_name=$( jq .infrastructure.vnets.sap.name "${parameterfile}" | tr -d \")
-    vnet_arm_id=$( jq .infrastructure.vnets.sap.arm_id "${parameterfile}" | tr -d \")
+    vnet_name=$(jq --raw-output .infrastructure.vnets.sap.name "${parameterfile}")
+    vnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.arm_id "${parameterfile}")
     if [ -z "${vnet_arm_id}" ]
     then
         vnet_name=$(echo $vnet_arm_id | cut -d/ -f9 | xargs)
@@ -153,17 +153,17 @@ if [ "${deployment_system}" == sap_system ] ; then
 
     # Admin subnet 
 
-    subnet_name=$( jq .infrastructure.vnets.sap.subnet_admin.name "${parameterfile}" | tr -d \")
-    subnet_arm_id=$( jq .infrastructure.vnets.sap.subnet_admin.arm_id "${parameterfile}" | tr -d \")
-    subnet_prefix=$( jq .infrastructure.vnets.sap.subnet_admin.prefix "${parameterfile}" | tr -d \")
+    subnet_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.name "${parameterfile}")
+    subnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.arm_id "${parameterfile}")
+    subnet_prefix=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.prefix "${parameterfile}")
     if [ -z "${subnet_arm_id}" ]
     then
         subnet_name=$(echo $subnet_arm_id | cut -d/ -f11 | xargs)
     fi
     
 
-    subnet_nsg_name=$( jq .infrastructure.vnets.sap.subnet_admin.nsg.name "${parameterfile}" | tr -d \")
-    subnet_nsg_arm_id=$( jq .infrastructure.vnets.sap.subnet_admin.nsg.arm_id "${parameterfile}" | tr -d \")
+    subnet_nsg_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.nsg.name "${parameterfile}")
+    subnet_nsg_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.nsg.arm_id "${parameterfile}")
     if [ -z "${subnet_nsg_arm_id}" ]
     then
         subnet_nsg_name=$(echo $subnet_nsg_arm_id | cut -d/ -f13 | xargs)
@@ -190,17 +190,17 @@ if [ "${deployment_system}" == sap_system ] ; then
     
     # db subnet 
     
-    subnet_name=$( jq .infrastructure.vnets.sap.subnet_db.name "${parameterfile}" | tr -d \")
-    subnet_arm_id=$( jq .infrastructure.vnets.sap.subnet_db.arm_id "${parameterfile}" | tr -d \")
-    subnet_prefix=$( jq .infrastructure.vnets.sap.subnet_db.prefix "${parameterfile}" | tr -d \")
+    subnet_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.name "${parameterfile}")
+    subnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.arm_id "${parameterfile}")
+    subnet_prefix=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.prefix "${parameterfile}")
     if [ -z "${subnet_arm_id}" ]
     then
         subnet_name=$(echo $subnet_arm_id | cut -d/ -f11 | xargs)
     fi
     
 
-    subnet_nsg_name=$( jq .infrastructure.vnets.sap.subnet_db.nsg.name "${parameterfile}" | tr -d \")
-    subnet_nsg_arm_id=$( jq .infrastructure.vnets.sap.subnet_db.nsg.arm_id "${parameterfile}" | tr -d \")
+    subnet_nsg_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.nsg.name "${parameterfile}")
+    subnet_nsg_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.nsg.arm_id "${parameterfile}")
     if [ -z "${subnet_nsg_arm_id}" ]
     then
         subnet_nsg_name=$(echo $subnet_nsg_arm_id | cut -d/ -f13 | xargs)
@@ -227,16 +227,16 @@ if [ "${deployment_system}" == sap_system ] ; then
     
     # app subnet 
     
-    subnet_name=$( jq .infrastructure.vnets.sap.subnet_app.name "${parameterfile}" | tr -d \")
-    subnet_arm_id=$( jq .infrastructure.vnets.sap.subnet_app.arm_id "${parameterfile}" | tr -d \")
-    subnet_prefix=$( jq .infrastructure.vnets.sap.subnet_app.prefix "${parameterfile}" | tr -d \")
+    subnet_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.name "${parameterfile}")
+    subnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.arm_id "${parameterfile}")
+    subnet_prefix=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.prefix "${parameterfile}")
     if [ -z "${subnet_arm_id}" ]
     then
         subnet_name=$(echo $subnet_arm_id | cut -d/ -f11 | xargs)
     fi
 
-    subnet_nsg_name=$( jq .infrastructure.vnets.sap.subnet_app.nsg.name "${parameterfile}" | tr -d \")
-    subnet_nsg_arm_id=$( jq .infrastructure.vnets.sap.subnet_app.nsg.arm_id "${parameterfile}" | tr -d \")
+    subnet_nsg_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.nsg.name "${parameterfile}")
+    subnet_nsg_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.nsg.arm_id "${parameterfile}")
     if [ -z "${subnet_nsg_arm_id}" ]
     then
         subnet_nsg_name=$(echo $subnet_nsg_arm_id | cut -d/ -f13 | xargs)
@@ -263,16 +263,16 @@ if [ "${deployment_system}" == sap_system ] ; then
     
     # web subnet 
     
-    subnet_name=$( jq .infrastructure.vnets.sap.subnet_web.name "${parameterfile}" | tr -d \")
-    subnet_arm_id=$( jq .infrastructure.vnets.sap.subnet_web.arm_id "${parameterfile}" | tr -d \")
-    subnet_prefix=$( jq .infrastructure.vnets.sap.subnet_web.prefix "${parameterfile}" | tr -d \")
+    subnet_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.name "${parameterfile}")
+    subnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.arm_id "${parameterfile}")
+    subnet_prefix=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.prefix "${parameterfile}")
     if [ -z "${subnet_arm_id}" ]
     then
         subnet_name=$(echo $subnet_arm_id | cut -d/ -f11 | xargs)
     fi
 
-    subnet_nsg_name=$( jq .infrastructure.vnets.sap.subnet_web.nsg.name "${parameterfile}" | tr -d \")
-    subnet_nsg_arm_id=$( jq .infrastructure.vnets.sap.subnet_web.nsg.arm_id "${parameterfile}" | tr -d \")
+    subnet_nsg_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.nsg.name "${parameterfile}")
+    subnet_nsg_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.nsg.arm_id "${parameterfile}")
     if [ -z "${subnet_nsg_arm_id}" ]
     then
         subnet_nsg_name=$(echo $subnet_nsg_arm_id | cut -d/ -f13 | xargs)
@@ -301,13 +301,13 @@ if [ "${deployment_system}" == sap_system ] ; then
     
     echo -e " $cyan Database tier$resetformatting"
     echo -e " $cyan ----------------------------------------------------------------------------$resetformatting"
-    platform=$(jq .databases[0].platform "${parameterfile}" | tr -d \")
+    platform=$(jq --raw-output '.databases[0].platform' "${parameterfile}")
     echo "Platform:                    " "${platform}"
-    ha=$(jq .databases[0].high_availability "${parameterfile}")
+    ha=$(jq '.databases[0].high_availability' "${parameterfile}")
     echo "High availability:           " "${ha}"
     nr=$(jq '.databases[0].dbnodes | length' "${parameterfile}")
     echo "Number of servers:           " "${nr}"
-    size=$(jq .databases[0].size "${parameterfile}" | tr -d \")
+    size=$(jq --raw-output '.databases[0].size' "${parameterfile}")
     echo "Database sizing:             " "${size}"
     echo "Database load balancer:      "  "(name defined by automation)"
     if [ $db_zone_count -gt 1 ] ; then
@@ -315,35 +315,35 @@ if [ "${deployment_system}" == sap_system ] ; then
     else
         echo "Database availability set:   "  "(name defined by automation)"
     fi
-    if cat "${parameterfile}"  | jq --exit-status '.databases[0].os.source_image_id' >/dev/null; then
-        image=$(jq .databases[0].os.source_image_id "${parameterfile}" | tr -d \")
+    if jq --exit-status '.databases[0].os.source_image_id' "${parameterfile}" >/dev/null; then
+        image=$(jq --raw-output '.databases[0].os.source_image_id' "${parameterfile}")
         echo "Database os custom image:    " "${image}"
-        if cat "${parameterfile}"  | jq --exit-status '.databases[0].os.os_type' >/dev/null; then
-            os_type=$(jq .databases[0].os.os_type "${parameterfile}" | tr -d \")
+        if jq --exit-status '.databases[0].os.os_type' "${parameterfile}" >/dev/null; then
+            os_type=$(jq --raw-output '.databases[0].os.os_type' "${parameterfile}")
             echo "Database os type:            " "${os_type}"
         else
             echo "Error!!! Database os_type must be specified when using custom image"
         fi
     else
-        publisher=$(jq .databases[0].os.publisher "${parameterfile}" | tr -d \" )
+        publisher=$(jq --raw-output '.databases[0].os.publisher' "${parameterfile}")
         echo "Image publisher:             " "${publisher}"
-        offer=$(jq .databases[0].os.offer  "${parameterfile}" | tr -d \")
+        offer=$(jq --raw-output '.databases[0].os.offer' "${parameterfile}")
         echo "Image offer:                 " "${offer}"
-        sku=$(jq .databases[0].os.sku  "${parameterfile}"| tr -d \")
+        sku=$(jq --raw-output '.databases[0].os.sku' "${parameterfile}")
         echo "Image sku:                   " "${sku}"
-        version=$(jq .databases[0].os.version  "${parameterfile}"| tr -d \")
+        version=$(jq --raw-output '.databases[0].os.version' "${parameterfile}")
         echo "Image version:               " "${version}"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.databases[0].zones' >/dev/null; then
+    if jq --exit-status '.databases[0].zones' "${parameterfile}" >/dev/null; then
         echo "Deployment:                  " "Zonal"
-        zones=$(jq --compact-output .databases[0].zones "${parameterfile}")
+        zones=$(jq --compact-output '.databases[0].zones' "${parameterfile}")
         echo "  Zones:                     " "${zones}"
     else
         echo "Deployment:                  " "Regional"
     fi
-    if cat "${parameterfile}"  | jq --exit-status '.databases[0].use_DHCP' >/dev/null; then
-        use_DHCP=$(jq .databases[0].use_DHCP  "${parameterfile}"| tr -d \" )
+    if jq --exit-status '.databases[0].use_DHCP' "${parameterfile}" >/dev/null; then
+        use_DHCP=$(jq --raw-output '.databases[0].use_DHCP'  "${parameterfile}")
         if [ "true" == "${use_DHCP}" ]; then
             echo "Networking:                  " "Use Azure provided IP addresses"
         else
@@ -352,8 +352,8 @@ if [ "${deployment_system}" == sap_system ] ; then
     else
         echo "Networking:                  " "Use Customer provided IP addresses"
     fi
-    if cat "${parameterfile}"  | jq --exit-status '.databases[0].authentication.type' >/dev/null; then
-        authentication=$(jq '.databases[0].authentication.type'  "${parameterfile}" | tr -d \")
+    if jq --exit-status '.databases[0].authentication.type' "${parameterfile}" >/dev/null; then
+        authentication=$(jq --raw-output '.databases[0].authentication.type' "${parameterfile}")
         echo "Authentication:              " "${authentication}"
     else
         echo "Authentication:              " "key"
@@ -363,8 +363,8 @@ if [ "${deployment_system}" == sap_system ] ; then
     
     echo -e " $cyan Application tier$resetformatting"
     echo -e " $cyan ----------------------------------------------------------------------------$resetformatting"
-    if cat "${parameterfile}"  | jq --exit-status '.application.authentication.type' >/dev/null; then
-        authentication=$(jq '.application.authentication.type'  "${parameterfile}" | tr -d \")
+    if jq --exit-status '.application.authentication.type' "${parameterfile}" >/dev/null; then
+        authentication=$(jq --raw-output '.application.authentication.type' "${parameterfile}")
         echo "Authentication:              " "${authentication}"
     else
         echo "Authentication:              " "key"
@@ -376,28 +376,28 @@ if [ "${deployment_system}" == sap_system ] ; then
     else
         echo "  Application avset:         " "(name defined by automation)"
     fi
-    app_server_count=$(jq .application.application_server_count "${parameterfile}")
+    app_server_count=$(jq --raw-output .application.application_server_count "${parameterfile}")
     echo "  Number of servers:         " "${app_server_count}"
-    if cat "${parameterfile}"  | jq --exit-status '.application.os.source_image_id' >/dev/null; then
-        image=$(jq .application.os.source_image_id | tr -d \")
+    if jq --exit-status '.application.os.source_image_id' "${parameterfile}" >/dev/null; then
+        image=$(jq --raw-output .application.os.source_image_id "${parameterfile}")
         echo "  Custom image:          " "${image}"
-        if cat "${parameterfile}"  | jq --exit-status '.application.os.os_type' >/dev/null; then
-            os_type=$(jq .application.os.os_type  "${parameterfile}"| tr -d \")
+        if jq --exit-status '.application.os.os_type' "${parameterfile}" >/dev/null; then
+            os_type=$(jq --raw-output .application.os.os_type  "${parameterfile}")
             echo "  Image os type:     " "${os_type}"
         else
             echo "Error!!! Application os_type must be specified when using custom image"
         fi
     else
-        publisher=$(jq .application.os.publisher "${parameterfile}" | tr -d \")
+        publisher=$(jq --raw-output .application.os.publisher "${parameterfile}")
         echo "  Image publisher:           " "${publisher}"
-        offer=$(jq .application.os.offer "${parameterfile}" | tr -d \")
+        offer=$(jq --raw-output .application.os.offer "${parameterfile}")
         echo "  Image offer:               " "${offer}"
-        sku=$(jq .application.os.sku "${parameterfile}" | tr -d \")
+        sku=$(jq --raw-output .application.os.sku "${parameterfile}")
         echo "  Image sku:                 " "${sku}"
-        version=$(jq .application.os.version "${parameterfile}" | tr -d \")
+        version=$(jq --raw-output .application.os.version "${parameterfile}")
         echo "  Image version:             " "${version}"
     fi
-    if cat "${parameterfile}"  | jq --exit-status '.application.app_zones' >/dev/null; then
+    if jq --exit-status '.application.app_zones' "${parameterfile}" >/dev/null; then
         echo "  Deployment:                " "Zonal"
         zones=$(jq --compact-output .application.app_zones "${parameterfile}")
         echo "    Zones:                   " "${zones}"
@@ -417,48 +417,48 @@ if [ "${deployment_system}" == sap_system ] ; then
     scs_server_ha=$(jq .application.scs_high_availability "${parameterfile}")
     echo "  High availability:         " "${scs_server_ha}"
 
-    if cat "${parameterfile}"  | jq --exit-status '.application.scs_os' >/dev/null; then
-        if cat "${parameterfile}"  | jq --exit-status '.application.scs_os.source_image_id' >/dev/null; then
-            image=$(jq .application.scs_os.source_image_id  "${parameterfile}"| tr -d \")
+    if jq --exit-status '.application.scs_os' "${parameterfile}" >/dev/null; then
+        if jq --exit-status '.application.scs_os.source_image_id' "${parameterfile}" >/dev/null; then
+            image=$(jq --raw-output .application.scs_os.source_image_id  "${parameterfile}")
             echo "  Custom image:          " "${image}"
-            if cat "${parameterfile}"  | jq --exit-status '.application.scs_os.os_type' >/dev/null; then
-                os_type=$(jq .application.scs_os.os_type  "${parameterfile}"| tr -d \")
+            if jq --exit-status '.application.scs_os.os_type' "${parameterfile}" >/dev/null; then
+                os_type=$(jq --raw-output .application.scs_os.os_type "${parameterfile}")
                 echo "  Image os type:     " "${os_type}"
             else
                 echo "Error!!! SCS os_type must be specified when using custom image"
             fi
         else
-            publisher=$(jq .application.scs_os.publisher  "${parameterfile}"| tr -d \")
+            publisher=$(jq --raw-output .application.scs_os.publisher "${parameterfile}")
             echo "  Image publisher:           " "${publisher}"
-            offer=$(jq .application.scs_os.offer "${parameterfile}" | tr -d \")
+            offer=$(jq --raw-output .application.scs_os.offer "${parameterfile}")
             echo "  Image offer:               " "${offer}"
-            sku=$(jq .application.scs_os.sku  "${parameterfile}"| tr -d \")
+            sku=$(jq --raw-output .application.scs_os.sku "${parameterfile}")
             echo "  Image sku:                 " "${sku}"
-            version=$(jq .application.scs_os.version "${parameterfile}" | tr -d \")
+            version=$(jq --raw-output .application.scs_os.version "${parameterfile}")
             echo "  Image version:             " "${version}"
         fi
     else
-        if cat "${parameterfile}"  | jq --exit-status '.application.os.source_image_id' >/dev/null; then
-            image=$(jq .application.os.source_image_id "${parameterfile}" | tr -d \")
+        if jq --exit-status '.application.os.source_image_id' "${parameterfile}" >/dev/null; then
+            image=$(jq --raw-output .application.os.source_image_id "${parameterfile}")
             echo "  Custom image:          " "${image}"
-            if cat "${parameterfile}"  | jq --exit-status '.application.os.os_type' >/dev/null; then
-                os_type=$(jq .application.os.os_type  "${parameterfile}"| tr -d \")
+            if jq --exit-status '.application.os.os_type' "${parameterfile}" >/dev/null; then
+                os_type=$(jq --raw-output .application.os.os_type "${parameterfile}")
                 echo "  Image os type:     " "${os_type}"
             else
                 echo "Error!!! Application os_type must be specified when using custom image"
             fi
         else
-            publisher=$(jq .application.os.publisher "${parameterfile}" | tr -d \")
+            publisher=$(jq --raw-output .application.os.publisher "${parameterfile}")
             echo "  Image publisher:           " "${publisher}"
-            offer=$(jq .application.os.offer "${parameterfile}" | tr -d \")
+            offer=$(jq --raw-output .application.os.offer "${parameterfile}")
             echo "  Image offer:               " "${offer}"
-            sku=$(jq .application.os.sku "${parameterfile}" | tr -d \")
+            sku=$(jq --raw-output .application.os.sku "${parameterfile}")
             echo "  Image sku:                 " "${sku}"
-            version=$(jq .application.os.version "${parameterfile}" | tr -d \")
+            version=$(jq --raw-output .application.os.version "${parameterfile}")
             echo "  Image version:             " "${version}"
         fi
     fi
-    if cat "${parameterfile}"  | jq --exit-status '.application.scs_zones' >/dev/null; then
+    if jq --exit-status '.application.scs_zones' "${parameterfile}" >/dev/null; then
         echo "  Deployment:                " "Zonal"
         zones=$(jq --compact-output .application.scs_zones "${parameterfile}")
         echo "    Zones:                   " "${zones}"
@@ -467,7 +467,7 @@ if [ "${deployment_system}" == sap_system ] ; then
     fi
     
     echo "Web dispatcher"
-    web_server_count=$(jq .application.webdispatcher_count "${parameterfile}")
+    web_server_count=$(jq --raw-output .application.webdispatcher_count "${parameterfile}")
     echo "  Web dispatcher lb:         " "(name defined by automation)"
     if [ $web_zone_count -gt 1 ] ; then
         echo "  Web dispatcher avset:      " "($web_zone_count) (name defined by automation)"
@@ -476,48 +476,48 @@ if [ "${deployment_system}" == sap_system ] ; then
     fi
     echo "  Number of servers:         " "${web_server_count}"
     
-    if cat "${parameterfile}"  | jq --exit-status '.application.web_os' >/dev/null; then
-        if cat "${parameterfile}"  | jq --exit-status '.application.web_os.source_image_id' >/dev/null; then
-            image=$(jq .application.web_os.source_image_id "${parameterfile}" | tr -d \")
+    if jq --exit-status '.application.web_os' "${parameterfile}" >/dev/null; then
+        if jq --exit-status '.application.web_os.source_image_id' "${parameterfile}" >/dev/null; then
+            image=$(jq --raw-output .application.web_os.source_image_id "${parameterfile}")
             echo "  Custom image:          " "${image}"
-            if cat "${parameterfile}"  | jq --exit-status '.application.web_os.os_type' >/dev/null; then
-                os_type=$(jq .application.web_os.os_type "${parameterfile}" | tr -d \")
+            if jq --exit-status '.application.web_os.os_type' "${parameterfile}" >/dev/null; then
+                os_type=$(jq --raw-output .application.web_os.os_type "${parameterfile}")
                 echo "  Image os type:     " "${os_type}"
             else
                 echo "Error!!! SCS os_type must be specified when using custom image"
             fi
         else
-            publisher=$(jq .application.web_os.publisher "${parameterfile}" | tr -d \")
+            publisher=$(jq --raw-output .application.web_os.publisher "${parameterfile}")
             echo "  Image publisher:           " "${publisher}"
-            offer=$(jq .application.web_os.offer "${parameterfile}" | tr -d \")
+            offer=$(jq --raw-output .application.web_os.offer "${parameterfile}")
             echo "  Image offer:               " "${offer}"
-            sku=$(jq .application.web_os.sku "${parameterfile}" | tr -d \")
+            sku=$(jq --raw-output .application.web_os.sku "${parameterfile}")
             echo "  Image sku:                 " "${sku}"
-            version=$(jq .application.web_os.version "${parameterfile}" | tr -d \")
+            version=$(jq --raw-output .application.web_os.version "${parameterfile}")
             echo "  Image version:             " "${version}"
         fi
     else
-        if cat "${parameterfile}"  | jq --exit-status '.application.os.source_image_id' >/dev/null; then
-            image=$(jq .application.os.source_image_id "${parameterfile}" | tr -d \")
+        if jq --exit-status '.application.os.source_image_id' "${parameterfile}" >/dev/null; then
+            image=$(jq --raw-output .application.os.source_image_id "${parameterfile}")
             echo "  Custom image:          " "${image}"
-            if cat "${parameterfile}"  | jq --exit-status '.application.os.os_type' >/dev/null; then
-                os_type=$(jq .application.os.os_type "${parameterfile}" | tr -d \")
+            if jq --exit-status '.application.os.os_type' "${parameterfile}" >/dev/null; then
+                os_type=$(jq --raw-output .application.os.os_type "${parameterfile}")
                 echo "  Image os type:     " "${os_type}"
             else
                 echo "Error!!! Application os_type must be specified when using custom image"
             fi
         else
-            publisher=$(jq .application.os.publisher "${parameterfile}" | tr -d \")
+            publisher=$(jq --raw-output .application.os.publisher "${parameterfile}")
             echo "  Image publisher:           " "${publisher}"
-            offer=$(jq .application.os.offer "${parameterfile}" | tr -d \")
+            offer=$(jq --raw-output .application.os.offer "${parameterfile}")
             echo "  Image offer:               " "${offer}"
-            sku=$(jq .application.os.sku "${parameterfile}" | tr -d \")
+            sku=$(jq --raw-output .application.os.sku "${parameterfile}")
             echo "  Image sku:                 " "${sku}"
-            version=$(jq .application.os.version "${parameterfile}" | tr -d \")
+            version=$(jq --raw-output .application.os.version "${parameterfile}")
             echo "  Image version:             " "${version}"
         fi
     fi
-    if cat "${parameterfile}"  | jq --exit-status '.application.scs_zones' >/dev/null; then
+    if jq --exit-status '.application.scs_zones' "${parameterfile}" >/dev/null; then
         echo "  Deployment:                " "Zonal"
         zones=$(jq --compact-output .application.scs_zones "${parameterfile}")
         echo "    Zones:                   " "${zones}"
@@ -528,22 +528,22 @@ if [ "${deployment_system}" == sap_system ] ; then
     echo ""
     echo -e " $cyan Key Vault$resetformatting"
     echo -e " $cyan ----------------------------------------------------------------------------$resetformatting"
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_spn_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_spn_id "${parameterfile}" | tr -d \")
+    if jq --exit-status '.key_vault.kv_spn_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_spn_id "${parameterfile}")
         echo "  SPN Key Vault:             " "${kv}"
     else
         echo "  SPN Key Vault:             " "Deployer keyvault"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_user_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_user_id "${parameterfile}" | tr -d \")
+    if jq --exit-status '.key_vault.kv_user_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_user_id "${parameterfile}")
         echo "  User Key Vault:            " "${kv}"
     else
         echo "  User Key Vault:            " "Workload keyvault"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_prvt_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_prvt_id "${parameterfile}" | tr -d \")
+    if jq --exit-status '.key_vault.kv_prvt_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_prvt_id "${parameterfile}")
         echo "  Automation Key Vault:      " "${kv}"
     else
         echo "  Automation Key Vault:      " "Workload keyvault"
@@ -558,9 +558,9 @@ if [ "${deployment_system}" == sap_landscape ] ; then
     echo -e " $cyan Networking$resetformatting"
     echo "----------------------------------------------------------------------------"
     
-    vnet_name=$( jq .infrastructure.vnets.sap.name "${parameterfile}" | tr -d \")
-    vnet_arm_id=$( jq .infrastructure.vnets.sap.arm_id "${parameterfile}" | tr -d \")
-    vnet_address_space=$( jq .infrastructure.vnets.sap.address_space "${parameterfile}" | tr -d \")
+    vnet_name=$(jq --raw-output .infrastructure.vnets.sap.name "${parameterfile}")
+    vnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.arm_id "${parameterfile}")
+    vnet_address_space=$(jq --raw-output .infrastructure.vnets.sap.address_space "${parameterfile}")
     if [ -z "${vnet_arm_id}" ]
     then
         vnet_name=$(echo $vnet_arm_id | cut -d/ -f19 | xargs)
@@ -570,16 +570,16 @@ if [ "${deployment_system}" == sap_landscape ] ; then
     echo "Address space:               " "${vnet_address_space}"
     # Admin subnet 
 
-    subnet_name=$( jq .infrastructure.vnets.sap.subnet_admin.name "${parameterfile}" | tr -d \")
-    subnet_arm_id=$( jq .infrastructure.vnets.sap.subnet_admin.arm_id "${parameterfile}" | tr -d \")
-    subnet_prefix=$( jq .infrastructure.vnets.sap.subnet_admin.prefix "${parameterfile}" | tr -d \")
+    subnet_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.name "${parameterfile}")
+    subnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.arm_id "${parameterfile}")
+    subnet_prefix=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.prefix "${parameterfile}")
     if [ -z "${subnet_arm_id}" ]
     then
         subnet_name=$(echo $subnet_arm_id | cut -d/ -f11 | xargs)
     fi
 
-    subnet_nsg_name=$( jq .infrastructure.vnets.sap.subnet_admin.nsg.name "${parameterfile}" | tr -d \")
-    subnet_nsg_arm_id=$( jq .infrastructure.vnets.sap.subnet_admin.nsg.arm_id "${parameterfile}" | tr -d \")
+    subnet_nsg_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.nsg.name "${parameterfile}")
+    subnet_nsg_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_admin.nsg.arm_id "${parameterfile}")
     if [ -z "${subnet_nsg_arm_id}" ]
     then
         subnet_nsg_name=$(echo $subnet_nsg_arm_id | cut -d/ -f13 | xargs)
@@ -606,16 +606,16 @@ if [ "${deployment_system}" == sap_landscape ] ; then
     
     # db subnet 
     
-    subnet_name=$( jq .infrastructure.vnets.sap.subnet_db.name "${parameterfile}" | tr -d \")
-    subnet_arm_id=$( jq .infrastructure.vnets.sap.subnet_db.arm_id "${parameterfile}" | tr -d \")
-    subnet_prefix=$( jq .infrastructure.vnets.sap.subnet_db.prefix "${parameterfile}" | tr -d \")
+    subnet_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.name "${parameterfile}")
+    subnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.arm_id "${parameterfile}")
+    subnet_prefix=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.prefix "${parameterfile}")
     if [ -z "${subnet_arm_id}" ]
     then
         subnet_name=$(echo $subnet_arm_id | cut -d/ -f11 | xargs)
     fi
     
-    subnet_nsg_name=$( jq .infrastructure.vnets.sap.subnet_db.nsg.name "${parameterfile}" | tr -d \")
-    subnet_nsg_arm_id=$( jq .infrastructure.vnets.sap.subnet_db.nsg.arm_id "${parameterfile}" | tr -d \")
+    subnet_nsg_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.nsg.name "${parameterfile}")
+    subnet_nsg_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_db.nsg.arm_id "${parameterfile}")
     if [ -z "${subnet_nsg_arm_id}" ]
     then
         subnet_nsg_name=$(echo $subnet_nsg_arm_id | cut -d/ -f13 | xargs)
@@ -642,16 +642,16 @@ if [ "${deployment_system}" == sap_landscape ] ; then
     
     # app subnet 
     
-    subnet_name=$( jq .infrastructure.vnets.sap.subnet_app.name "${parameterfile}" | tr -d \")
-    subnet_arm_id=$( jq .infrastructure.vnets.sap.subnet_app.arm_id "${parameterfile}" | tr -d \")
-    subnet_prefix=$( jq .infrastructure.vnets.sap.subnet_app.prefix "${parameterfile}" | tr -d \")
+    subnet_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.name "${parameterfile}")
+    subnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.arm_id "${parameterfile}")
+    subnet_prefix=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.prefix "${parameterfile}")
     if [ -z "${subnet_arm_id}" ]
     then
         subnet_name=$(echo $subnet_arm_id | cut -d/ -f11 | xargs)
     fi
 
-    subnet_nsg_name=$( jq .infrastructure.vnets.sap.subnet_app.nsg.name "${parameterfile}" | tr -d \")
-    subnet_nsg_arm_id=$( jq .infrastructure.vnets.sap.subnet_app.nsg.arm_id "${parameterfile}" | tr -d \")
+    subnet_nsg_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.nsg.name "${parameterfile}")
+    subnet_nsg_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_app.nsg.arm_id "${parameterfile}")
     if [ -z "${subnet_nsg_arm_id}" ]
     then
         subnet_nsg_name=$(echo $subnet_nsg_arm_id | cut -d/ -f13 | xargs)
@@ -678,16 +678,16 @@ if [ "${deployment_system}" == sap_landscape ] ; then
     
     # web subnet 
     
-    subnet_name=$( jq .infrastructure.vnets.sap.subnet_web.name "${parameterfile}" | tr -d \")
-    subnet_arm_id=$( jq .infrastructure.vnets.sap.subnet_web.arm_id "${parameterfile}" | tr -d \")
-    subnet_prefix=$( jq .infrastructure.vnets.sap.subnet_web.prefix "${parameterfile}" | tr -d \")
+    subnet_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.name "${parameterfile}")
+    subnet_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.arm_id "${parameterfile}")
+    subnet_prefix=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.prefix "${parameterfile}")
     if [ -z "${subnet_arm_id}" ]
     then
         subnet_name=$(echo $subnet_arm_id | cut -d/ -f11 | xargs)
     fi
 
-    subnet_nsg_name=$( jq .infrastructure.vnets.sap.subnet_web.nsg.name "${parameterfile}" | tr -d \")
-    subnet_nsg_arm_id=$( jq .infrastructure.vnets.sap.subnet_web.nsg.arm_id "${parameterfile}" | tr -d \")
+    subnet_nsg_name=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.nsg.name "${parameterfile}")
+    subnet_nsg_arm_id=$(jq --raw-output .infrastructure.vnets.sap.subnet_web.nsg.arm_id "${parameterfile}")
     if [ -z "${subnet_nsg_arm_id}" ]
     then
         subnet_nsg_name=$(echo $subnet_nsg_arm_id | cut -d/ -f13 | xargs)
@@ -716,22 +716,22 @@ if [ "${deployment_system}" == sap_landscape ] ; then
     echo ""
     echo -e " $cyan Key Vault$resetformatting"
     echo "----------------------------------------------------------------------------"
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_spn_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_spn_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_spn_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_spn_id "${parameterfile}")
         echo "  SPN Key Vault:             " "${kv}"
     else
         echo "  SPN Key Vault:             " "Deployer keyvault"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_user_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_user_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_user_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_user_id "${parameterfile}")
         echo "  User Key Vault:            " "${kv}"
     else
         echo "  User Key Vault:            " "Workload keyvault"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_prvt_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_prvt_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_prvt_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_prvt_id "${parameterfile}")
         echo "  Automation Key Vault:      " "${kv}"
     else
         echo "  Automation Key Vault:      " "Workload keyvault"
@@ -745,22 +745,22 @@ fi
 if [ "${deployment_system}" == sap_library ] ; then
     echo ""
     echo -e " $cyan Key Vault$resetformatting"    echo "----------------------------------------------------------------------------"
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_spn_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_spn_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_spn_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_spn_id "${parameterfile}")
         echo "  SPN Key Vault:             " "${kv}"
     else
         echo "  SPN Key Vault:             " "Deployer keyvault"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_user_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_user_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_user_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_user_id "${parameterfile}")
         echo "  User Key Vault:            " "${kv}"
     else
         echo "  User Key Vault:            " "Library keyvault"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_prvt_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_prvt_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_prvt_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_prvt_id "${parameterfile}")
         echo "  Automation Key Vault:      " "${kv}"
     else
         echo "  Automation Key Vault:      " "Library keyvault"
@@ -775,18 +775,18 @@ fi
 if [ "${deployment_system}" == sap_deployer ] ; then
     echo -e " $cyan Networking$resetformatting"    
     echo "----------------------------------------------------------------------------"
-    if cat "${parameterfile}"  | jq --exit-status '.infrastructure.vnets.management' >/dev/null; then
-        if cat "${parameterfile}"  | jq --exit-status '.infrastructure.vnets.management.arm_id' >/dev/null; then
-            arm_id=$(jq .infrastructure.vnets.management.arm_id | tr -d \")
+    if jq --exit-status '.infrastructure.vnets.management' "${parameterfile}" >/dev/null; then
+        if jq --exit-status '.infrastructure.vnets.management.arm_id' "${parameterfile}" >/dev/null; then
+            arm_id=$(jq --raw-output .infrastructure.vnets.management.arm_id "${parameterfile}")
             echo "Virtual network:        " "${arm_id}"
         else
-            if cat "${parameterfile}"  | jq --exit-status '.infrastructure.vnets.management.name' >/dev/null; then
-                name=$(jq .infrastructure.vnets.management.name | tr -d \")
+            if jq --exit-status '.infrastructure.vnets.management.name' "${parameterfile}" >/dev/null; then
+                name=$(jq --raw-output .infrastructure.vnets.management.name "${parameterfile}")
                 echo "VNet Logical name  :      " "${name}"
             fi
         fi
-        if cat "${parameterfile}"  | jq --exit-status '.infrastructure.vnets.management.address_space' >/dev/null; then
-            prefix=$(jq .infrastructure.vnets.management.address_space | tr -d \")
+        if jq --exit-status '.infrastructure.vnets.management.address_space' "${parameterfile}" >/dev/null; then
+            prefix=$(jq --raw-output .infrastructure.vnets.management.address_space "${parameterfile}")
             echo "Address space:                " "${prefix}"
         else
             echo "Error!!! The Virtual network address space must be specified"
@@ -798,22 +798,22 @@ if [ "${deployment_system}" == sap_deployer ] ; then
     echo ""
     echo -e " $cyan Key Vault$resetformatting"    
     echo "----------------------------------------------------------------------------"
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_spn_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_spn_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_spn_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_spn_id "${parameterfile}")
         echo "  SPN Key Vault:             " "${kv}"
     else
         echo "  SPN Key Vault:             " "Deployer keyvault"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_user_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_user_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_user_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_user_id "${parameterfile}")
         echo "  User Key Vault:            " "${kv}"
     else
         echo "  User Key Vault:            " "Deployer keyvault"
     fi
     
-    if cat "${parameterfile}"  | jq --exit-status '.key_vault.kv_prvt_id' >/dev/null; then
-        kv=$(jq .key_vault.kv_prvt_id | tr -d \")
+    if jq --exit-status '.key_vault.kv_prvt_id' "${parameterfile}" >/dev/null; then
+        kv=$(jq --raw-output .key_vault.kv_prvt_id "${parameterfile}")
         echo "  Automation Key Vault:      " "${kv}"
     else
         echo "  Automation Key Vault:      " "Deployer keyvault"
