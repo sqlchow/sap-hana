@@ -11,7 +11,7 @@ resetformatting="\e[0m"
 full_script_path="$(realpath "${BASH_SOURCE[0]}")"
 script_directory="$(dirname "${full_script_path}")"
 
-#call stack has full scriptname when using source 
+#call stack has full scriptname when using source
 source "${script_directory}/deploy_utils.sh"
 
 function showhelp {
@@ -49,7 +49,7 @@ function showhelp {
     echo "#   [REPO-ROOT]deploy/scripts/installer.sh \                                            #"
     echo "#      --parameterfile DEV-WEEU-SAP01-X00 \                                             #"
     echo "#      --type sap_system                                                                #"
-    echo "#      --auto-approve                                                                   #"  
+    echo "#      --auto-approve                                                                   #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
@@ -78,22 +78,22 @@ INPUT_ARGUMENTS=$(getopt -n installer -o p:t:o:hif --longoptions type:,parameter
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
-  showhelp
+    showhelp
 fi
 
 eval set -- "$INPUT_ARGUMENTS"
 while :
 do
-  case "$1" in
-    -t | --type)                               deployment_system="$2"           ; shift 2 ;;
-    -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
-    -o | --storageaccountname)                 REMOTE_STATE_SA="$2"             ; shift 2 ;;
-    -f | --force)                              force=1                          ; shift ;;
-    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
-    -h | --help)                               showhelp 
-                                               exit 3                           ; shift ;;
-    --) shift; break ;;
-  esac
+    case "$1" in
+        -t | --type)                               deployment_system="$2"           ; shift 2 ;;
+        -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
+        -o | --storageaccountname)                 REMOTE_STATE_SA="$2"             ; shift 2 ;;
+        -f | --force)                              force=1                          ; shift ;;
+        -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+        -h | --help)                               showhelp
+        exit 3                           ; shift ;;
+        --) shift; break ;;
+    esac
 done
 
 
@@ -157,11 +157,11 @@ then
     if [ -d ./.terraform/ ]; then
         rm .terraform -r
     fi
-
+    
     if [ -f terraform.tfstate ]; then
         rm terraform.tfstate
     fi
-
+    
     if [ -f terraform.tfstate.backup ]; then
         rm terraform.tfstate.backup
     fi
@@ -218,7 +218,7 @@ param_dirname=$(pwd)
 
 init "${automation_config_directory}" "${generic_config_information}" "${system_config_information}"
 
-var_file="${param_dirname}"/"${parameterfile}" 
+var_file="${param_dirname}"/"${parameterfile}"
 
 extra_vars=""
 
@@ -231,7 +231,7 @@ then
     deployer_tfstate_key=${key}.terraform.tfstate
 fi
 
-if [ -z "$REMOTE_STATE_SA" ]; 
+if [ -z "$REMOTE_STATE_SA" ];
 then
     load_config_vars "${system_config_information}" "REMOTE_STATE_SA"
 fi
@@ -317,7 +317,7 @@ if [ ! -n "${REMOTE_STATE_SA}" ]; then
     STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
-        if [ $account_set==0 ] 
+        if [ $account_set==0 ]
         then
             $(az account set --sub "${STATE_SUBSCRIPTION}")
             account_set=1
@@ -329,7 +329,7 @@ if [ ! -n "${REMOTE_STATE_SA}" ]; then
         tfstate_resource_id \
         STATE_SUBSCRIPTION
     fi
-
+    
     tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
     
     if [ "${deployment_system}" != sap_deployer ]
@@ -353,7 +353,7 @@ if [ -z "${REMOTE_STATE_RG}" ]; then
     
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
-        if [ $account_set==0 ] 
+        if [ $account_set==0 ]
         then
             $(az account set --sub "${STATE_SUBSCRIPTION}")
             account_set=1
@@ -401,8 +401,16 @@ then
     if [ "${deployment_system}" != sap_deployer ]
     then
         tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
+    else
+        tfstate_parameter=" "
     fi
 fi
+
+if [ "${deployment_system}" == sap_deployer ]
+then
+    tfstate_parameter=" "
+fi
+
 
 
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
@@ -431,7 +439,7 @@ new_deployment=false
 
 check_output=0
 
-if [ $account_set==0 ] 
+if [ $account_set==0 ]
 then
     $(az account set --sub "${STATE_SUBSCRIPTION}")
     account_set=1
@@ -449,9 +457,9 @@ then
     --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
     --backend-config "container_name=tfstate" \
     --backend-config "key=${key}.terraform.tfstate"
-
+    
     deployment_parameter=" -var deployment=new "
-
+    
 else
     temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
     if [ ! -z "${temp}" ]
@@ -462,7 +470,7 @@ else
         --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
         --backend-config "container_name=tfstate" \
         --backend-config "key=${key}.terraform.tfstate"
-
+        
     else
         echo ""
         echo "#########################################################################################"
@@ -471,7 +479,7 @@ else
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
-        if [ ! -n ${approve} ] 
+        if [ ! -n ${approve} ]
         then
             read -p "Do you want to redeploy Y/N?"  ans
             answer=${ans^^}
@@ -483,7 +491,7 @@ else
         else
             ok_to_proceed=true
         fi
-
+        
         terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure  \
         --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
         --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
@@ -498,7 +506,7 @@ fi
 if [ 1 == $check_output ]
 then
     terraform -chdir=$terraform_module_directory refresh -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars}
-
+    
     outputs=$(terraform -chdir="${terraform_module_directory}" output )
     if echo "${outputs}" | grep "No outputs"; then
         ok_to_proceed=true
@@ -510,7 +518,7 @@ then
         echo "#########################################################################################"
         
         deployment_parameter=" -var deployment=new "
-
+        
     else
         echo ""
         echo "#########################################################################################"
@@ -519,11 +527,11 @@ then
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
-
+        
         deployment_parameter=" "
-
+        
         deployed_using_version=$(terraform -chdir="${terraform_module_directory}" output automation_version | tr -d \")
-
+        
         if [ ! -n "${deployed_using_version}" ]; then
             echo ""
             echo "#########################################################################################"
@@ -546,7 +554,7 @@ then
             fi
         else
             version_parameter=" -var terraform_template_version=${deployed_using_version} "
-                    
+            
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
@@ -575,7 +583,7 @@ fi
 allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
 echo $allParams
 
-terraform -chdir="$terraform_module_directory" plan -no-color $allParams  
+terraform -chdir="$terraform_module_directory" plan -no-color $allParams
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]
 then
@@ -665,11 +673,11 @@ if [ $ok_to_proceed ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-
+    
     allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
     
     terraform -chdir="${terraform_module_directory}" apply ${approve} $allParams  2>error.log
- 
+    
     str1=$(grep "Error: " error.log)
     if [ -n "${str1}" ]
     then
@@ -685,7 +693,7 @@ if [ $ok_to_proceed ]; then
         unset TF_DATA_DIR
         exit -1
     fi
-        
+    
 fi
 
 if [ "${deployment_system}" == sap_landscape ]
@@ -696,7 +704,7 @@ fi
 
 if [ "${deployment_system}" == sap_library ]
 then
-
+    
     REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
     REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
     tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
