@@ -351,6 +351,8 @@ then
     temp=$(echo "${REMOTE_STATE_SA}" | grep "Backend reinitialization required")
     if [ -z "${temp}" ]
     then
+        save_config_vars "${library_config_information}" REMOTE_STATE_SA 
+
         REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
         fail_if_null REMOTE_STATE_RG
         tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
