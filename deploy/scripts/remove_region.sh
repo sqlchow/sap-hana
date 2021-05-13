@@ -147,8 +147,8 @@ if [ ! -n "${az}" ]; then
 fi
 
 # Helper variables
-environment=$(jq .infrastructure.environment "${deployer_parameter_file}" | tr -d \")
-region=$(jq .infrastructure.region "${deployer_parameter_file}" | tr -d \")
+environment=$(jq --raw-output .infrastructure.environment "${deployer_parameter_file}")
+region=$(jq --raw-output .infrastructure.region "${deployer_parameter_file}")
 key=$(echo "${deployer_parameter_file}" | cut -d. -f1)
 
 if [ ! -n "${environment}" ]

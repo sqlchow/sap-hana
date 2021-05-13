@@ -134,8 +134,8 @@ if [ ! -n "${deployment_system}" ]; then
 fi
 
 # Read environment
-environment=$(jq .infrastructure.environment "${parameterfile}" | tr -d \")
-region=$( jq .infrastructure.region "${parameterfile}" | tr -d \")
+environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+region=$(jq --raw-output .infrastructure.region "${parameterfile}")
 
 if [ ! -n "${environment}" ]; then
     echo "#########################################################################################"
