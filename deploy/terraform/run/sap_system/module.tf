@@ -180,5 +180,7 @@ module "output_files" {
   sid_kv_user_id            = module.common_infrastructure.sid_kv_user_id
   disks                     = distinct(compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks)))
   use_local_credentials     = module.common_infrastructure.use_local_credentials
+  scs_ha                    = module.app_tier.scs_ha
+  db_ha                     = upper(try(var.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_ha : module.anydb_node.db_ha
 
 }

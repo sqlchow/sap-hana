@@ -194,6 +194,8 @@ resource "local_file" "sap-parameters_yml" {
     kv_uri        = local.kv_name,
     secret_prefix = local.secret_prefix,
     disks         = var.disks
+    scs_ha        = var.scs_ha
+    db_ha         = var.db_ha
     }
   )
   filename             = format("%s/ansible_config_files/sap-parameters.yaml", path.cwd)

@@ -66,3 +66,8 @@ output "anydb_vm_ids" {
 output "dbtier_disks" {
   value = local.enable_deployment ? local.db_disks_ansible : []
 }
+
+
+output "db_ha" {
+  value = local.anydb_ha
+}

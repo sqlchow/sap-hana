@@ -107,6 +107,17 @@ variable "use_local_credentials" {
   description = "SDU has unique credentials"
 }
 
+variable "db_ha" {
+  description = "Is the DB deployment highly available"
+  default = false
+}
+
+variable "scs_ha" {
+  description = "Is the SCS deployment highly available"
+  default = false
+}
+
+
 locals {
 
   tfstate_resource_id          = try(var.tfstate_resource_id, "")
