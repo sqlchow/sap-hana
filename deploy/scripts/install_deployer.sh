@@ -98,8 +98,8 @@ fi
 
 
 # Read environment
-environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+region=$(jq --raw-output .infrastructure.region "${parameterfile}")
 key=$(echo "${parameterfile}" | cut -d. -f1)
 
 if [ ! -n "${environment}" ]
