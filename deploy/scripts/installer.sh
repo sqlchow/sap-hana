@@ -169,8 +169,8 @@ fi
 
 
 # Read environment
-environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+region=$(jq --raw-output .infrastructure.region "${parameterfile}")
 
 if [ ! -n "${environment}" ]
 then
@@ -274,7 +274,7 @@ fi
 if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
     option="DEPLOYMENT_REPO_PATH"
     missing
-    exit -1
+    exit 1
 fi
 
 
@@ -293,7 +293,7 @@ if [ -n "${temp}" ]; then
     then
         rm stdout.az
     fi
-    exit -1
+    exit 1
 else
     if [ -f stdout.az ]
     then
@@ -312,9 +312,11 @@ fi
 
 if [ ! -n "${REMOTE_STATE_SA}" ]; then
     read -p "Terraform state storage account name:"  REMOTE_STATE_SA
-    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
-    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
+    fail_if_null REMOTE_STATE_RG
+    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
+    fail_if_null tfstate_resource_id
+    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3)
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
         if [ $account_set==0 ] 
@@ -343,13 +345,15 @@ fi
 if [ -z "${REMOTE_STATE_SA}" ]; then
     option="REMOTE_STATE_SA"
     missing
-    exit -1
+    exit 1
 fi
 
 if [ -z "${REMOTE_STATE_RG}" ]; then
-    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
-    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
+    fail_if_null REMOTE_STATE_RG
+    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
+    fail_if_null tfstate_resource_id
+    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3)
     
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
@@ -376,8 +380,9 @@ fi
 if [ "${deployment_system}" != sap_deployer ]
 then
     if [ ! -n "${tfstate_resource_id}" ]; then
-        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-        STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
+        fail_if_null tfstate_resource_id
+        STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3)
         
         save_config_vars "${system_config_information}" \
         tfstate_resource_id \
@@ -423,7 +428,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 1
 fi
 
 ok_to_proceed=false
@@ -593,7 +598,7 @@ then
         rm plan_output.log
     fi
     unset TF_DATA_DIR
-    exit -1
+    exit 1
 fi
 
 if [ ! $new_deployment ]
@@ -640,7 +645,7 @@ then
             ok_to_proceed=true
         else
             unset TF_DATA_DIR
-            exit -1
+            exit 1
         fi
     else
         ok_to_proceed=true
@@ -683,7 +688,7 @@ if [ $ok_to_proceed ]; then
         cat error.log
         rm error.log
         unset TF_DATA_DIR
-        exit -1
+        exit 1
     fi
         
 fi
@@ -698,9 +703,11 @@ if [ "${deployment_system}" == sap_library ]
 then
 
     REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
-    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
-    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
+    fail_if_null REMOTE_STATE_RG
+    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
+    fail_if_null tfstate_resource_id
+    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3)
     
     save_config_vars "${system_config_information}" \
     REMOTE_STATE_RG \

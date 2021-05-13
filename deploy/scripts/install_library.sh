@@ -95,11 +95,14 @@ if [ $param_dirname != '.' ]; then
 fi
 
 # Read environment
-environment=$(jq .infrastructure.environment "${parameterfile}" | tr -d \")
-region=$(jq .infrastructure.region "${parameterfile}" | tr -d \")
+environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+region=$(jq --raw-output .infrastructure.region "${parameterfile}")
 key=$(echo "${parameterfile}" | cut -d. -f1)
 
-use_deployer=$(jq .deployer.use "${parameterfile}" | tr -d \")
+use_deployer=$(jq --raw-output .deployer.use "${parameterfile}")
+if [ "${use_deployer}" == "null" ]; then
+    use_deployer=false
+fi
 
 if [ ! -n "${environment}" ]
 then
@@ -128,7 +131,7 @@ then
 fi
 
 
-echo $use_deployer
+echo "Use Deployer: $use_deployer"
 
 if [ false != $use_deployer ]
 then
@@ -348,8 +351,10 @@ then
     temp=$(echo "${REMOTE_STATE_SA}" | grep "Backend reinitialization required")
     if [ -z "${temp}" ]
     then
-        REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
-        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
+        REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
+        fail_if_null REMOTE_STATE_RG
+        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
+        fail_if_null tfstate_resource_id
         STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
         
         save_config_vars "${library_config_information}" \

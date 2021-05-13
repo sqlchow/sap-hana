@@ -75,3 +75,26 @@ function init() {
     
     
 }
+
+function error_msg {
+    echo "Error!!! ${@}"
+}
+
+function fail_if_null {
+    local var_name="${1}"
+
+    # return immeditaely if no action required
+    if [ "${!var_name}" != "null" ]; then
+        return
+    fi
+
+    shift 1
+
+    if (( $# > 0 )); then
+        error_msg "${@}"
+    else
+        error_msg "Got a null value for '${var_name}'"
+    fi
+
+    exit 1
+}

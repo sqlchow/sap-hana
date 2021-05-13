@@ -179,8 +179,8 @@ if [ ! -n "${az}" ]; then
 fi
 
 # Helper variables
-environment=$(jq .infrastructure.environment "${deployer_parameter_file}" | tr -d \")
-region=$(jq .infrastructure.region "${deployer_parameter_file}" | tr -d \")
+environment=$(jq --raw-output .infrastructure.environment "${deployer_parameter_file}")
+region=$(jq --raw-output .infrastructure.region "${deployer_parameter_file}")
 
 if [ ! -n "${environment}" ]
 then
@@ -358,7 +358,7 @@ then
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
                 
     "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_deployer.sh $allParams
-    if [ $? -eq 255 ]
+    if (( $? > 0 ))
     then
         exit $?
     fi
@@ -408,7 +408,7 @@ then
             allParams=$(printf " -e %s -r %s -v %s --spn_secret %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
             
             "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
-            if [ $? -eq 255 ]
+            if (( $? > 0 ))
             then
                 exit $?
             fi
@@ -420,7 +420,7 @@ then
                 allParams="${env_param}""${keyvault_param}""${region_param}"
                 
                 "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
-                if [ $? -eq 255 ]
+                if (( $? > 0 ))
                 then
                     exit $?
                 fi
@@ -428,7 +428,10 @@ then
         fi
         
         if [ -f post_deployment.sh ]; then
-            "./post_deployment.sh"
+            ./post_deployment.sh
+            if (( $? > 0 )); then
+                exit $?
+            fi
         fi
         cd "${curdir}" || exit
         step=2
@@ -470,7 +473,7 @@ then
     allParams=$(printf " -p %s -d %s %s" "${library_file_parametername}" "${relative_path}" "${approveparam}")
     
     "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_library.sh $allParams
-    if [ $? -eq 255 ]
+    if (( $? > 0 ))
     then
         exit $?
     fi
@@ -513,7 +516,7 @@ then
     allParams=$(printf " -p %s -t sap_deployer %s" "${deployer_file_parametername}" "${approveparam}")
     
     "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
-    if [ $? -eq 255 ]
+    if (( $? > 0 ))
     then
         exit $?
     fi
@@ -541,7 +544,7 @@ then
     allParams=$(printf " -p %s -t sap_library %s" "${library_file_parametername}" "${approveparam}")
 
     "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
-    if [ $? -eq 255 ]
+    if (( $? > 0 ))
     then
         exit $?
     fi
