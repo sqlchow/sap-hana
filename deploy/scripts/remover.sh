@@ -161,7 +161,6 @@ if [ ! -n "${region}" ]; then
     exit 65 #data format error
 fi
 
-#key=$(echo "${parameterfile_name}" | cut -d. -f1)
 
 if [ ! -f "${parameterfile}" ]; then
     printf -v val %-40.40s "$parameterfile"
@@ -178,6 +177,9 @@ fi
 automation_config_directory="$HOME/.sap_deployment_automation/"
 generic_config_information="${automation_config_directory}"config
 system_config_information="${automation_config_directory}""${environment}""${region}"
+
+key=$(echo "${parameterfile}" | cut -d. -f1)
+
 
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]; then
@@ -275,6 +277,23 @@ if [ -f backend.tf ]; then
 fi
 
 #check_output=0
+
+echo ""
+echo "#########################################################################################"
+echo "#                                                                                       #"
+echo "#                             Running Terraform init                                    #"
+echo "#                                                                                       #"
+echo "#########################################################################################"
+echo ""
+
+
+
+terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
+--backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
+--backend-config "resource_group_name=${REMOTE_STATE_RG}" \
+--backend-config "storage_account_name=${REMOTE_STATE_SA}" \
+--backend-config "container_name=tfstate" \
+--backend-config "key=${key}.terraform.tfstate"
 
 echo ""
 echo "#########################################################################################"

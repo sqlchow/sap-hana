@@ -41,5 +41,8 @@
     "options": {},
     "diagnostics_storage_account": {
         "arm_id": ""
+    },
+    "witness_storage_account": {
+        "arm_id": ""
     }
 }
