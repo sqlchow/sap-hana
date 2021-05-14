@@ -98,3 +98,26 @@ function fail_if_null {
 
     exit 1
 }
+
+function get_and_store_sa_details {
+    local REMOTE_STATE_SA="${1}"
+    local config_file_name="${2}"
+
+    save_config_vars "${config_file_name}" REMOTE_STATE_SA
+
+    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
+    fail_if_null REMOTE_STATE_RG
+    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
+    fail_if_null tfstate_resource_id
+    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    
+    save_config_vars "${config_file_name}" \
+        REMOTE_STATE_RG \
+        tfstate_resource_id \
+        STATE_SUBSCRIPTION
+
+
+
+
+
+}
