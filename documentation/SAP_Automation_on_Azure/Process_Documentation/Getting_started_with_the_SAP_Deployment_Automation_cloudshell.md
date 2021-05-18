@@ -17,7 +17,7 @@ Open the cloud shell and use bash.
 3. Navigate to that directory and clone the sap-hana repository by running:
 
 ```bash
-git clone <https://github.com/Azure/sap-hana.git> 
+git clone https://github.com/Azure/sap-hana.git
 
 cd sap-hana
 
@@ -30,13 +30,13 @@ git checkout beta
 
     ```bash
     export DEPLOYMENT_REPO_PATH=~/Azure_SAP_Automated_Deployment/sap-hana/
-    export ARM_SUBSCRIPTION_ID=xxxxx
+    export ARM_SUBSCRIPTION_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 5. Copy the sample parameter folders with
 
     ```bash
     cd ~/Azure_SAP_Automated_Deployment
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES WORKSPACES/ -r
+    cp -R sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES WORKSPACES
 
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
 
@@ -52,16 +52,16 @@ For a highlevel overview of what will be deployed use the validate.sh script to 
 
 ```bash
 ${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh --parameterfile DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json \
-    --type sap_deployer
+                                                  --type sap_deployer
 
-${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh --parameterfile LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json \
-    --type sap_library
+${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh --parameterfile LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json                    \
+                                                  --type sap_library
 
 ${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh --parameterfile LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json \
-    --type sap_landscape
+                                                  --type sap_landscape
 
-${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh --parameterfile SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json \
-    --type sap_system
+${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh --parameterfile SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json                          \
+                                                  --type sap_system
 
 ```
 
