@@ -78,8 +78,8 @@
 3. Terraform
      ```bash
      mkdir -p ~/bin; cd $_
-     wget  https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
-     unzip terraform_0.13.5_linux_amd64.zip
+     wget  https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
+     unzip terraform_0.14.7_linux_amd64.zip
      alias terraform=~/bin/terraform
      ```
 
@@ -111,14 +111,14 @@
 5. Create Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/NP-EUS2-DEP00-INFRASTRUCTURE; cd $_
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER/DEMO-EUS2-DEP00-INFRASTRUCTURE; cd $_
     ```
     <br/>
 
-6. Create input parameter [JSON](templates/NP-EUS2-DEP00-INFRASTRUCTURE.json)
+6. Create input parameter [JSON](templates/DEMO-EUS2-DEP00-INFRASTRUCTURE.json)
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    vi NP-EUS2-DEP00-INFRASTRUCTURE.json
+    vi DEMO-EUS2-DEP00-INFRASTRUCTURE.json
     ```
     <br/>
 
@@ -131,7 +131,7 @@
     2. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=NP-EUS2-DEP00-INFRASTRUCTURE.json                    \
+       terraform plan  --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                    \
                        ../../../sap-hana/deploy/terraform/bootstrap/sap_deployer/
        ```
 
@@ -140,7 +140,7 @@
        *This step deploys the resources*
        ```bash
        terraform apply --auto-approve                                                  \
-                       --var-file=NP-EUS2-DEP00-INFRASTRUCTURE.json                    \
+                       --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                    \
                        ../../../sap-hana/deploy/terraform/bootstrap/sap_deployer/
        ```
         <br/>
