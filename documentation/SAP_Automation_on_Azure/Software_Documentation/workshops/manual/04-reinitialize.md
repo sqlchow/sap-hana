@@ -38,7 +38,7 @@
     | `<REGION>`        | [4 CHAR] | EUS2   |
     | `<DEPLOYER_VNET>` | [7 CHAR] | DEP00  |
   
-    Which becomes this: **NP-EUS2-DEP00-INFRASTRUCTURE**
+    Which becomes this: **DEMO-EUS2-DEP00-INFRASTRUCTURE**
     
     This is used in several places:
     - The path of the Workspace Directory.
@@ -60,7 +60,7 @@
 1. Change to Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/NP-EUS2-DEP00-INFRASTRUCTURE
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/DEMO-EUS2-DEP00-INFRASTRUCTURE
     ```
     <br/>
 
@@ -68,10 +68,10 @@
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
     cat <<EOF > backend
-    resource_group_name   = "NP-EUS2-SAP_LIBRARY"
+    resource_group_name   = "DEMO-EUS2-SAP_LIBRARY"
     storage_account_name  = "<tfstate_storage_account_name>"
     container_name        = "tfstate"
-    key                   = "NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate"
+    key                   = "DEMO-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate"
     EOF
     ```
     |                      |           |
@@ -100,7 +100,7 @@
     3. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=NP-EUS2-DEP00-INFRASTRUCTURE.json                    \
+       terraform plan  --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                    \
                        ../../../sap-hana/deploy/terraform/run/sap_deployer/
        ```
 
@@ -108,7 +108,7 @@
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
        terraform apply --auto-approve                                                  \
-                       --var-file=NP-EUS2-DEP00-INFRASTRUCTURE.json                    \
+                       --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                  \
                        ../../../sap-hana/deploy/terraform/run/sap_deployer/
        ```
 
@@ -125,7 +125,7 @@
 1. Change to Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/NP-EUS2-SAP_LIBRARY
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/DEMO-EUS2-SAP_LIBRARY
     ```
     <br/>
 
@@ -133,10 +133,10 @@
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
     cat <<EOF > backend
-    resource_group_name   = "NP-EUS2-SAP_LIBRARY"
+    resource_group_name   = "DEMO-EUS2-SAP_LIBRARY"
     storage_account_name  = "<tfstate_storage_account_name>"
     container_name        = "tfstate"
-    key                   = "NP-EUS2-SAP_LIBRARY.terraform.tfstate"
+    key                   = "DEMO-EUS2-SAP_LIBRARY.terraform.tfstate"
     EOF
     ```
     |                      |           |
@@ -177,7 +177,7 @@
     3. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=NP-EUS2-SAP_LIBRARY.json                             \
+       terraform plan  --var-file=DEMO-EUS2-SAP_LIBRARY.json                             \
                        ../../../sap-hana/deploy/terraform/run/sap_library/
        ```
 
@@ -185,7 +185,7 @@
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
        terraform apply --auto-approve                                                  \
-                       --var-file=NP-EUS2-SAP_LIBRARY.json                             \
+                       --var-file=DEMO-EUS2-SAP_LIBRARY.json                             \
                        ../../../sap-hana/deploy/terraform/run/sap_library/
        ```
 

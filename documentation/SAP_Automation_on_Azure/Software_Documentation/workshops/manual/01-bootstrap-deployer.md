@@ -38,7 +38,7 @@
     | `<REGION>`        | [4 CHAR] | EUS2   |
     | `<DEPLOYER_VNET>` | [7 CHAR] | DEP00  |
   
-    Which becomes this: **NP-EUS2-DEP00-INFRASTRUCTURE**
+    Which becomes this: **DEMO-EUS2-DEP00-INFRASTRUCTURE**
     
     This is used in several places:
     - The path of the Workspace Directory.
@@ -139,7 +139,7 @@
        <br/>*`Observe Naming Convention`*<br/>
        *This step deploys the resources*
        ```bash
-       terraform apply --auto-approve                                                  \
+       terraform apply --auto-approve                                                    \
                        --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                    \
                        ../../../sap-hana/deploy/terraform/bootstrap/sap_deployer/
        ```
@@ -166,9 +166,9 @@
        1. Private Key
           <br/>*`Observe Naming Convention`*<br/>
           ```
-          az keyvault secret show            \
-            --vault-name NPEUS2DEP00userF6A \
-            --name NP-EUS2-DEP00-sshkey   | \
+          az keyvault secret show               \
+            --vault-name DEMOEUS2DEP00userE27   \
+            --name DEMO-EUS2-DEP00-sshkey     | \
             jq -r .value > sshkey
           ```
           <br/>
@@ -177,8 +177,8 @@
           <br/>*`Observe Naming Convention`*<br/>
           ```
           az keyvault secret show               \
-            --vault-name NPEUS2DEP00userF6A     \
-            --name NP-EUS2-DEP00-sshkey-pub   | \
+            --vault-name DEMOEUS2DEP00userF6A   \
+            --name DEMO-EUS2-DEP00-sshkey-pub | \
             jq -r .value > sshkey.pub
           ```
           <br/>

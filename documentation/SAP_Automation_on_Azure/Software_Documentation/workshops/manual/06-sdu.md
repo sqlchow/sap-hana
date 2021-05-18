@@ -41,7 +41,7 @@
     | `<SAP_VNET>` | [7 CHAR] | SAP00  |
     | `<SAP_SID>`  | [3 CHAR] | X00    |
   
-    Which becomes this: **NP-EUS2-SAP00-X00**
+    Which becomes this: **DEMO-EUS2-SAP00-X00**
     
     This is used in several places:
     - The path of the Workspace Directory.
@@ -61,7 +61,7 @@
 1. Create Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/NP-EUS2-SAP00-X00; cd $_
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-EUS2-SAP00-X00; cd $_
     ```
     <br/>
 
@@ -69,10 +69,10 @@
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
     cat <<EOF > backend
-    resource_group_name   = "NP-EUS2-SAP_LIBRARY"
+    resource_group_name   = "DEMO-EUS2-SAP_LIBRARY"
     storage_account_name  = "<tfstate_storage_account_name>"
     container_name        = "tfstate"
-    key                   = "NP-EUS2-SAP00-X00.terraform.tfstate"
+    key                   = "DEMO-EUS2-SAP00-X00.terraform.tfstate"
     EOF
     ```
     |                      |           |
@@ -82,10 +82,10 @@
     | key                  | A composit of the `SAP Deployment Unit` Resource Group name and the `.terraform.tfstate` extension. |
     <br/>
 
-3. Create input parameter [JSON](templates/NP-EUS2-SAP00-X00.json)
+3. Create input parameter [JSON](templates/DEMO-EUS2-SAP00-X00.json)
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    vi NP-EUS2-SAP00-X00.json
+    vi DEMO-EUS2-SAP00-X00.json
     ```
     <br/>
 
@@ -99,7 +99,7 @@
     2. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=NP-EUS2-SAP00-X00.json                                \
+       terraform plan  --var-file=DEMO-EUS2-SAP00-X00.json                                \
                        ../../../sap-hana/deploy/terraform/run/sap_system/
        ```
 
@@ -107,7 +107,7 @@
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
        terraform apply --auto-approve                                                  \
-                       --var-file=NP-EUS2-SAP00-X00.json                               \
+                       --var-file=DEMO-EUS2-SAP00-X00.json                               \
                        ../../../sap-hana/deploy/terraform/run/sap_system/
        ```
        <br/>

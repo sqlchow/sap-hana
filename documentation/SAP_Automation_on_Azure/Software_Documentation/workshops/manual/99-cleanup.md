@@ -28,13 +28,13 @@
 <br/>
 
 ```
-cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/NP-EUS2-SAP00-X00
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-EUS2-SAP00-X00
 ```
 
 
 ```
 terraform destroy --auto-approve                                                        \
-                  --var-file=NP-EUS2-SAP00-X00.json                                      \
+                  --var-file=DEMO-EUS2-SAP00-X00.json                                      \
                   ../../../sap-hana/deploy/terraform/run/sap_system/
 ```
 <br/><br/>
@@ -44,13 +44,13 @@ terraform destroy --auto-approve                                                
 <br/>
 
 ```
-cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LANDSCAPE/NP-EUS2-SAP00-INFRASTRUCTURE
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEMO-EUS2-SAP00-INFRASTRUCTURE
 ```
 
 
 ```
 terraform destroy --auto-approve                                                        \
-                  --var-file=NP-EUS2-SAP00-INFRASTRUCTURE.json                           \
+                  --var-file=DEMO-EUS2-SAP00-INFRASTRUCTURE.json                           \
                   ../../../sap-hana/deploy/terraform/run/sap_system/
 ```
 <br/><br/>

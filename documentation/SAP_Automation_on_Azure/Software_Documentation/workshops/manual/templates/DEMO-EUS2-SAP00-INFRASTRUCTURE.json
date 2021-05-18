@@ -1,8 +1,8 @@
 {
   "tfstate_resource_id"                   : "<RESOURCE_ID_FOR_TFSTATE_STORAGE_ACCOUNT>", 
-  "deployer_tfstate_key"                  : "NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate",
+  "deployer_tfstate_key"                  : "DEMO-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate",
   "infrastructure": {
-    "environment"                         : "NP",
+    "environment"                         : "DEMO",
     "region"                              : "eastus2",
     "vnets": {
       "sap": {

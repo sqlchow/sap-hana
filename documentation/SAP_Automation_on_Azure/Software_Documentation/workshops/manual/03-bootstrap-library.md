@@ -37,7 +37,7 @@
     | `<ENV>`           | [5 CHAR] | NP     |
     | `<REGION>`        | [4 CHAR] | EUS2   |
   
-    Which becomes this: **NP-EUS2-SAP_LIBRARY**
+    Which becomes this: **DEMO-EUS2-SAP_LIBRARY**
     
     This is used in several places:
     - The path of the Workspace Directory.
@@ -77,14 +77,14 @@
 2. Create Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/NP-EUS2-SAP_LIBRARY; cd $_
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/DEMO-EUS2-SAP_LIBRARY; cd $_
     ```
     <br/>
 
-3. Create input parameter [JSON](templates/NP-EUS2-SAP_LIBRARY.json)
+3. Create input parameter [JSON](templates/DEMO-EUS2-SAP_LIBRARY.json)
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    vi NP-EUS2-SAP_LIBRARY.json
+    vi DEMO-EUS2-SAP_LIBRARY.json
     ```
     <br/>
 
@@ -98,7 +98,7 @@
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
        terraform plan                                                                  \
-                       --var-file=NP-EUS2-SAP_LIBRARY.json                             \
+                       --var-file=DEMO-EUS2-SAP_LIBRARY.json                           \
                        ../../../sap-hana/deploy/terraform/bootstrap/sap_library
        ```
 
@@ -107,7 +107,7 @@
        *This step deploys the resources*
        ```bash
        terraform apply --auto-approve                                                  \
-                       --var-file=NP-EUS2-SAP_LIBRARY.json                             \
+                       --var-file=DEMO-EUS2-SAP_LIBRARY.json                           \
                        ../../../sap-hana/deploy/terraform/bootstrap/sap_library/
        ```
 

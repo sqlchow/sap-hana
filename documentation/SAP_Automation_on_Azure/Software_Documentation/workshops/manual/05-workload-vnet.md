@@ -38,7 +38,7 @@
     | `<REGION>`   | [4 CHAR] | EUS2   |
     | `<SAP_VNET>` | [7 CHAR] | SAP00  |
   
-    Which becomes this: **NP-EUS2-SAP00-INFRASTRUCTURE**
+    Which becomes this: **DEMO-EUS2-SAP00-INFRASTRUCTURE**
     
     This is used in several places:
     - The path of the Workspace Directory.
@@ -58,7 +58,7 @@
 1. Create Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/NP-EUS2-SAP00-INFRASTRUCTURE; cd $_
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEMO-EUS2-SAP00-INFRASTRUCTURE; cd $_
     ```
     <br/>
 
@@ -66,10 +66,10 @@
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
     cat <<EOF > backend
-    resource_group_name   = "NP-EUS2-SAP_LIBRARY"
+    resource_group_name   = "DEMO-EUS2-SAP_LIBRARY"
     storage_account_name  = "<tfstate_storage_account_name>"
     container_name        = "tfstate"
-    key                   = "NP-EUS2-SAP00-INFRASTRUCTURE.terraform.tfstate"
+    key                   = "DEMO-EUS2-SAP00-INFRASTRUCTURE.terraform.tfstate"
     EOF
     ```
     |                      |           |
@@ -79,10 +79,10 @@
     | key                  | A composit of the `SAP Workload VNET` Resource Group name and the `.terraform.tfstate` extension. |
     <br/>
 
-3. Create input parameter [JSON](templates/NP-EUS2-SAP00-INFRASTRUCTURE.json)
+3. Create input parameter [JSON](templates/DEMO-EUS2-SAP00-INFRASTRUCTURE.json)
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    vi NP-EUS2-SAP00-INFRASTRUCTURE.json
+    vi DEMO-EUS2-SAP00-INFRASTRUCTURE.json
     ```
     <br/>
 
@@ -96,7 +96,7 @@
     2. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=NP-EUS2-SAP00-INFRASTRUCTURE.json                     \
+       terraform plan  --var-file=DEMO-EUS2-SAP00-INFRASTRUCTURE.json                   \
                        ../../../sap-hana/deploy/terraform/run/sap_landscape/
        ```
 
@@ -104,7 +104,7 @@
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
        terraform apply --auto-approve                                                  \
-                       --var-file=NP-EUS2-SAP00-INFRASTRUCTURE.json                     \
+                       --var-file=DEMO-EUS2-SAP00-INFRASTRUCTURE.json                  \
                        ../../../sap-hana/deploy/terraform/run/sap_landscape/
        ```
        <br/>
