@@ -172,7 +172,7 @@ init "${automation_config_directory}" "${generic_config_information}" "${library
 export TF_DATA_DIR="${param_dirname}"/.terraform
 var_file="${param_dirname}"/"${parameterfile}" 
 
-if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
+if [ ! -n "${DEPLOYMENT_REPO_PATH}/" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -207,7 +207,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     exit 3
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}/"deploy/terraform/bootstrap/"${deployment_system}"/
 
 if [ ! -d ${terraform_module_directory} ]
 then

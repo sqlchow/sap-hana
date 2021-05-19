@@ -247,7 +247,7 @@ load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
 
 echo "Terraform storage " "${REMOTE_STATE_SA}"
 
-if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
+if [ ! -n "${DEPLOYMENT_REPO_PATH}/" ]; then
     option="DEPLOYMENT_REPO_PATH"
     missing
     exit 1
@@ -368,7 +368,7 @@ else
 fi
 
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}/"deploy/terraform/run/"${deployment_system}"/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 if [ ! -d "${terraform_module_directory}" ]

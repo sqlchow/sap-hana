@@ -353,7 +353,7 @@ then
     
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
                 
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_deployer.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}/"deploy/scripts/install_deployer.sh $allParams
     if (( $? > 0 ))
     then
         exit $?
@@ -403,7 +403,7 @@ then
         then
             allParams=$(printf " -e %s -r %s -v %s --spn_secret %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
             
-            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+            "${DEPLOYMENT_REPO_PATH}/"deploy/scripts/set_secrets.sh $allParams
             if (( $? > 0 ))
             then
                 exit $?
@@ -415,7 +415,7 @@ then
                 
                 allParams="${env_param}""${keyvault_param}""${region_param}"
                 
-                "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+                "${DEPLOYMENT_REPO_PATH}/"deploy/scripts/set_secrets.sh $allParams
                 if (( $? > 0 ))
                 then
                     exit $?
@@ -468,7 +468,7 @@ then
     fi
     allParams=$(printf " -p %s -d %s %s" "${library_file_parametername}" "${relative_path}" "${approveparam}")
     
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_library.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}/"deploy/scripts/install_library.sh $allParams
     if (( $? > 0 ))
     then
         exit $?
@@ -511,7 +511,7 @@ then
     fi
     allParams=$(printf " -p %s -t sap_deployer %s" "${deployer_file_parametername}" "${approveparam}")
     
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}/"deploy/scripts/installer.sh $allParams
     if (( $? > 0 ))
     then
         exit $?
@@ -539,7 +539,7 @@ then
     cd "${library_dirname}" || exit
     allParams=$(printf " -p %s -t sap_library %s" "${library_file_parametername}" "${approveparam}")
 
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}/"deploy/scripts/installer.sh $allParams
     if (( $? > 0 ))
     then
         exit $?

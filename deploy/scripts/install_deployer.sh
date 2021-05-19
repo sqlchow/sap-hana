@@ -142,7 +142,7 @@ init "${automation_config_directory}" "${generic_config_information}" "${deploye
 
 var_file="${param_dirname}"/"${parameterfile}" 
 
-if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
+if [ ! -n "${DEPLOYMENT_REPO_PATH}/" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -190,7 +190,7 @@ else
     fi
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}/"deploy/terraform/bootstrap/"${deployment_system}"/
 export TF_DATA_DIR="${param_dirname}"/.terraform
 
 ok_to_proceed=false
