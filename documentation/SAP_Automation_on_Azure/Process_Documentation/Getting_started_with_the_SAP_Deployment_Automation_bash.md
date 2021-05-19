@@ -26,7 +26,7 @@ git checkout beta
 4. Export the required environment variables
 
     ```bash
-    export DEPLOYMENT_REPO_PATH=~/Azure_SAP_Automated_Deployment/sap-hana/
+    export DEPLOYMENT_REPO_PATH=~/Azure_SAP_Automated_Deployment/sap-hana
     export ARM_SUBSCRIPTION_ID=xxxxx
 
 5. Copy the sample parameter folders with
