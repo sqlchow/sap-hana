@@ -213,7 +213,7 @@ fi
 
 tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
 
-if [ ! -n "${DEPLOYMENT_REPO_PATH}/" ]; then
+if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
     option="DEPLOYMENT_REPO_PATH"
     missing
     exit -1
@@ -250,7 +250,7 @@ fi
 
 export TF_DATA_DIR="${parameterfile_dirname}"/.terraform
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}/"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="{DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 
 if [ ! -d "${terraform_module_directory}" ]; then
     printf -v val %-40.40s "$deployment_system"
