@@ -57,7 +57,7 @@ function init() {
         mkdir "${automation_config_directory}"
         touch "${app_config_information}"
         touch "${generic_config_information}"
-        if [ -n "${DEPLOYMENT_REPO_PATH}/" ]; then
+        if [ -n "${DEPLOYMENT_REPO_PATH}" ]; then
             # Store repo path in ~/.sap_deployment_automation/config
             save_config_var "DEPLOYMENT_REPO_PATH" "${generic_config_information}"
         fi
