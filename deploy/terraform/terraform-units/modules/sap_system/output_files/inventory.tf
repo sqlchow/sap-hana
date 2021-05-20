@@ -213,3 +213,10 @@ resource "azurerm_storage_blob" "hosts_yaml" {
   source                 = local_file.ansible_inventory_new_yml.filename
 }
 
+resource "local_file" "ansible_cfg" {
+  content = templatefile(format("%s/ansible.cfg.tmpl", path.module), {})
+  filename             = format("%s/ansible_config_files/ansible.cfg", path.cwd)
+  file_permission      = "0660"
+  directory_permission = "0770"
+}
+
