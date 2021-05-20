@@ -205,7 +205,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit 64 #script usage wrong
+    exit 64                                                                                           #script usage wrong
 fi
 
 automation_config_directory=~/.sap_deployment_automation/
@@ -251,7 +251,7 @@ if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit 65 #data format error
+    exit 65                                                                                           #data format error
 fi
 
 templen=$(echo "${ARM_SUBSCRIPTION_ID}" | wc -c)
@@ -272,7 +272,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit 65 #data format error
+    exit 65                                                                                           #data format error
 else
     if [ "{$arm_config_stored}" != 0 ]
     then
@@ -304,7 +304,7 @@ if [ -n "${temp}" ]; then
     then
         rm stdout.az
     fi
-    exit 67 #addressee unknown
+    exit 67                                                                                             #addressee unknown
 else
     if [ -f stdout.az ]
     then
@@ -338,17 +338,30 @@ then
     
     if [ $force == 1 ]
     then
-        if [ -d ./.terraform/ ]; then
-            rm .terraform -r
-        fi
+        # This is a a bit verbose
+
+        # if [ -d ./.terraform/ ]; then
+        #     rm .terraform -r
+        # fi
         
-        if [ -f terraform.tfstate ]; then
-            rm terraform.tfstate
-        fi
+        # if [ -f terraform.tfstate ]; then
+        #     rm terraform.tfstate
+        # fi
         
-        if [ -f terraform.tfstate.backup ]; then
-            rm terraform.tfstate.backup
-        fi
+        # if [ -f terraform.tfstate.backup ]; then
+        #     rm terraform.tfstate.backup
+        # fi
+        
+        
+        
+        # Another way to do it
+        
+        # [ -d .terraform ]               && rm -Rf .terraform
+        # [ -f terraform.tfstate ]        && rm     terraform.tfstate
+        # [ -f terraform.tfstate.backup ] && rm     terraform.tfstate.backup
+
+        # This is the simplest
+        rm -Rf .terraform terraform.tfstate*
     fi
     
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")

@@ -140,6 +140,7 @@ The deployment configuration file defines the region and the environment name an
          "environment"                 : "MGMT",
          "vnets": {
                "management": {
+                  "name"               : "DEP00",
                   "address_space"      : "10.10.20.0/25",
                   "subnet_mgmt": {
                      "prefix"          : "10.10.20.64/28"
@@ -239,16 +240,16 @@ The Workload Zone configuration file defines the region and the environment name
                     "name"                  : "SAP01",
                     "address_space"         : "10.110.0.0/24",
                     "subnet_admin": {
-                    "prefix"              : "10.110.0.0/27"
+                    "prefix"                : "10.110.0.0/27"
                     },
                     "subnet_app": {
-                    "prefix"              : "10.110.0.32/27"
+                    "prefix"                : "10.110.0.32/27"
                     },
                     "subnet_db": {
-                    "prefix"              : "10.110.0.64/27"
+                    "prefix"                : "10.110.0.64/27"
                     },
                     "subnet_web": {
-                    "prefix"              : "10.110.0.96/27"
+                    "prefix"                : "10.110.0.96/27"
                     }
                 }
             }

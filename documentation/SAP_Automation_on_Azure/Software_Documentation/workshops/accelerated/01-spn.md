@@ -39,7 +39,27 @@ This allows for mapping of an environment to a subscription, along with credenti
 
 <br/>
 
-1. Create SPN<br/>
+1. Cloud Shell
+   1. Log on to the [Azure Portal](https://portal.azure.com).
+   2. Open the cloud shell.
+      <br/>![Cloud Shell](assets/CloudShell1.png)
+      <br/><br/>
+
+2. Ensure that you are authenticated with the correct subscription.
+    ```bash
+    az login
+    az account list --output=table | grep -i true
+    ```
+
+    If not, then find and set the Default to the correct subscription.
+
+    ```bash
+    az account list --output=table
+    az account set  --subscription XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    ```
+    <br/>
+
+3. Create SPN<br/>
     From a privilaged account, create an SPN.<br/>
     The Subscription ID that you are deploying into is reqired.
     ```
@@ -47,7 +67,7 @@ This allows for mapping of an environment to a subscription, along with credenti
     ```
     <br/><br/>
 
-2. Record the credential outputs.<br/>
+4. Record the credential outputs.<br/>
    The pertinant fields are:
    - appId
    - password
@@ -63,13 +83,13 @@ This allows for mapping of an environment to a subscription, along with credenti
     ```
     <br/><br/>
 
-3. Add Role Assignment to SPN.
+5. Add Role Assignment to SPN.
     ```
     az role assignment create --assignee <appId> --role "User Access Administrator"
     ```
     <br/><br/>
 
-4. Add keys for SPN to KeyVault.
+6. Add keys for SPN to KeyVault.
    - Where `<ENV>` is the environment.
    - Where `<User_KV_name>`
    - Where `<subscription-id>`
@@ -86,4 +106,4 @@ This allows for mapping of an environment to a subscription, along with credenti
 <br/><br/><br/><br/>
 
 
-# Next: [Bootstrap - Library](03-bootstrap-library.md) <!-- omit in toc -->
+# Next: [Bootstrap - Library](02-prepare-environment.md) <!-- omit in toc -->

@@ -11,32 +11,36 @@
 
 1. Navigate to the home root directory
 2. Create a directory "Azure_SAP_Automated_Deployment"
+   ```bash
+   mkdir ~/Azure_SAP_Automated_Deployment; cd $_
+   ```
+
 3. Navigate to that directory and clone the sap-hana repository by running:
 
-```bash
-git clone <https://github.com/Azure/sap-hana.git> 
+    ```bash
+    git clone <https://github.com/Azure/sap-hana.git> 
 
-cd sap-hana
+    cd sap-hana
 
-git checkout beta
-```
+    git checkout beta
+    ```
 
-**Note** If using the deployer the repository is already cloned.
+    **Note** If using the deployer the repository is already cloned.
 
 4. Export the required environment variables
 
     ```bash
     export DEPLOYMENT_REPO_PATH=~/Azure_SAP_Automated_Deployment/sap-hana
     export ARM_SUBSCRIPTION_ID=xxxxx
+    ````
 
 5. Copy the sample parameter folders with
 
     ```bash
     cd ~/Azure_SAP_Automated_Deployment
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES WORKSPACES/ -r
+    cp -R sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES WORKSPACES
 
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
-
     ```
 
 Navigate to the ~/Azure_SAP_Automated_Deployment/WORKSPACES folder.
