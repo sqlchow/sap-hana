@@ -108,6 +108,10 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
     "Restore",
     "Purge"
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 // Comment out code with users.object_id for the time being.
