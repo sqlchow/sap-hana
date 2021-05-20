@@ -8,7 +8,9 @@
 ## Table of Contents
 <br/>
 
-1. [Standard](standard/overview.md)
-    This is the Standard workshop    
+1. [Manual](manual/overview.md) 
+    This workshop goes through the manual, step-by-step, process.
+1. [Accelerated](accelerated/overview.md)
+    This workshop uses several scripts to accelerate the process.
 
 <br/><br/>

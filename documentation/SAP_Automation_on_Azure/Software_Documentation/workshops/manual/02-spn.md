@@ -43,7 +43,7 @@ This allows for mapping of an environment to a subscription, along with credenti
     From a privilaged account, create an SPN.<br/>
     The Subscription ID that you are deploying into is reqired.
     ```
-    az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" --name="Deployment-Account-NP"
+    az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" --name="DEMO-Deployment-Account"
     ```
     <br/><br/>
 
@@ -55,8 +55,8 @@ This allows for mapping of an environment to a subscription, along with credenti
     ```
     {
       "appId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-      "displayName": "Deployment-Account-NP",
-      "name": "http://Deployment-Account-NP",
+      "displayName": "DEMO-Deployment-Account",
+      "name": "http://DEMO-Deployment-Account",
       "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "tenant": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx""
     }
@@ -78,9 +78,9 @@ This allows for mapping of an environment to a subscription, along with credenti
    - Where `<tenant>`
     ```
     az keyvault secret set --name "<ENV>-subscription-id" --vault-name "<User_KV_name>" --value "<subscription-id>";
+    az keyvault secret set --name "<ENV>-tenant-id"       --vault-name "<User_KV_name>" --value "<tenant>";
     az keyvault secret set --name "<ENV>-client-id"       --vault-name "<User_KV_name>" --value "<appId>";
     az keyvault secret set --name "<ENV>-client-secret"   --vault-name "<User_KV_name>" --value "<password>";
-    az keyvault secret set --name "<ENV>-tenant-id"       --vault-name "<User_KV_name>" --value "<tenant>";
     ```
 
 <br/><br/><br/><br/>

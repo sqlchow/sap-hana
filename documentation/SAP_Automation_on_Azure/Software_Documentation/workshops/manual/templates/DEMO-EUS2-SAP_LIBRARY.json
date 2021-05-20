@@ -1,10 +1,10 @@
 {
   "infrastructure": {
-    "environment"                         : "NP",
+    "environment"                         : "DEMO",
     "region"                              : "eastus2"
   },
   "deployer": {
-    "environment"                         : "NP",
+    "environment"                         : "DEMO",
     "region"                              : "eastus2",
     "vnet"                                : "DEP00"
   }
