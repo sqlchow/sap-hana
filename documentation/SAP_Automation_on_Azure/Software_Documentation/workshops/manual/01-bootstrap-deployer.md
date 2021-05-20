@@ -108,17 +108,35 @@
         ```
         <br/>
 
-5. Create Working Directory.
+5. Create Working Directory and prepare JSON.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER/DEMO-EUS2-DEP00-INFRASTRUCTURE; cd $_
-    ```
-    <br/>
 
-6. Create input parameter [JSON](templates/DEMO-EUS2-DEP00-INFRASTRUCTURE.json)
-    <br/>*`Observe Naming Convention`*<br/>
-    ```bash
-    vi DEMO-EUS2-DEP00-INFRASTRUCTURE.json
+    cat <<EOF > DEMO-EUS2-DEP00-INFRASTRUCTURE.json
+    {
+      "infrastructure": {
+        "environment"                         : "DEMO",
+        "region"                              : "eastus2",
+        "vnets": {
+          "management": {
+            "name"                            : "DEP00",
+            "address_space"                   : "10.0.0.0/25",
+            "subnet_mgmt": {
+              "prefix"                        : "10.0.0.64/28"
+            },
+            "subnet_fw": {
+              "prefix"                        : "10.0.0.0/26"
+            }
+          }
+        }
+      },
+      "options": {
+        "enable_deployer_public_ip"           : true
+      },
+      "firewall_deployment"                   : true
+    }
+    EOF
     ```
     <br/>
 

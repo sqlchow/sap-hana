@@ -82,7 +82,22 @@
 3. Create input parameter [JSON](templates/DEMO-EUS2-SAP00-INFRASTRUCTURE.json)
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    vi DEMO-EUS2-SAP00-INFRASTRUCTURE.json
+    cat <<EOF > DEMO-EUS2-SAP00-INFRASTRUCTURE.json
+    {
+      "tfstate_resource_id"                   : "<RESOURCE_ID_FOR_TFSTATE_STORAGE_ACCOUNT>", 
+      "deployer_tfstate_key"                  : "DEMO-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate",
+      "infrastructure": {
+        "environment"                         : "DEMO",
+        "region"                              : "eastus2",
+        "vnets": {
+          "sap": {
+            "name"                            : "SAP00",
+            "address_space"                   : "10.1.0.0/16"
+          }
+        }
+      }
+    }
+    EOF
     ```
     <br/>
 

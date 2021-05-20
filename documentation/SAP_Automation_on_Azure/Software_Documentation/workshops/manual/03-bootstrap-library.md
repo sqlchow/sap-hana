@@ -74,17 +74,24 @@
         ```
         <br/>
 
-2. Create Working Directory.
+2. Create Working Directory and prepare JSON.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/DEMO-EUS2-SAP_LIBRARY; cd $_
-    ```
-    <br/>
 
-3. Create input parameter [JSON](templates/DEMO-EUS2-SAP_LIBRARY.json)
-    <br/>*`Observe Naming Convention`*<br/>
-    ```bash
-    vi DEMO-EUS2-SAP_LIBRARY.json
+    cat <<EOF > DEMO-EUS2-SAP_LIBRARY.json
+    {
+      "infrastructure": {
+        "environment"                         : "DEMO",
+        "region"                              : "eastus2"
+      },
+      "deployer": {
+        "environment"                         : "DEMO",
+        "region"                              : "eastus2",
+        "vnet"                                : "DEP00"
+      }
+    }
+    EOF
     ```
     <br/>
 
