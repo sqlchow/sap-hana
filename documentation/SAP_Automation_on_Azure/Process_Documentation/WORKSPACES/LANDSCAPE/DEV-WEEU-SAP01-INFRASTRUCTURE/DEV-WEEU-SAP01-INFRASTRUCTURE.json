@@ -25,5 +25,3 @@
         }
     }
 }
-# TODO: We cant use this as an example. this ceates a vnet with a address space so small it can only support a couple of SAP systems
-Also I do not know what is going on in these templates. We cant use these for getting started
