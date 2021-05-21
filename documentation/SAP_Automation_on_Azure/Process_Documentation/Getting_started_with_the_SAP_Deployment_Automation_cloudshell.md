@@ -56,20 +56,20 @@ For a highlevel overview of what will be deployed use the validate.sh script to 
 
 ```bash
 ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh                                              \
-    --parameterfile DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json \
-    --type sap_deployer
+  --parameterfile DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json   \
+  --type sap_deployer
 
 ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh                                              \
-    --parameterfile LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json                    \
-    --type sap_library
+  --parameterfile LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json                      \
+  --type sap_library
 
 ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh                                              \
-    --parameterfile LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json  \
-    --type sap_landscape
+  --parameterfile LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json    \
+  --type sap_landscape
 
 ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh                                              \
-    --parameterfile SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json                               \
-    --type sap_system
+  --parameterfile SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json                             \
+  --type sap_system
 
 ```
 
@@ -151,20 +151,22 @@ A sample output is listed below
 For deploying the supporting infrastructure for the Azure region(Deployer, Library) use the prepare_region.sh script. Navigate to the root folder of your repository containing your parameter files (DEPLOYMENT-WORKSPACES).
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                            \
-        --deployer_parameter_file DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json \    --library_parameter_file LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                  \
+  --deployer_parameter_file DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json   \
+  --library_parameter_file LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json
 ```
 
 or
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                  \
-    --deployer_parameter_file DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json     \
-    --library_parameter_file LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json                         \  --force
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                  \
+  --deployer_parameter_file DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json   \
+  --library_parameter_file LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json                       \
+  --force
 ```
 
 The script will deploy the deployment infrastructure and create the Azure keyvault for storing the Service Principal details. If prompted for the environment details enter "MGMT" and enter the Service Principal details. The script will then deploy the rest of the resources required.
@@ -174,16 +176,16 @@ The --force parameter can be used to clean up the terraform deployment support f
 It is also possible to provide the Service Principal details as part of the script parameters
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                \
-    --deployer_parameter_file DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json   \ 
-    --library_parameter_file LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json                       \
-    --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                                                     \
-    --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                                                           \
-    --spn_secret ************************                                                                   \
-    --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz                                                        \
-    --auto-approve
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                  \
+  --deployer_parameter_file DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json   \ 
+  --library_parameter_file LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json                       \
+  --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                                                     \
+  --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                                                           \
+  --spn_secret ************************                                                                   \
+  --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz                                                        \
+  --auto-approve
 ```
 
 ## **Deploying the SAP workload zone** ##
@@ -191,10 +193,10 @@ It is also possible to provide the Service Principal details as part of the scri
 Before the actual SAP system can be deployed a workload zone needs to be prepared. For deploying the DEV workload zone (vnet & keyvaults) navigate to the folder(LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE) containing the DEV-WEEU-SAP01-INFRASTRUCTURE.json parameter file and use the install_workloadzone script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh \
-        --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json 
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh  \
+  --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json 
 ```
 
 When prompted for the Workload SPN Details choose Y and enter the Service Principal details. When prompted enter "MGMT" for the Deployer environment name.
@@ -202,26 +204,26 @@ When prompted for the Workload SPN Details choose Y and enter the Service Princi
 If the deployer deployment uses a different environment name it is possible to specify that using the --deployer_environment parameter:
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh  \
-        --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json              \
-        --deployer_environment MGMT
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh  \
+  --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json            \
+  --deployer_environment MGMT
 ```
 
 As with the region deployment it is possible to provide the Service Principal details using the command:
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh  \
-        --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json          \
-        --deployer_environment MGMT                                 \
-        --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx         \
-        --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy               \
-        --spn_secret ************************                       \
-        --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz            \
-        --auto-approve
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh  \
+  --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json            \
+  --deployer_environment MGMT                                   \
+  --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx           \
+  --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                 \
+  --spn_secret ************************                         \
+  --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz              \
+  --auto-approve
 ```
 
 ## **Removing the SAP workload zone** ##
@@ -229,11 +231,11 @@ As with the region deployment it is possible to provide the Service Principal de
 For removing the SAP workload zone  navigate to the folder(DEV-WEEU-SAP01-INFRASTRUCTURE) containing the DEV-WEEU-SAP01-INFRASTRUCTURE.json parameter file and use the remover.sh script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/remover.sh       \
-        --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json  \
-        --type sap_landscape
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/remover.sh               \
+  --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json            \
+  --type sap_landscape
 ```
 
 ## **Deploying the SAP system** ##
@@ -241,12 +243,12 @@ For removing the SAP workload zone  navigate to the folder(DEV-WEEU-SAP01-INFRAS
 For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containing the DEV-WEEU-SAP01-X00.json parameter file and use the installer.sh script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh \
-        --parameterfile DEV-WEEU-SAP01-X00.json         \
-        --type sap_system                               \
-        --auto-approve
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh             \
+  --parameterfile DEV-WEEU-SAP01-X00.json                       \
+  --type sap_system                                             \
+  --auto-approve
 ```
 
 ## **Removing the SAP system** ##
@@ -254,9 +256,9 @@ For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containi
 For removing the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containing the DEV-WEEU-SAP01-X00.json parameter file and use the remover.sh script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00
 
-    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/remover.sh   \
-        --parameterfile DEV-WEEU-SAP01-X00.json         \
-        --type sap_system
+${DEPLOYMENT_REPO_PATH}/deploy/scripts/remover.sh               \
+  --parameterfile DEV-WEEU-SAP01-X00.json                       \
+  --type sap_system
 ```
