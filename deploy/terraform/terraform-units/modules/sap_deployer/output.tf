@@ -45,7 +45,7 @@ output "deployer_pip" {
 // Details of deployer(s)
 output "deployers" {
   sensitive = true
-  value = local.deployers_updated
+  value     = local.deployers_updated
 }
 
 output "random_id" {
