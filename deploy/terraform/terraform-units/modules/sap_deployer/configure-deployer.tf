@@ -86,7 +86,7 @@ resource "null_resource" "prepare-deployer" {
       //
       // Install pywinrm
       //
-      "sudo pip3 install \"pywinrm>=0.3.0\"",     
+      "sudo pip3 install \"pywinrm>=0.3.0\"",
       //
       // Install yamllint
       //

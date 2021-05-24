@@ -36,7 +36,7 @@ variable "options" {
 }
 
 variable "authentication" {
-  description = "Details of ssh key pair"
+  description = "Authentication details"
   default = {
     username            = "azureadm",
     path_to_public_key  = "",
