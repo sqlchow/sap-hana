@@ -2,7 +2,7 @@
 data "azurerm_client_config" "deployer" {}
 
 data "azuread_service_principal" "deployer" {
-  count = data.azurerm_client_config.deployer.object_id == "" ? 1 : 0
+  count          = data.azurerm_client_config.deployer.object_id == "" ? 1 : 0
   application_id = data.azurerm_client_config.deployer.client_id
 }
 
@@ -179,7 +179,7 @@ resource "random_password" "deployer" {
     local.enable_deployers
     && local.enable_password
     && !local.pwd_exist
-    && local.input_pwd == null
+    && try(var.authentication.password, "") == ""
   ) ? 1 : 0
 
   length           = 32

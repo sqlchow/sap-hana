@@ -29,12 +29,18 @@ locals {
 
   // Resource group and location
   region = try(var.infrastructure.region, "")
-  prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
+  prefix = length(var.infrastructure.resource_group.name) > 0 ? var.infrastructure.resource_group.name : var.naming.prefix.DEPLOYER
 
   rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
-  rg_exists = length(local.rg_arm_id) > 0
+  rg_exists = length(local.rg_arm_id) > 0 ? true : false
   // If resource ID is specified extract the resourcegroup name from it otherwise read it either from input of create using the naming convention
-  rg_name = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_rg))
+  rg_name = local.rg_exists ? (
+    split("/", local.rg_arm_id)[4]) : (
+    length(var.infrastructure.resource_group.name) > 0 ? (
+      var.infrastructure.resource_group.name) : (
+      format("%s%s", local.prefix, local.resource_suffixes.deployer_rg)
+    )
+  )
 
   // Post fix for all deployed resources
   postfix = random_id.deployer.hex
@@ -45,7 +51,13 @@ locals {
   vnet_mgmt_exists = length(local.vnet_mgmt_arm_id) > 0
 
   // If resource ID is specified extract the vnet name from it otherwise read it either from input of create using the naming convention
-  vnet_mgmt_name = local.vnet_mgmt_exists ? split("/", local.vnet_mgmt_arm_id)[8] : try(local.vnet_mgmt.name, format("%s%s", local.prefix, local.resource_suffixes.vnet))
+  vnet_mgmt_name = local.vnet_mgmt_exists ? (
+    split("/", local.vnet_mgmt_arm_id)[8]) : (
+    length(local.vnet_mgmt.name) > 0 ? (
+      local.vnet_mgmt.name) : (
+      format("%s%s", local.prefix, local.resource_suffixes.vnet)
+    )
+  )
 
   vnet_mgmt_addr = local.vnet_mgmt_exists ? "" : try(local.vnet_mgmt.address_space, "")
 
@@ -65,7 +77,13 @@ locals {
   sub_mgmt_nsg_arm_id = try(local.sub_mgmt_nsg.arm_id, "")
   sub_mgmt_nsg_exists = length(local.sub_mgmt_nsg_arm_id) > 0
   // If resource ID is specified extract the nsg name from it otherwise read it either from input of create using the naming convention
-  sub_mgmt_nsg_name        = local.sub_mgmt_nsg_exists ? split("/", local.sub_mgmt_nsg_arm_id)[8] : try(local.sub_mgmt_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_subnet_nsg))
+  sub_mgmt_nsg_name = local.sub_mgmt_nsg_exists ? (
+    split("/", local.sub_mgmt_nsg_arm_id)[8]) : (
+    length(local.sub_mgmt_nsg.name) > 0 ? (
+      local.sub_mgmt_nsg.name) : (
+      format("%s%s", local.prefix, local.resource_suffixes.deployer_subnet_nsg)
+  ))
+
   sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(local.sub_mgmt_nsg.allowed_ips, ["0.0.0.0/0"])
   sub_mgmt_nsg_deployed    = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0]
 
@@ -88,7 +106,13 @@ locals {
   enable_password = try(local.deployer_input[0].authentication.type, "key") == "password"
   enable_key      = !local.enable_password
 
-  username = local.enable_deployers ? (local.username_exist ? data.azurerm_key_vault_secret.username[0].value : try(var.authentication.username, "azureadm")) : ""
+  username = local.enable_deployers ? (
+    local.username_exist ? (
+      data.azurerm_key_vault_secret.username[0].value) : (
+      try(var.authentication.username, "azureadm")
+    )) : (
+    ""
+  )
 
   // By default use generated password. Provide password under authentication overides it
   password = (local.enable_deployers && local.enable_password) ? (
@@ -124,8 +148,8 @@ locals {
       "disk_type"            = try(deployer.disk_type, "Premium_LRS")
       "use_DHCP"             = try(deployer.use_DHCP, false)
       "os" = {
-        "source_image_id" = try(json_deployer_os.source_image_id, try(var.deployer_os,.source_image_id, ""))
-        "publisher"       = try(deployer.os.source_image_id, "") == "" ? try(var.deployer.os.publisher, "Canonical") : ""
+        "source_image_id" = try(deployer.os.source_image_id, "")
+        "publisher"       = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.publisher, "Canonical") : ""
         "offer"           = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.offer, "UbuntuServer") : ""
         "sku"             = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.sku, "18.04-LTS") : ""
         "version"         = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.version, "latest") : ""

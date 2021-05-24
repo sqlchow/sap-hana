@@ -11,7 +11,7 @@
                 "subnet_mgmt": {
                     "name"              : "NP-WEEU-DEP00_deployment-subnet",
                     "arm_id"            : "",
-                        "prefix"        : "10.0.0.16/28",
+                    "prefix"            : "10.0.0.16/28",
                     "nsg": {
                         "name"          : "NP-WEEU-DEP00_deployment-nsg",
                         "arm_id"        : "",
@@ -19,6 +19,11 @@
                             "0.0.0.0/0"
                         ]
                     }
+                },
+                "subnet_fw": {
+                    "name"              : "",
+                    "arm_id"            : "",
+                    "prefix"            : "10.0.0.16/24"
                 }
             }
         }

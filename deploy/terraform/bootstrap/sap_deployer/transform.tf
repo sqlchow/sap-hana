@@ -12,10 +12,13 @@ locals {
 
   json_sub_mgmt_name            = try(var.infrastructure.vnets.management.subnet_mgmt.name, "")
   json_sub_mgmt_arm_id          = try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, "")
-  json_deployer_subnet_prefix   = try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")
+  json_sub_mgmt_prefix          = try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")
   json_sub_mgmt_nsg_name        = try(var.infrastructure.vnets.management.nsg_mgmt.name, "")
   json_sub_mgmt_nsg_arm_id      = try(var.infrastructure.vnets.management.nsg_mgmt.arm_id, "")
   json_sub_mgmt_nsg_allowed_ips = try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips, [])
+
+  json_sub_fw_arm_id = try(var.infrastructure.vnets.management.subnet_fw.arm_id, "")
+  json_sub_fw_prefix = try(var.infrastructure.vnets.management.subnet_fw.prefix, "")
 
   json_deployer_size                = try(var.deployers[0].size, "")
   json_deployer_disk_type           = try(var.deployers[0].disk_type, "")
@@ -29,6 +32,10 @@ locals {
 
   json_deployer_authentication = try(var.authentication, {})
 
+  json_deployer_firewall_deployment             = try(var.firewall_deployment, null)
+  json_deployer_firewall_rule_subnets           = try(var.firewall_rule_subnets, [])
+  json_deployer_firewall_allowed_ipaddresses    = try(var.firewall_allowed_ipaddresses, [])
+  json_deployer_assign_subscription_permissions = try(var.assign_subscription_permissions, null)
 }
 
 locals {
@@ -48,13 +55,17 @@ locals {
 
         subnet_mgmt = {
           name   = local.json_sub_mgmt_name != "" ? local.json_sub_mgmt_name : var.deployer_sub_mgmt_name
-          prefix = local.json_deployer_subnet_prefix != "" ? local.json_deployer_subnet_prefix : var.deployer_subnet_prefix
           arm_id = local.json_sub_mgmt_arm_id != "" ? local.json_sub_mgmt_arm_id : var.deployer_sub_mgmt_arm_id
+          prefix = local.json_sub_mgmt_prefix != "" ? local.json_sub_mgmt_prefix : var.deployer_sub_mgmt_prefix
           nsg = {
             name        = local.json_sub_mgmt_nsg_name != "" ? local.json_sub_mgmt_nsg_name : var.deployer_sub_mgmt_nsg_name
             arm_id      = local.json_sub_mgmt_nsg_arm_id != "" ? local.json_sub_mgmt_nsg_arm_id : var.deployer_sub_mgmt_nsg_arm_id
             allowed_ips = local.json_sub_mgmt_nsg_allowed_ips != [] ? local.json_sub_mgmt_nsg_allowed_ips : var.deployer_sub_mgmt_nsg_allowed_ips
           }
+        }
+        subnet_fw = {
+          arm_id = local.json_sub_fw_arm_id != "" ? local.json_sub_fw_arm_id : var.deployer_sub_fw_arm_id
+          prefix = local.json_sub_fw_prefix != "" ? local.json_sub_fw_prefix : var.deployer_sub_fw_prefix
         }
       }
     }
@@ -62,7 +73,7 @@ locals {
   deployers = [
     {
       size      = local.json_deployer_size != "" ? local.json_deployer_size : var.deployer_size
-      disk_type = local.json_deployer_disk_type != "" ? json_deployer_disk_type : var.deployer_disk_type
+      disk_type = local.json_deployer_disk_type != "" ? local.json_deployer_disk_type : var.deployer_disk_type
       use_DHCP  = local.json_deployer_use_DHCP != null ? local.json_deployer_use_DHCP : var.deployer_use_DHCP
       authentication = {
         type = local.json_deployer_authentication_type != "" ? local.json_deployer_authentication_type : var.deployer_authentication_type
@@ -78,10 +89,10 @@ locals {
     }
   ]
   authentication = {
-    username            = local.json_deployer_authentication_username != "" ? local.json_deployer_authentication_username : var.deployer_authentication_username
-    password            = local.json_deployer_authentication_password != "" ? local.json_deployer_authentication_password : var.deployer_authentication_password
-    path_to_public_key  = local.json_deployer_sshkey_path_to_public_key != "" ? local.json_deployer_sshkey_path_to_public_key : var.deployer_sshkey_path_to_public_key
-    path_to_private_key = local.json_deployer_sshkey_path_to_private_key != "" ? local.json_deployer_sshkey_path_to_private_key : var.deployer_sshkey_path_to_private_key
+    username            = local.json_deployer_authentication.username != "" ? local.json_deployer_authentication.username : var.deployer_authentication_username
+    password            = try(local.json_deployer_authentication.password, "") != "" ? local.json_deployer_authentication.password : var.deployer_authentication_password
+    path_to_public_key  = local.json_deployer_authentication.path_to_public_key != "" ? local.json_deployer_authentication.path_to_public_key : var.deployer_authentication_path_to_public_key
+    path_to_private_key = local.json_deployer_authentication.path_to_private_key != "" ? local.json_deployer_authentication.path_to_private_key : var.deployer_authentication_path_to_private_key
 
   }
   key_vault = {
@@ -97,4 +108,12 @@ locals {
   options = {
     enable_deployer_public_ip = local.json_enable_deployer_public_ip != "" ? local.json_enable_deployer_public_ip : var.deployer_options_enable_deployer_public_ip
   }
+
+  firewall_deployment = local.json_deployer_firewall_deployment != null ? local.json_deployer_firewall_deployment : var.deployer_firewall_deployment
+
+  firewall_rule_subnets = local.json_deployer_firewall_rule_subnets != [] ? local.json_deployer_firewall_rule_subnets : var.deployer_firewall_rule_subnets
+
+  firewall_allowed_ipaddresses = local.json_deployer_firewall_allowed_ipaddresses != [] ? local.json_deployer_firewall_allowed_ipaddresses : var.deployer_firewall_allowed_ipaddresses
+
+  assign_subscription_permissions = local.json_deployer_assign_subscription_permissions != null ? local.json_deployer_assign_subscription_permissions : var.deployer_assign_subscription_permissions
 }

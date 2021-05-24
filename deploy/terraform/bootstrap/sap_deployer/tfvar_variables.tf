@@ -54,19 +54,27 @@ variable "deployer_sub_mgmt_arm_id" {
   default = ""
 }
 
-variable "deployer_subnet_prefix" {
+variable "deployer_sub_mgmt_prefix" {
   default = ""
 }
 
-variable "sub_mgmt_nsg_name" {
+variable "deployer_sub_fw_arm_id" {
   default = ""
 }
 
-variable "sub_mgmt_nsg_arm_id" {
+variable "deployer_sub_fw_prefix" {
   default = ""
 }
 
-variable "sub_mgmt_nsg_allowed_ips" {
+variable "deployer_sub_mgmt_nsg_name" {
+  default = ""
+}
+
+variable "deployer_sub_mgmt_nsg_arm_id" {
+  default = ""
+}
+
+variable "deployer_sub_mgmt_nsg_allowed_ips" {
   default = []
 }
 
@@ -103,7 +111,7 @@ variable "deployer_os" {
 }
 
 variable "deployer_private_ip_address" {
-  default = []
+  default = ""
 }
 
 /*
@@ -119,12 +127,15 @@ variable "deployer_authentication_username" {
 }
 
 variable "deployer_authentication_password" {
+  default = ""
 }
 
 variable "deployer_authentication_path_to_public_key" {
+  default = ""
 }
 
 variable "deployer_authentication_path_to_private_key" {
+  default = ""
 }
 
 /*
@@ -133,28 +144,36 @@ This block describes the variables for the key_vault section block in the json f
 
 
 variable "deployer_key_vault_kv_user_id" {
+  default = ""
 }
 
 variable "deployer_key_vault_kv_prvt_id" {
+  default = ""
 }
 
 variable "deployer_key_vault_kv_sshkey_prvt" {
+  default = ""
 }
 
 variable "deployer_key_vault_kv_sshkey_pub" {
+  default = ""
 }
 
 variable "deployer_key_vault_kv_username" {
+  default = ""
 }
 
 variable "deployer_key_vault_kv_pwd" {
+  default = ""
 }
+
 
 /*
 This block describes the variables for the options section block in the json file
 */
 
 variable "deployer_options_enable_deployer_public_ip" {
+  default = false
 }
 
 
@@ -163,9 +182,11 @@ variable "deployer_firewall_deployment" {
 }
 
 variable "deployer_firewall_rule_subnets" {
+  default = []
 }
 
-variable "firewall_allowed_ipaddresses" {
+variable "deployer_firewall_allowed_ipaddresses" {
+  default = []
 }
 
 variable "deployer_assign_subscription_permissions" {
