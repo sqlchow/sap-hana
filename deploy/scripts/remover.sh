@@ -250,7 +250,7 @@ fi
 
 export TF_DATA_DIR="${parameterfile_dirname}"/.terraform
 
-terraform_module_directory="{DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 
 if [ ! -d "${terraform_module_directory}" ]; then
     printf -v val %-40.40s "$deployment_system"
