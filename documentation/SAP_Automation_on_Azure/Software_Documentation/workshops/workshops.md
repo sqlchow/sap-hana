@@ -12,10 +12,12 @@
   This workshop will iterate through the setps to first, manually deploy the infrastructure, then configure the deployed VM's and install the SAP  product.
   <br /><br />
 
-  1.  [Infrastructure Deployment - Manual](manual/overview.md) This workshop goes through the manual, step-by-step, process.
+  1.  [Infrastructure Deployment - Manual](manual-infrastructure-deployment/overview.md)
+      This workshop goes through the manual, step-by-step, process.
       <br/><br/>
 
-  1.  [Manual](manual/overview.md) This workshop goes through the manual, step-by-step, process.
+  2.  [Post Deployment Configuration and SAP Install](manual-post-deployment-configuration/overview.md)
+      This workshop goes through the manual, step-by-step, process.
       <br/><br/>
 
 ### 2. Accelerated Deployment Process
