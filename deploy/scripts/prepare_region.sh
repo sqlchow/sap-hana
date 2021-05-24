@@ -274,7 +274,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#########################################################################################"
     exit 65                                                                                           #data format error
 else
-    if [ "{$arm_config_stored}" != 0 ]
+    if [ "${arm_config_stored}" != 0 ]
     then
         echo "Storing the configuration"
         save_config_var "ARM_SUBSCRIPTION_ID" "${deployer_config_information}"
