@@ -100,6 +100,7 @@ resource "azurerm_route" "admin" {
 }
 
 
+
 // Creates witness storage account
 resource "azurerm_storage_account" "witness_storage" {
   provider                  = azurerm.main
