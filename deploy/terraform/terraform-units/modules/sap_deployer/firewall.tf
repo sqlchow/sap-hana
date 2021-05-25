@@ -74,8 +74,10 @@ resource "random_integer" "priority" {
 resource "azurerm_firewall_network_rule_collection" "firewall-azure" {
   count               = var.firewall_deployment ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_app)
-  azure_firewall_name = local.firewall_name
-  resource_group_name = local.firewall_rgname
+  # azure_firewall_name = local.firewall_name
+  # resource_group_name = local.firewall_rgname
+  azure_firewall_name = azurerm_firewall.firewall[0].name
+  resource_group_name = azurerm_resource_group.deployer[0].name
   priority            = random_integer.priority.result
   action              = "Allow"
   rule {
