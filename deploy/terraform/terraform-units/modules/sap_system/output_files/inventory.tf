@@ -181,6 +181,7 @@ resource "local_file" "ansible_inventory_new_yml" {
     scsconnectiontype = var.application.auth_type
     ersconnectiontype = var.application.auth_type
     dbconnectiontype  = length(local.hdb_vms) > 0 ? local.hdb_vms[0].auth_type : local.anydb_vms[0].auth_type
+    ansible_user      = local.ansible_user
     }
   )
   filename             = format("%s/ansible_config_files/%s_hosts.yaml", path.cwd, var.hdb_sid)
@@ -214,9 +215,12 @@ resource "azurerm_storage_blob" "hosts_yaml" {
 }
 
 resource "local_file" "ansible_cfg" {
-  content = templatefile(format("%s/ansible.cfg.tmpl", path.module), {})
+  content = templatefile(format("%s/ansible.cfg.tmpl", path.module), {
+    inventory        = local_file.ansible_inventory_new_yml.filename
+    private_key_file = "sshkey",
+    }
+  )
   filename             = format("%s/ansible_config_files/ansible.cfg", path.cwd)
   file_permission      = "0660"
   directory_permission = "0770"
 }
-

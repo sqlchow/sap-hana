@@ -117,12 +117,19 @@ variable "scs_ha" {
   default = false
 }
 
+variable "ansible_user" {
+  description = "The ansible remote user account to use"
+  default = "azureadm"
+}
+
 
 locals {
 
   tfstate_resource_id          = try(var.tfstate_resource_id, "")
   tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
   ansible_container_name       = try(var.naming.resource_suffixes.ansible, "ansible")
+  # Need to figure out how to leverage common_infrasture's local.sid_auth_username
+  ansible_user                 = try(var.ansible_user, "azureadm")
 
   kv_name = split("/", var.sid_kv_user_id)[8]
 
