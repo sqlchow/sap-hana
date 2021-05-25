@@ -15,6 +15,8 @@ variable "assign_subscription_permissions" {
   description = "Assign permissions on the subscription"
 }
 
+variable "bootstrap" {}
+
 // Set defaults
 locals {
 
@@ -67,7 +69,13 @@ locals {
   sub_mgmt_exists = length(local.sub_mgmt_arm_id) > 0
 
   // If resource ID is specified extract the subnet name from it otherwise read it either from input of create using the naming convention
-  sub_mgmt_name   = local.sub_mgmt_exists ? split("/", local.sub_mgmt_arm_id)[10] : try(local.sub_mgmt.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_subnet))
+  sub_mgmt_name = local.sub_mgmt_exists ? (
+    split("/", local.sub_mgmt_arm_id)[10]) : (
+    length(local.sub_mgmt.name) > 0 ? (
+      local.sub_mgmt.name) : (
+      format("%s%s", local.prefix, local.resource_suffixes.deployer_subnet)
+  ))
+
   sub_mgmt_prefix = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.prefix, "")
 
   sub_mgmt_deployed = local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0] : azurerm_subnet.subnet_mgmt[0]
@@ -84,8 +92,14 @@ locals {
       format("%s%s", local.prefix, local.resource_suffixes.deployer_subnet_nsg)
   ))
 
-  sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(local.sub_mgmt_nsg.allowed_ips, ["0.0.0.0/0"])
-  sub_mgmt_nsg_deployed    = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0]
+  sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? (
+    []) : (
+    length(local.sub_mgmt_nsg.allowed_ips) > 0 ? (
+      local.sub_mgmt_nsg.allowed_ips) : (
+      ["0.0.0.0/0"]
+    )
+  )
+  sub_mgmt_nsg_deployed = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0]
 
   // Firewall subnet
   sub_fw_snet        = try(local.vnet_mgmt.subnet_fw, {})
@@ -150,8 +164,8 @@ locals {
       "os" = {
         "source_image_id" = try(deployer.os.source_image_id, "")
         "publisher"       = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.publisher, "Canonical") : ""
-        "offer"           = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.offer, "UbuntuServer") : ""
-        "sku"             = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.sku, "18.04-LTS") : ""
+        "offer"           = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.offer, "0001-com-ubuntu-server-focal") : ""
+        "sku"             = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.sku, "20_04-lts") : ""
         "version"         = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.version, "latest") : ""
       },
       "authentication" = {
@@ -199,9 +213,7 @@ locals {
   // public ip address of the first deployer
   deployer_public_ip_address = local.enable_deployers && local.enable_deployer_public_ip ? local.deployer_public_ip_address_list[0] : ""
 
-  // Comment out code with users.object_id for the time being.
-  // deployer_users_id_list = distinct(compact(concat(local.deployer_users_id)))
-
+  
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")

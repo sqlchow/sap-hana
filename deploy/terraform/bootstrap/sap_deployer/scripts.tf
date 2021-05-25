@@ -11,7 +11,7 @@ resource "local_file" "scp" {
     ppk_name        = module.sap_deployer.ppk_secret_name,
     pwd_name        = module.sap_deployer.pwd_secret_name,
     deployers       = module.sap_deployer.deployers,
-    deployer-ips    = local.enable_deployer_public_ip ? module.sap_deployer.deployer_pip[*].ip_address : module.sap_deployer.deployer_private_ip_address,
+    deployer-ips    = local.options.enable_deployer_public_ip ? module.sap_deployer.deployer_pip[*].ip_address : module.sap_deployer.deployer_private_ip_address,
     deployer-rgs    = module.sap_deployer.deployer_rg_name
   })
   filename             = format("%s/post_deployment.sh", path.cwd)

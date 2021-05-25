@@ -167,10 +167,21 @@ then
     fi
 fi
 
+ext=$(echo ${parameterfile} | cut -d. -f2)
 
-# Read environment
-environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+else
+    if [ "${deployment_system}" == sap_deployer ]
+    then
+        load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_environment"
+        environment=$(echo ${deployer_environment} | xargs)
+        load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_location"
+        region=$(echo ${deployer_location} | xargs)
+    fi    
+fi
 
 if [ ! -n "${environment}" ]
 then
