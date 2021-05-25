@@ -182,5 +182,6 @@ module "output_files" {
   use_local_credentials     = module.common_infrastructure.use_local_credentials
   scs_ha                    = module.app_tier.scs_ha
   db_ha                     = upper(try(var.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_ha : module.anydb_node.db_ha
+  ansible_user              = module.common_infrastructure.sid_username
 
 }

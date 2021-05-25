@@ -181,7 +181,7 @@ resource "local_file" "ansible_inventory_new_yml" {
     scsconnectiontype = var.application.auth_type
     ersconnectiontype = var.application.auth_type
     dbconnectiontype  = length(local.hdb_vms) > 0 ? local.hdb_vms[0].auth_type : local.anydb_vms[0].auth_type
-    ansible_user      = local.ansible_user
+    ansible_user      = var.ansible_user
     }
   )
   filename             = format("%s/ansible_config_files/%s_hosts.yaml", path.cwd, var.hdb_sid)
