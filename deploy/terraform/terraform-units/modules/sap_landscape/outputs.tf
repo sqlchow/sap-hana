@@ -79,10 +79,6 @@ output "dns_info_vms" {
   value = local.iscsi_count > 0 ? zipmap(local.full_iscsiserver_names, azurerm_network_interface.iscsi[*].private_ip_address) : null
 }
 
-output "route_table_id" {
-  value = local.vnet_sap_exists ? "" : azurerm_route_table.rt[0].id
-}
-
 //Witness Info
 output "witness_storage_account" {
   value = length(var.witness_storage_account.arm_id) > 0 ? (
