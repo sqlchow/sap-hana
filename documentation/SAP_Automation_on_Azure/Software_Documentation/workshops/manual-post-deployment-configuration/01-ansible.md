@@ -56,185 +56,137 @@
 <br/>
 
 
-- from the deployment directory ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-EUS2-SAP00-X00
-- cd ansible_config_files
-- edit sap-parameters.yaml
-  - bom_base_name:              S419009SPS03_v1
-  - sapbits_location_base_path: https://sapcontrollib.blob.core.windows.net/sapbits
-- execute time ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/test_menu.sh
-  - 
 
 
 
 
 
-1) Base OS Config            8) APP Install
-2) SAP specific OS Config    9) WebDisp Install
-3) BOM Processing           10) Pacemaker Setup
-4) HANA DB Install          11) Pacemaker SCS Setup
-5) SCS Install              12) Pacemaker HANA Setup
-6) DB Load                  13) Install SAP (1-7)
-7) PAS Install              14) Quit
+<br/><br/>
 
 
-
-sed -i 's/\(^bom_base_name:\s\+$\)/\1S41909SPS03_v1/' sap-parameters.yaml.test
-sed -i 's/\(^sapbits_location_base_path:\s\+$\)/\1https:\/\/sapcontrollib.blob.core.windows.net\/sapbits/' sap-parameters.yaml.test
-
-bom_base_name:                 S41909SPS03_v1
-sapbits_location_base_path:    https://sapcontrollib.blob.core.windows.net/sapbits
-
-
-
-
-
-1. Cloud Shell
-   1. Log on to the [Azure Portal](https://portal.azure.com).
-   2. Open the cloud shell.
-      <br/>![Cloud Shell](assets/CloudShell1.png)
-      <br/><br/>
-
-2. Ensure that you are authenticated with the correct subscription.
+1. From the SAP Deployment Workspace directory, change to the `ansible_config_files` directory.
     ```bash
-    az login
-    az account list --output=table | grep -i true
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-EUS2-SAP00-X00/ansible_config_files
+    ```
+    <br/><br/>
+
+
+2. Update the `sap_parameters.yaml` parameter file.
+    <br/>
+    
+    Values to be updated:
+
+    | Parameter                  | Value                                  |
+    | -------------------------- | -------------------------------------- |
+    | bom_base_name              | S419009SPS03_v1                        |
+    | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits |
+    | password_master            | MasterPass00                           |
+    | sap_fqdn                   | sap.contoso.com                        |
+    
+    <br/>
+
+    ```bash
+    vi sap_parameters.yaml
     ```
 
-    If not, then find and set the Default to the correct subscription.
-
     ```bash
-    az account list --output=table
-    az account set  --subscription XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    ---
+
+    bom_base_name:                 S41909SPS03_v1
+    sapbits_location_base_path:    https://<storage_account_FQDN>/sapbits
+    password_master:               MasterPass00
+    sap_fqdn:                      sap.contoso.com
+
+
+    # TERRAFORM CREATED
+    sap_sid:                       X00
+    kv_uri:                        DEMOEUS2SAP00user298
+    secret_prefix:                 DEMO-EUS2-SAP00
+    scs_high_availability:         false
+    db_high_availability:          false
+
+    disks:
+      - { host: 'x00dhdb00l0c75', LUN: 0,  type: 'sap'    }
+      - { host: 'x00dhdb00l0c75', LUN: 10, type: 'data'   }
+      - { host: 'x00dhdb00l0c75', LUN: 11, type: 'data'   }
+      - { host: 'x00dhdb00l0c75', LUN: 12, type: 'data'   }
+      - { host: 'x00dhdb00l0c75', LUN: 13, type: 'data'   }
+      - { host: 'x00dhdb00l0c75', LUN: 20, type: 'log'    }
+      - { host: 'x00dhdb00l0c75', LUN: 21, type: 'log'    }
+      - { host: 'x00dhdb00l0c75', LUN: 22, type: 'log'    }
+      - { host: 'x00dhdb00l0c75', LUN: 2,  type: 'backup' }
+      - { host: 'x00app00lc75',   LUN: 0,  type: 'sap'    }
+      - { host: 'x00app01lc75',   LUN: 0,  type: 'sap'    }
+      - { host: 'x00app02lc75',   LUN: 0,  type: 'sap'    }
+      - { host: 'x00scs00lc75',   LUN: 0,  type: 'sap'    }
+      - { host: 'x00web00lc75',   LUN: 0,  type: 'sap'    }
+
+    ...
     ```
     <br/>
 
-3. Terraform
-     ```bash
-     mkdir -p ~/bin; cd $_
-     wget  https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
-     unzip terraform_0.14.7_linux_amd64.zip
-     ```
 
-4. Repository
-   1. Clone the Repository and Checkout the branch.
-        ```bash
-        mkdir -p ~/Azure_SAP_Automated_Deployment; cd $_
-        git clone https://github.com/Azure/sap-hana.git
-        cd  ~/Azure_SAP_Automated_Deployment/sap-hana
-        ```
+3. Execute the Ansible Playbook. <br/>There are three ways to do this.
 
-    1. (*Optional*) Checkout Branch
+
+   1. Via the Test Menu.
         ```bash
-        git checkout <branch_name>
+        time ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/test_menu.sh
         ```
-        Do nothing if using **master** branch.<br/>
-        Otherwise, use the appropriate
-        - Tag         (*ex. v2.1.0-1*)
-        - Branch Name (*ex. feature/remote-tfstate2*)
-        - Commit Hash (*ex. 6d7539d02be007da769e97b6af6b3e511765d7f7*)
+        Note: Use  of the `time` command is optional. It is simply there to output the length of time of the execution.<br/>
+              Ex: `real    1m7.984s`
+        <br/><br/>
+        Select the Menu option sequentially, in order, 1 - 7 or 13 for all.<br/>
+        Options 8 - 12 are not yet functional. 
+        ```bash
+        1) Base OS Config            8) APP Install
+        2) SAP specific OS Config    9) WebDisp Install
+        3) BOM Processing           10) Pacemaker Setup
+        4) HANA DB Install          11) Pacemaker SCS Setup
+        5) SCS Install              12) Pacemaker HANA Setup
+        6) DB Load                  13) Install SAP (1-7)
+        7) PAS Install              14) Quit
+        Please select playbook: 
+        ```
         <br/><br/>
 
-    2. (*Optional*) Verify Branch is at expected Revision
+
+    2. Execute the Ansible playbooks individulally via `ansible-playbook` command.
+        <br/>
         ```bash
-        git rev-parse HEAD
+        ansible-playbook                                                                                   \
+          --inventory   X00_hosts.yaml                                                                     \
+          --user        azureadm                                                                           \
+          --private-key sshkey                                                                             \
+          --extra-vars="@sap-parameters.yaml"                                                              \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/<playbook>
         ```
-        <br/>
+        Use the following playbooks in the command, as shown in the order below.
+        - `playbook_01_os_base_config.yaml`
+        - `playbook_02_os_sap_specific_config.yaml`
+        - `playbook_03_bom_processing.yaml`
+        - `playbook_04_00_00_hana_db_install.yaml`
+        - `playbook_05_00_00_sap_scs_install.yaml`
+        - `playbook_05_01_sap_dbload.yaml`
+        - `playbook_05_02_sap_pas_install.yaml`
+        <br/><br/>
 
-5. Create Working Directory and prepare JSON.
-    <br/>*`Observe Naming Convention`*<br/>
-    ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER/DEMO-EUS2-DEP00-INFRASTRUCTURE; cd $_
 
-    cat <<EOF > DEMO-EUS2-DEP00-INFRASTRUCTURE.json
-    {
-      "infrastructure": {
-        "environment"                         : "DEMO",
-        "region"                              : "eastus2",
-        "vnets": {
-          "management": {
-            "name"                            : "DEP00",
-            "address_space"                   : "10.0.0.0/25",
-            "subnet_mgmt": {
-              "prefix"                        : "10.0.0.64/28"
-            },
-            "subnet_fw": {
-              "prefix"                        : "10.0.0.0/26"
-            }
-          }
-        }
-      },
-      "options": {
-        "enable_deployer_public_ip"           : true
-      },
-      "firewall_deployment"                   : true
-    }
-    EOF
-    ```
-    <br/>
-
-7.  Terraform
-    1. Initialization
-       ```bash
-       terraform init  ../../../sap-hana/deploy/terraform/bootstrap/sap_deployer/
-       ```
-
-    2. Plan
-       <br/>*`Observe Naming Convention`*<br/>
-       ```bash
-       terraform plan  --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                    \
-                       ../../../sap-hana/deploy/terraform/bootstrap/sap_deployer/
-       ```
-
-    3. Apply
-       <br/>*`Observe Naming Convention`*<br/>
-       *This step deploys the resources*
-       ```bash
-       terraform apply --auto-approve                                                    \
-                       --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                    \
-                       ../../../sap-hana/deploy/terraform/bootstrap/sap_deployer/
-       ```
-        <br/>
-
-8.  Post Processing
-    1. In Output Section make note of the following 
-       1. deployer_public_ip_address
-       2. deployer_kv_user_name
-       3. deployer_kv_prvt_name
-       4. deployer_public_key_secret_name
-       5. deployer_private_key_secret_name
-      
-          <br/>![Outputs](assets/Outputs-Deployer.png)
-          <br/><br/>
-
-    2. Post Processing.
-       ```bash
-       ./post_deployment.sh
-       ```
-       <br/>
-
-    3. Extract SSH Keys
-       1. Private Key
-          <br/>*`Observe Naming Convention`*<br/>
-          ```
-          az keyvault secret show               \
-            --vault-name DEMOEUS2DEP00userE27   \
-            --name DEMO-EUS2-DEP00-sshkey     | \
-            jq -r .value > sshkey
-          ```
-          <br/>
-
-       2. Public Key
-          <br/>*`Observe Naming Convention`*<br/>
-          ```
-          az keyvault secret show               \
-            --vault-name DEMOEUS2DEP00userF6A   \
-            --name DEMO-EUS2-DEP00-sshkey-pub | \
-            jq -r .value > sshkey.pub
-          ```
-          <br/>
-
-    4. Download the Private/Public Key Pair for use in your SSH Terminal Application
-       <br/>![Download File](assets/CloudShell2.png)
+    3. Execute the Ansible playbooks sequentially via a single `ansible-playbook` command.
+        ```bash
+        ansible-playbook                                                                                   \
+          --inventory   X00_hosts.yaml                                                                     \
+          --user        azureadm                                                                           \
+          --private-key sshkey                                                                             \
+          --extra-vars="@sap-parameters.yaml"                                                              \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_01_os_base_config.yaml         \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_02_os_sap_specific_config.yaml \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_03_bom_processing.yaml         \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_04_00_00_hana_db_install.yaml  \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_05_00_00_sap_scs_install.yaml  \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_05_01_sap_dbload.yaml          \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_05_02_sap_pas_install.yaml
+        ```
 
        <br/><br/><br/><br/>
 
