@@ -78,6 +78,26 @@ data "azurerm_storage_account" "storage_bootdiag" {
   resource_group_name = split("/", var.diagnostics_storage_account.arm_id)[4]
 }
 
+//Route table
+resource "azurerm_route_table" "rt" {
+  provider                      = azurerm.main
+  count                         = local.vnet_sap_exists ? 0 : 1
+  name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.routetable)
+  resource_group_name           = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
+  location                      = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].location : azurerm_virtual_network.vnet_sap[0].location
+  disable_bgp_route_propagation = false
+}
+
+resource "azurerm_route" "admin" {
+  provider               = azurerm.main
+  count                  = length(local.firewall_ip) > 0 ? 1 : 0
+  name                   = format("%s%s%s", local.prefix, var.naming.separator, "fw-route")
+  resource_group_name    = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
+  route_table_name       = azurerm_route_table.rt[0].name
+  address_prefix         = "0.0.0.0/0"
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = local.firewall_ip
+}
 
 
 
