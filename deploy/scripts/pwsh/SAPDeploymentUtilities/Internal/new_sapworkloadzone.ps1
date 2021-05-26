@@ -104,7 +104,6 @@ Licensed under the MIT license.
         $iniContent.Remove($combined)
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
         $iniContent = Get-IniContent -Path $fileINIPath
-    
     }
     
     $changed = $false
@@ -137,7 +136,6 @@ Licensed under the MIT license.
         Connect-AzAccount 
     }
 
-
     Write-Host $State_subscription
     $current_Subscription = (Get-AzContext).Subscription.Id
 
@@ -165,60 +163,50 @@ Licensed under the MIT license.
      
         }
         else {
-            if ($StorageAccountName.Length > 0) {
-
+            if ($Deployerenvironment.Length -gt 0) {
+                $deployercombined = $Deployerenvironment + $region
             }
             else {
-                
-
-                if ($null -ne $Deployerenvironment -and "" -ne $Deployerenvironment) {
-                    $deployercombined = $Deployerenvironment + $region
-                }
-                else {
-                    $Deployerenvironment = Read-Host -Prompt "Please specify the environment name for the deployer"
-                    $deployercombined = $Deployerenvironment + $region
+                $Deployerenvironment = Read-Host -Prompt "Please specify the environment name for the deployer"
+                $deployercombined = $Deployerenvironment + $region
             
-                }
+            }
 
-                if ($null -ne $iniContent[$deployercombined]) {
-                    Write-Host "Reading the state information from the deployer"
-                    $rgName = $iniContent[$deployercombined]["REMOTE_STATE_RG"]
-                    $saName = $iniContent[$deployercombined]["REMOTE_STATE_SA"]
-                    $tfstate_resource_id = $iniContent[$deployercombined]["tfstate_resource_id"] 
-                    $deployer_tfstate_key = $iniContent[$deployercombined]["Deployer"]
-                    $vault = $iniContent[$deployercombined]["Vault"]
-                    $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key; "Deployer" = $deployer_tfstate_key; "Vault" = $Vault; }
+            if ($null -ne $iniContent[$deployercombined]) {
+                Write-Host "Reading the state information from the deployer"
+                $rgName = $iniContent[$deployercombined]["REMOTE_STATE_RG"]
+                $saName = $iniContent[$deployercombined]["REMOTE_STATE_SA"]
+                $tfstate_resource_id = $iniContent[$deployercombined]["tfstate_resource_id"] 
+                $deployer_tfstate_key = $iniContent[$deployercombined]["Deployer"]
+                $vault = $iniContent[$deployercombined]["Vault"]
+                $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key; "Deployer" = $deployer_tfstate_key; "Vault" = $Vault; }
+                $iniContent += @{$combined = $Category1 }
+                Out-IniFile -InputObject $iniContent -Path $fileINIPath
+                $iniContent = Get-IniContent -Path $fileINIPath
+         
+            }
+            else {
+                if ($StorageAccountName.Length -eq 0) {
+                    Write-Error "The Terraform state information is not available"
+                    $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
+                    $rID = Get-AzResource -Name $saName 
+                    $rgName = $rID.ResourceGroupName
+    
+                    $tfstate_resource_id = $rID.ResourceId
+    
+                    $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key }
                     $iniContent += @{$combined = $Category1 }
                     Out-IniFile -InputObject $iniContent -Path $fileINIPath
                     $iniContent = Get-IniContent -Path $fileINIPath
-         
                 }
-                else {
-                    if ($null -eq $StorageAccountName -or "" -eq $StorageAccountName) {
-
-                        Write-Error "The Terraform state information is not available"
-
-                        $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
-                        $rID = Get-AzResource -Name $saName 
-                        $rgName = $rID.ResourceGroupName
-    
-                        $tfstate_resource_id = $rID.ResourceId
-    
-                        $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key }
-                        $iniContent += @{$combined = $Category1 }
-                        Out-IniFile -InputObject $iniContent -Path $fileINIPath
-                        $iniContent = Get-IniContent -Path $fileINIPath
-                    }
                 
-                }
             }
-
 
         }
     }
     else {
         $deployer_tfstate_key = $iniContent[$combined]["Deployer"]
-        if ($null -eq $deployer_tfstate_key -or "" -eq $deployer_tfstate_key) {
+        if ($Deployerstatefile.Length -gt 0) {
             $deployer_tfstate_key = $Deployerstatefile
             $iniContent[$combined]["Deployer"] = $Deployerstatefile
         }
@@ -233,11 +221,13 @@ Licensed under the MIT license.
     # Subscription
     $sub = $iniContent[$combined]["subscription"]
 
-    if ($sub -ne $Subscription) {
-        $sub = $Subscription
-        $iniContent[$combined]["subscription"] = $Subscription
-        $changed = $true
-        
+    if ($Subscription.Length -gt 0) {
+        if ($sub -ne $Subscription) {
+            $sub = $Subscription
+            $iniContent[$combined]["subscription"] = $Subscription
+            $changed = $true
+        }
+       
     }
 
     if ($null -eq $sub -or "" -eq $sub) {
@@ -248,15 +238,17 @@ Licensed under the MIT license.
 
     $vaultname = $iniContent[$combined]["Vault"] 
 
-    if ($Vault -ne $vaultname) {
-        $vaultname = $Vault
-        $iniContent[$combined]["Vault"] = $vaultname
-        $changed = $true
+    if ($Vault.Length -gt 0) {
+        if ($vaultname -ne $Vault) {
+            $vaultname = $Vault
+            $iniContent[$combined]["Vault"] = $vaultname
+            $changed = $true
+        }
     }
 
     $state_subscription_id = $iniContent[$combined]["STATE_SUBSCRIPTION"]
 
-    if ($State_subscription -ne $state_subscription_id) {
+    if ($State_subscription.Length -gt 0) {
         $state_subscription_id = $State_subscription
         $iniContent[$combined]["STATE_SUBSCRIPTION"] = $state_subscription_id 
         $changed = $true
@@ -266,18 +258,14 @@ Licensed under the MIT license.
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
 
-
     $bAsk = $true
+    $vault = $iniContent[$combined]["Vault"]
+
     if ($null -ne $vault -and "" -ne $vault) {
         if ($null -eq (Get-AzKeyVaultSecret -VaultName $vaultname -Name ($Environment + "-client-id") )) {
-            $bAsk = $true
             if (($null -ne $SPN_id) -and ($null -ne $SPN_password) -and ($null -ne $Tenant_id)) {
                 Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vaultname -SPN_id $SPN_id -SPN_password $SPN_password -Tenant_id $Tenant_id -Workload
                 $iniContent = Get-IniContent -Path $fileINIPath
-        
-                $step = 2
-                $iniContent[$combined]["step"] = $step
-                Out-IniFile -InputObject $iniContent -Path $fileINIPath
                 $bAsk = $false
             }
         }
@@ -288,7 +276,6 @@ Licensed under the MIT license.
     if ($bAsk) {
         $ans = Read-Host -Prompt "Do you want to enter the Workload SPN secrets Y/N?"
         if ("Y" -eq $ans) {
-            $vault = $iniContent[$combined]["Vault"]
 
             if (($null -eq $vault ) -or ("" -eq $vault)) {
                 $vault = Read-Host -Prompt "Please enter the vault name"
