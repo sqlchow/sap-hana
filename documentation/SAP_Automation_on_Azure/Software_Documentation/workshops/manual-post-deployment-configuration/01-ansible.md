@@ -1,7 +1,7 @@
 ### <img src="../../../assets/images/UnicornSAPBlack256x256.png" width="64px"> SAP Deployment Automation Framework <!-- omit in toc -->
 <br/><br/>
 
-# Bootstrapping the Deployer <!-- omit in toc -->
+# Post Deployment Configuration and Software Install <!-- omit in toc -->
 
 <br/>
 
@@ -10,18 +10,36 @@
 - [Overview](#overview)
 - [Notes](#notes)
 - [Procedure](#procedure)
-  - [Bootstrap - Deployer](#bootstrap---deployer)
+  - [Post Deployment Configuration - Ansible](#post-deployment-configuration---ansible)
 
 <br/>
 
 ## Overview
 
-![Block2](assets/Block2.png)
-|                  |              |
-| ---------------- | ------------ |
-| Duration of Task | `12 minutes` |
-| Steps            | `10`         |
-| Runtime          | `5 minutes`  |
+![Graphic]()
+|                  |               |
+| ---------------- | ------------- |
+| Duration of Task | `130 minutes` |
+| Steps            | `3`           |
+| Runtime          | `110 minutes` |
+
+<br/>
+
+This Configuration as Code (CaC) tooling will perform several operations on the deployed resources.
+- Base OS configuration
+- SAP specific OS Configuration
+- SAP Bill of Materials (BOM) processing - Software Download
+- DB Install
+- SAP Software Install
+  - SCS Install
+  - DB Load
+  - Primary Application Server Install
+
+Future Steps will include:
+- Application Server Install
+- Web Dispatcher Install
+- SAPRouter
+- Pacemaker DB / SCS
 
 ---
 
@@ -29,47 +47,19 @@
 
 ## Notes
 
-- For the workshop the *default* naming convention is referenced and used. For the **Deployer** there are three fields.
-  - `<ENV>`-`<REGION>`-`<DEPLOYER_VNET>`-INFRASTRUCTURE
-
-    | Field             | Legnth   | Value  |
-    | ----------------- | -------- | ------ |
-    | `<ENV>`           | [5 CHAR] | NP     |
-    | `<REGION>`        | [4 CHAR] | EUS2   |
-    | `<DEPLOYER_VNET>` | [7 CHAR] | DEP00  |
-  
-    Which becomes this: **DEMO-EUS2-DEP00-INFRASTRUCTURE**
-    
-    This is used in several places:
-    - The path of the Workspace Directory.
-    - Input JSON file name
-    - Resource Group Name.
-
-    You will also see elements cascade into other places.
 
 <br/><br/>
 
 ## Procedure
 
-### Bootstrap - Deployer
-
+### Post Deployment Configuration - Ansible
 <br/>
-
-
-
-
-
-
-
-<br/><br/>
-
 
 1. From the SAP Deployment Workspace directory, change to the `ansible_config_files` directory.
     ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-EUS2-SAP00-X00/ansible_config_files
     ```
     <br/><br/>
-
 
 2. Update the `sap_parameters.yaml` parameter file.
     <br/>
@@ -88,7 +78,9 @@
     ```bash
     vi sap_parameters.yaml
     ```
+    <br/>
 
+    File: `sap-parameters.yaml`
     ```bash
     ---
 
@@ -137,7 +129,7 @@
               Ex: `real    1m7.984s`
         <br/><br/>
         Select the Menu option sequentially, in order, 1 - 7 or 13 for all.<br/>
-        Options 8 - 12 are not yet functional. 
+        *Options 8 - 12 are not yet functional.*
         ```bash
         1) Base OS Config            8) APP Install
         2) SAP specific OS Config    9) WebDisp Install
@@ -148,10 +140,13 @@
         7) PAS Install              14) Quit
         Please select playbook: 
         ```
+        <br/>
+
+        ---
         <br/><br/>
 
 
-    2. Execute the Ansible playbooks individulally via `ansible-playbook` command.
+    2. (*Optional*) Execute the Ansible playbooks individulally via `ansible-playbook` command.
         <br/>
         ```bash
         ansible-playbook                                                                                   \
@@ -172,7 +167,7 @@
         <br/><br/>
 
 
-    3. Execute the Ansible playbooks sequentially via a single `ansible-playbook` command.
+    3. (*Optional*) Execute the Ansible playbooks sequentially via a single `ansible-playbook` command.
         ```bash
         ansible-playbook                                                                                   \
           --inventory   X00_hosts.yaml                                                                     \
