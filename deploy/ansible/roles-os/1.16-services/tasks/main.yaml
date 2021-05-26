@@ -26,27 +26,43 @@
 # pass them as the argument to the name parameter; this is the recommended
 # approach as it only calls the underlying distro specific service manager
 # once per state value.
-- name:             "1.16 - Enable & Start Services : {{ distro_name }}"
+- name:             "1.16 - Start Services : {{ distro_name }}"
   service:
-    name:           "{services_to_process                      selectattr('state', 'equalto', item.state) |
-                        map(attribute='service') |
-                        list }}"
-    state:          "{{ item.state }}"
-    enabled:        "{{ item.enabled }}"
-  loop:
-    - { state: 'present' }  # First start the required services
-    - { enabled: 'yes' }   # ensure that the required service is enabled
+    name:           "{{ item }}"
+    state:          started
+  loop:             "{{ services_to_process |
+                      selectattr('state', 'equalto', 'started') |
+                      map(attribute='service') |
+                      list }}"
 
-- name:             "1.16 - Disable & Stop Services : {{ distro_name }}"
+- name:             "1.16 - Enable Services : {{ distro_name }}"
   service:
-    name:           "{services_to_process                      selectattr('state', 'equalto', item.state) |
-                        map(attribute='service') |
-                        list }}"
-    state:          "{{ item.state }}"
-    enabled:        "{{ item.enabled }}"
-  loop:
-    - { state: 'stopped' }  # First stop the services which are not required
-    - { enabled: 'no' }   # ensure that the service is stopped
+    name:           "{{ item }}"
+    enabled:         yes
+  loop:             "{{ services_to_process |
+                      selectattr('state', 'equalto', 'enabled') |
+                      map(attribute='service') |
+                      list }}"
+
+- name:             "1.16 - Stop Services : {{ distro_name }}"
+  service:
+    name:           "{{ item }}"
+    state:          stopped
+  loop:           "{{ services_to_process |
+                      selectattr('state', 'equalto', 'stopped') |
+                      map(attribute='service') |
+                      list }}"
+
+- name:             "1.16 - Disable Services : {{ distro_name }}"
+  service:
+    name:           "{{ item }}"
+    enabled:         no
+  loop:           "{{ services_to_process |
+                      selectattr('state', 'equalto', 'disabled') |
+                      map(attribute='service') |
+                      list }}"
+
+   
 
 
 # /*----------------------------------------------------------------------------8
