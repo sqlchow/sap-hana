@@ -27,7 +27,7 @@
 <br/>
 
 ## Overview
-![Overview](assets/BlockOverview.png)
+![Overview]()
 
 Playbooks
 - Base OS configuration
