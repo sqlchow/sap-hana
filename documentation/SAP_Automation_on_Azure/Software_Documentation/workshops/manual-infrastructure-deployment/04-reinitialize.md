@@ -146,7 +146,7 @@
     | key                  | A composit of the `SAP Library` Resource Group name and the `.terraform.tfstate` extension. |
     <br/>
 
-3. Add Key/Pair `tfstate_resource_id` to the input JSON.
+3. Add Key/Pair `tfstate_resource_id` and `deployer_tfstate_key` to the input JSON.
    <br/>
    It should be inserted as the first line following the opening `{`
     ```

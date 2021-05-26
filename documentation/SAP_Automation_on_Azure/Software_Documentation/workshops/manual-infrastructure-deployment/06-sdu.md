@@ -152,7 +152,7 @@
     2. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=DEMO-EUS2-SAP00-X00.json                                \
+       terraform plan  --var-file=DEMO-EUS2-SAP00-X00.json                             \
                        ../../../sap-hana/deploy/terraform/run/sap_system/
        ```
 
@@ -160,7 +160,7 @@
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
        terraform apply --auto-approve                                                  \
-                       --var-file=DEMO-EUS2-SAP00-X00.json                               \
+                       --var-file=DEMO-EUS2-SAP00-X00.json                             \
                        ../../../sap-hana/deploy/terraform/run/sap_system/
        ```
        <br/>

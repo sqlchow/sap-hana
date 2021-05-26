@@ -80,9 +80,9 @@ resource "null_resource" "prepare-deployer" {
       //
       "sudo pip3 install \"ansible>=2.9,<2.10\"",
       "sudo pip3 install ansible[azure]",
-      "sudo wget -nv -q https://raw.githubusercontent.com/ansible-collections/azure/dev/requirements-azure.txt",
-      "sudo pip3 install -r requirements-azure.txt",
-      "sudo ansible-galaxy collection install azure.azcollection --force",
+      "sudo -H wget -nv -q https://raw.githubusercontent.com/ansible-collections/azure/dev/requirements-azure.txt",
+      "sudo -H pip3 install -r requirements-azure.txt",
+      "sudo -H ansible-galaxy collection install azure.azcollection --force",
       //
       // Install pywinrm
       //
