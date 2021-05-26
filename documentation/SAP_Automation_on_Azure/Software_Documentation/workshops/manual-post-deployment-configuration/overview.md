@@ -9,11 +9,6 @@
 
 - [Steps](#steps)
 - [Overview](#overview)
-- [Close Up](#close-up)
-- [Deployer](#deployer)
-- [SAP Library](#sap-library)
-- [SAP Workload VNET](#sap-workload-vnet)
-- [SDU](#sdu)
 
 <br/><br/>
 
@@ -34,32 +29,21 @@
 ## Overview
 ![Overview](assets/BlockOverview.png)
 
-Environment
-- Subscription
-- Deployer
-- SAP Library (1 or more regionally distributed)
-- SAP Workload VNET (Harbor - Global and/or Logical Partitioning within region)
-- SDU - SAP Deployment Unit (Deploys into SAP Workload VNET)
+Playbooks
+- Base OS configuration
+- SAP specific OS Configuration
+- SAP Bill of Materials (BOM) processing - Software Download
+- DB Install
+- SAP Software Install
+  - SCS Install
+  - DB Load
+  - Primary Application Server Install
+Future Steps will include:
+- Application Server Install
+- Web Dispatcher Install
+- SAPRouter
+- Pacemaker DB / SCS
 
-## Close Up
-![Block1](assets/Block1.png)
-
-
-## Deployer
-![Block2](assets/Block2.png)
-
-
-## SAP Library
-![Block3](assets/Block3.png)
-
-
-## SAP Workload VNET
-![Block4](assets/Block4.png)
-
-
-## SDU
-![Block5a](assets/Block5a.png)
-![Block5b](assets/Block5b.png)
 
 <br/><br/><br/><br/>
 
