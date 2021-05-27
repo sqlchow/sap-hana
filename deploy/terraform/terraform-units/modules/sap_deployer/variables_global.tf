@@ -49,7 +49,7 @@ variable "key_vault" {
   validation {
     condition = (
       contains(keys(var.key_vault), "kv_user_id") ? (
-        length(split("/", var.key_vault.kv_user_id)) == 9) : (
+        length(split("/", var.key_vault.kv_user_id)) == 9 || length(var.key_vault.kv_user_id) == 0) : (
         true
       )
     )
@@ -59,7 +59,7 @@ variable "key_vault" {
   validation {
     condition = (
       contains(keys(var.key_vault), "kv_prvt_id") ? (
-        length(split("/", var.key_vault.kv_prvt_id)) == 9) : (
+        length(split("/", var.key_vault.kv_prvt_id)) == 9 || length(var.key_vault.kv_prvt_id) == 0) : (
         true
       )
     )
