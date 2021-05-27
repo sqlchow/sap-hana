@@ -71,6 +71,6 @@ output "naming" {
 
     resource_suffixes = var.resource_suffixes
 
-    separator = length(trimspace(var.custom_prefix)) ? local.separator : ""
+    separator = length(trimspace(var.custom_prefix)) > 0 ? local.separator : ""
   }
 }
