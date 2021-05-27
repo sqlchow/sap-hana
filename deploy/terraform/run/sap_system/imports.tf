@@ -4,6 +4,7 @@
 */
 
 data "terraform_remote_state" "deployer" {
+  provider     = azurerm.deployer
   backend = "azurerm"
   count = length(try(var.deployer_tfstate_key, "")) > 0 ? 1 : 0
   config = {
@@ -16,6 +17,7 @@ data "terraform_remote_state" "deployer" {
 }
 
 data "terraform_remote_state" "landscape" {
+  provider     = azurerm.deployer
   backend = "azurerm"
   config = {
     resource_group_name  = local.saplib_resource_group_name
