@@ -154,23 +154,32 @@ fi
 
 if [ $force == 1 ]
 then
-    if [ -d ./.terraform/ ]; then
-        rm .terraform -r
-    fi
-
-    if [ -f terraform.tfstate ]; then
-        rm terraform.tfstate
-    fi
-
-    if [ -f terraform.tfstate.backup ]; then
-        rm terraform.tfstate.backup
-    fi
+    rm -Rf .terraform terraform.tfstate*
 fi
 
+ext=$(echo ${parameterfile} | cut -d. -f2)
 
-# Read environment
-environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+else
+    if [ "${deployment_system}" == sap_deployer ]
+    then
+        load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_environment"
+        environment=$(echo ${deployer_environment} | xargs)
+        load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_location"
+        region=$(echo ${deployer_location} | xargs)
+    fi    
+    if [ "${deployment_system}" == sap_library ]
+    then
+        load_config_vars "${param_dirname}"/"${parameterfile}" "library_environment"
+        environment=$(echo ${library_environment} | xargs)
+        load_config_vars "${param_dirname}"/"${parameterfile}" "library_location"
+        region=$(echo ${library_location} | xargs)
+    fi    
+
+fi
 
 if [ ! -n "${environment}" ]
 then

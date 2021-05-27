@@ -95,11 +95,20 @@ if [ $param_dirname != '.' ]; then
 fi
 
 
+ext=$(echo ${parameterfile} | cut -d. -f2)
 
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+else
 
-# Read environment
-environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+    load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_environment"
+    environment=$(echo ${deployer_environment} | xargs)
+    load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_location"
+    region=$(echo ${deployer_location} | xargs)
+fi
+
 key=$(echo "${parameterfile}" | cut -d. -f1)
 
 if [ ! -n "${environment}" ]
