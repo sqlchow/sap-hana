@@ -132,3 +132,16 @@ resource "azurerm_application_security_group" "db" {
   location = local.nsg_asg_with_vnet ? (local.vnet_sap_resource_group_location) : (local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location)
 }
 
+// Define a cloud-init config that disables the automatic expansion
+// of the root partition.
+data "template_cloudinit_config" "disable_growpart" {
+  gzip          = true
+  base64_encode = true
+
+  # Main cloud-config configuration file.
+  part {
+    content_type = "text/cloud-config"
+    content      = "growpart: {'mode': 'off'}"
+  }
+}
+

@@ -47,6 +47,7 @@ module "common_infrastructure" {
   authentication             = var.authentication
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+
 }
 
 // Create HANA database nodes
@@ -77,6 +78,8 @@ module "hdb_node" {
   db_asg_id                  = module.common_infrastructure.db_asg_id
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+  cloudinit_disable_growpart = module.common_infrastructure.cloudinit_disable_growpart
+
 }
 
 // Create Application Tier nodes
@@ -108,6 +111,7 @@ module "app_tier" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+  cloudinit_disable_growpart = module.common_infrastructure.cloudinit_disable_growpart
 
 }
 
@@ -138,6 +142,7 @@ module "anydb_node" {
   db_asg_id                  = module.common_infrastructure.db_asg_id
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+  cloudinit_disable_growpart = module.common_infrastructure.cloudinit_disable_growpart
 
 }
 

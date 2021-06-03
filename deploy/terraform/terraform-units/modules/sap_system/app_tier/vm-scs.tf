@@ -103,6 +103,9 @@ resource "azurerm_linux_virtual_machine" "scs" {
       public_key = var.sdu_public_key
     }
   }
+
+  custom_data = var.cloudinit_disable_growpart
+
   dynamic "os_disk" {
     iterator = disk
     for_each = flatten(

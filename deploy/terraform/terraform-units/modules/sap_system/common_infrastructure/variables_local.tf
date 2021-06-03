@@ -382,3 +382,8 @@ locals {
   service_principal = try(var.service_principal, {})
 
 }
+
+locals {
+  // 'Cg==` is empty string, base64 encoded.
+  cloudinit_disable_growpart = try(data.template_cloudinit_config.disable_growpart.rendered, "Cg==")
+}
