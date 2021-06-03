@@ -117,6 +117,11 @@ variable "scs_ha" {
   default = false
 }
 
+variable "ansible_user" {
+  description = "The ansible remote user account to use"
+  default = "azureadm"
+}
+
 
 locals {
 
