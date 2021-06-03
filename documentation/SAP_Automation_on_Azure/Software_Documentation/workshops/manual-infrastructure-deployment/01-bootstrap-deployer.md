@@ -80,6 +80,7 @@
      mkdir -p ~/bin; cd $_
      wget  https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
      unzip terraform_0.14.7_linux_amd64.zip
+     hash terraform
      ```
 
 4. Repository
