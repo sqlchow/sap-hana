@@ -231,15 +231,10 @@ fi
 
 init "${automation_config_directory}" "${generic_config_information}" "${deployer_config_information}"
 
-if [ ! -n "${subscription}" ]
+if [ ! -z "${subscription}" ]
 then
-    kvsubscription="${subscription}"
-    save_config_var "kvsubscription" "${deployer_config_information}"
-    export ARM_SUBSCRIPTION_ID=$subscription
-fi
-
-if [ ! -n "${subscription}" ]
-then
+    ARM_SUBSCRIPTION_ID="${subscription}"
+    save_config_var "ARM_SUBSCRIPTION_ID" "${deployer_config_information}"
     save_config_var "subscription" "${deployer_config_information}"
     export ARM_SUBSCRIPTION_ID=$subscription
 fi
@@ -318,7 +313,9 @@ else
 
     if [ ! -z "${subscription}" ]
     then
+        echo "Setting the subscription"
         az account set --sub "${subscription}"
+        export ARM_SUBSCRIPTION_ID="${subscription}"
     fi
 
 fi
@@ -327,7 +324,6 @@ step=0
 load_config_vars "${deployer_config_information}" "step"
 
 curdir=$(pwd)
-
 if [ 0 == $step ]
 then
     echo ""

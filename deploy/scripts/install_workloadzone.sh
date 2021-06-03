@@ -328,19 +328,16 @@ then
     
     if [ -z $REMOTE_STATE_RG ]
     then
-        REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
-        fail_if_null REMOTE_STATE_RG
-        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
-        fail_if_null tfstate_resource_id
+        get_and_store_sa_details ${REMOTE_STATE_SA} "${workload_config_information}"
+        load_config_vars "${workload_config_information}" "STATE_SUBSCRIPTION"
+        load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
+        load_config_vars "${workload_config_information}" "tfstate_resource_id"
+
     fi
     
     tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
 
     save_config_vars "${workload_config_information}" \
-    REMOTE_STATE_RG \
-    REMOTE_STATE_SA \
-    tfstate_resource_id \
-    STATE_SUBSCRIPTION \
     keyvault \
     deployer_tfstate_key
     
@@ -357,19 +354,10 @@ then
 else
     if [ -z "$REMOTE_STATE_RG" ]
     then
-        REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
-        fail_if_null REMOTE_STATE_RG
-        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
-        fail_if_null tfstate_resource_id
-        if [ -n "$tfstate_resource_id" ]
-        then
-            STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3)
-        fi
-
-        save_config_vars "${workload_config_information}" \
-            REMOTE_STATE_RG \
-            tfstate_resource_id \
-            STATE_SUBSCRIPTION
+        get_and_store_sa_details ${REMOTE_STATE_SA} "${workload_config_information}"
+        load_config_vars "${workload_config_information}" "STATE_SUBSCRIPTION"
+        load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
+        load_config_vars "${workload_config_information}" "tfstate_resource_id"
 
     fi
 
@@ -447,20 +435,15 @@ fi
 
 if [ -z "${REMOTE_STATE_SA}" ]; then
     read -p "Terraform state storage account name:"  REMOTE_STATE_SA
-    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
-    fail_if_null REMOTE_STATE_RG
-    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
-    fail_if_null tfstate_resource_id
-    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3)
+    get_and_store_sa_details ${REMOTE_STATE_SA} "${workload_config_information}"
+    load_config_vars "${workload_config_information}" "STATE_SUBSCRIPTION"
+    load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
+    load_config_vars "${workload_config_information}" "tfstate_resource_id"
+
     tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
 
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
-        
-        save_config_vars "${workload_config_information}" REMOTE_STATE_RG \
-        REMOTE_STATE_SA \
-        tfstate_resource_id \
-        STATE_SUBSCRIPTION
         if [ $account_set==0 ]
         then
             $(az account set --sub "${STATE_SUBSCRIPTION}")
@@ -473,17 +456,10 @@ fi
 
 if [ -z "${REMOTE_STATE_RG}" ]; then
     if [  -n "${REMOTE_STATE_SA}" ]; then
-        REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].resourceGroup')
-        fail_if_null REMOTE_STATE_RG
-        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
-        fail_if_null tfstate_resource_id
-        STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3)
-        
-        save_config_vars "${workload_config_information}" \
-        REMOTE_STATE_RG \
-        REMOTE_STATE_SA \
-        tfstate_resource_id \
-        STATE_SUBSCRIPTION
+        get_and_store_sa_details ${REMOTE_STATE_SA} "${workload_config_information}"
+        load_config_vars "${workload_config_information}" "STATE_SUBSCRIPTION"
+        load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
+        load_config_vars "${workload_config_information}" "tfstate_resource_id"
         
         tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
     else
@@ -498,8 +474,8 @@ if [ -n "${tfstate_resource_id}" ]
 then
     tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
 else
-    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq --raw-output '.[0].id')
-    fail_if_null tfstate_resource_id
+    get_and_store_sa_details ${REMOTE_STATE_SA} "${workload_config_information}"
+    load_config_vars "${workload_config_information}" "tfstate_resource_id"
     tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
 
 fi
