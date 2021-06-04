@@ -1,0 +1,272 @@
+---
+# Assumptions
+#   target_media_location exists on disk
+#
+# Inputs:
+#   target_media_location             Default     /usr/sap/install
+#   inventory_dir
+#   bom_name
+#   sapbits_location_base_path
+#   sapbits_bom_files
+#   sapbits_sas_token
+#
+# Locals:
+#   _bom
+#   item
+#   result
+#
+# BOM Fields:
+#   download
+#   archive
+#   permissions
+#   
+
+
+
+# Steps:
+#   01) Register BOM
+#   02) Create static download directories
+#   03) Download media from bom
+#   04) Upload files to Azure blob storage
+#   05) Purge BOM file from Ansible Controller
+
+
+
+#   01) Register BOM
+- name:         "Register BOM: {{ bom_name }}"
+  include_vars:
+    file:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
+    name:       _bom
+
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:      "Archive: {{ item.archive }}"
+#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+#------------------</DEBUGGING>------------------
+
+
+
+#   02) Create static download directories
+- name:     "BOM: Create SAP download directories"
+  file:
+    path:   "{{ item.path }}"
+    state:  directory
+    mode:   0755
+  loop:
+    - { path: '/usr/sap/install/downloads' }
+
+
+
+#   03) Download media from bom
+- name: "BOM: Create BOM directories"
+  file:
+    path:   "{{ target_media_location }}/{{ item.extractDir }}"
+    state:  directory
+    mode:   0755
+  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:     not (    (item.extractDir is undefined)
+                  or (item.extractDir == '') )
+
+
+
+
+# Download Files
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:      
+#       - "URL : {{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/archives/{{ item.archive }}{% if sapbits_sas_token is not undefined %}{{ sapbits_sas_token }}{% endif %}"
+#       - "DEST: {{ target_media_location }}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
+#       - "MODE: {% if item.permissions is undefined %}0644{% else %}{{ item.permissions }}{% endif %}"
+#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+#------------------</DEBUGGING>------------------
+
+
+
+#   04) Download media from bom
+# Loop throough BOM media files and download to correct location
+- name: "BOM: Download Files"
+  get_url:
+    url:    item.url
+    dest:   "/usr/sap/install/downloads/{{ item.archive }}""
+    username: S0020871714
+    password: 'SL0s€n0rd2021'
+    force_basic_auth: yes
+
+  register: result
+  until:    result is succeeded
+  retries:  10
+  delay:    6
+  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:     item.url is defined
+
+
+
+# #   08) Purge BOM file from Ansible Controller
+# - name:         "Ensure {{ bom_name }} is absent"
+#   file:
+#     path:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
+#     state:      absent
+#   delegate_to:  localhost
+
+# -------------------------------------+---------------------------------------8
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# - name:         "Ensure {{ target_media_location }} exists"
+#   file:
+#     path:       "{{ target_media_location }}"
+#     state:      directory
+#   check_mode:   "{{ test_mode is defined and test_mode }}"
+
+# - name:               "Ensure current property is iterated"
+#   include_tasks:      download_media.yaml
+#   vars:
+#     default_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
+#     bom_media:        "{{ media_iterator.media }}"
+#     source_location:  "{{ media_iterator.uri_location }}"
+#     file_name:        "{{ media_iterator.property_name }}"
+#   loop:
+#     - uri_location:   archives
+#       property_name:  archive
+#       media:          "{{ bom.materials.media | flatten(levels=1) }}"
+#     # - uri_location:   "boms/{{ bom_base_name }}/stackfiles"
+#     #   property_name:  file
+#     #   media:          "{{ bom.materials.stackfiles | flatten(levels=1) }}"
+#     # - uri_location:   "boms/{{ bom_base_name }}/templates"
+#     #   property_name:  file
+#     #   media:          "{{ bom.materials.templates if (bom.materials.templates | type_debug == 'list') else [] | flatten(levels=1) }}"
+#   loop_control:
+#     loop_var:         media_iterator
+
+# - name:               "Ensure {{ bom_base_name }} dependencies are followed"
+#   when:               bom_dependencies | length != 0
+#   include_tasks:      "{{ iterator }}"
+#   vars:
+#     bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
+#     bom_media:        "{{ bom.materials.media }}"
+#     bom_base_name:    "{{ item.name }}"
+#   loop:               "{{ bom_dependencies | flatten(levels=1) }}"
+
+
+
+
+#------------------<DEBUGGING>-------------------
+# - name:           Ensure target folders exist
+#   debug:  
+#     msg:          "{{ download_location }}"
+#   loop:           "{{
+#                       bom_media |
+#                       flatten(levels=1) |
+#                       selectattr('override_target_location', 'defined') |
+#                       map(attribute='override_target_location') |
+#                       list |
+#                       union([default_location]) |
+#                       unique }}"
+#   loop_control:
+#     loop_var:     download_location
+#------------------</DEBUGGING>------------------
+
+# - name: "Ensure media property is iterated"
+#   block:
+#     - name: Ensure target folders exist
+#       file:
+#         path: "{{ download_location }}"
+#         state: directory
+#       loop: "{{
+#         bom_media |
+#         flatten(levels=1) |
+#         selectattr('override_target_location', 'defined') |
+#         map(attribute='override_target_location') |
+#         list |
+#         union([default_location]) |
+#         unique }}"
+#       loop_control:
+#         loop_var: download_location
+#       check_mode: "{{ test_mode is defined and test_mode }}"
+
+
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:          "{{ download_iterator }}"
+#   loop:           "{{ bom_media | flatten(levels=1) }}"
+#   loop_control:
+#     loop_var:     download_iterator
+#------------------</DEBUGGING>------------------
+
+
+    # - name: Ensure media are downloaded
+    #   vars:
+    #     archive_location:           "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/{{ source_location }}"
+    #     default_file_name:          "{{ download_iterator[file_name] }}"
+    #     file_source:                "{{ archive_location }}/{{ default_file_name }}"
+    #     file_dest_target_location:  "{{ download_iterator.override_target_location is defined | ternary(download_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
+    #     file_dest_target_name:      "{{ download_iterator.override_target_filename is defined | ternary(download_iterator.override_target_filename, default_file_name) }}"
+    #     file_dest:                  "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
+    #   uri:
+    #     url:                        "{{ file_source }}{{ sapbits_sas_token }}"
+    #     dest:                       "{{ file_dest }}"
+    #     creates:                    "{{ file_dest }}"
+    #   loop:                         "{{ bom_media | flatten(levels=1) }}"
+    #   loop_control:
+    #     loop_var:                   download_iterator
+    #   check_mode:                   "{{ test_mode is defined and test_mode }}"
+
+
+
+# - name: Determine SWPM archive name
+#   set_fact:
+#     swpm_archive: "{{ swpm_entry.override_target_filename is defined | ternary(swpm_entry.override_target_filename, swpm_entry.archive) }}"
+#   vars:
+#     swpm_entry: "{{
+#       bom.materials.media |
+#       flatten(levels=1) |
+#       selectattr('archive', 'match', '^SWPM.*\\.SAR$') |
+#       list |
+#       first
+#       }}"
+
+# - name: Ensure SAPCAR is executable
+#   file:
+#     path: "{{ download_basket_dir }}/{{ sapcar_executable }}"
+#     mode: "0755"
+
+
+# - name: Ensure SWPM directory is present
+#   file:
+#     path: "{{ target_media_location }}/SWPM"
+#     state: directory
+
+
+# - name: Ensure SWPM is unarchived
+#   command: >
+#     {{ download_basket_dir }}/{{ sapcar_executable }} -xf {{ download_basket_dir }}/{{ swpm_archive }} -R {{ target_media_location }}/SWPM/
+#   args:
+#     creates: "{{ target_media_location }}/SWPM/SIGNATURE.SMF"
+
+# - name: Determine SAPCAR executable file name
+#   set_fact:
+#     sapcar_executable: "{{ sapcar_entry.override_target_filename is defined | ternary(sapcar_entry.override_target_filename, sapcar_entry.archive) }}"
+#   vars:
+#     sapcar_entry: "{{
+#       bom.materials.media |
+#       flatten(levels=1) |
+#       selectattr('archive', 'match', '^SAPCAR.*\\.EXE$') |
+#       list |
+#       first
+#       }}"
