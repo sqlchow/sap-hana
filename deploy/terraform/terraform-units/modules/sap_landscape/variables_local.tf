@@ -19,6 +19,11 @@ variable "use_deployer" {
   description = "Use the deployer"
 }
 
+variable "cloudinit_disable_growpart" {
+  description = "A cloud-init config that disables automatic growpart expansion of root partition"
+}
+
+
 locals {
   // Resources naming
   vnet_prefix                 = var.naming.prefix.VNET
