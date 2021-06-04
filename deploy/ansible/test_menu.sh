@@ -37,7 +37,6 @@ bash ${DEPLOYMENT_REPO_PATH}/deploy/ansible/get-sshkey.sh
 
 PS3='Please select playbook: '
 options=(                           \
-        "BOM Validator"            \
         "Base OS Config"            \
         "SAP specific OS Config"    \
         "BOM Processing"            \
@@ -51,6 +50,7 @@ options=(                           \
         "Pacemaker SCS Setup"       \
         "Pacemaker HANA Setup"      \
         "Install SAP (1-7)"         \
+        "BOM Validator"             \
         "Quit"                      \
 )
 
@@ -59,7 +59,6 @@ select opt in "${options[@]}";
 do
         echo "You selected ($REPLY) $opt";
         case $opt in
-                "BOM Validator")            playbook=playbook_00_bom_validating.yaml;;
                 "Base OS Config")           playbook=playbook_01_os_base_config.yaml;;
                 "SAP specific OS Config")   playbook=playbook_02_os_sap_specific_config.yaml;;
                 "BOM Processing")           playbook=playbook_03_bom_processing.yaml;;
@@ -73,6 +72,7 @@ do
                 "Pacemaker SCS Setup")      playbook=playbook_06_00_01_pacemaker_scs.yaml;;
                 "Pacemaker HANA Setup")     playbook=playbook_06_00_03_pacemaker_hana.yaml;;
                 "Install SAP (1-7)")        playbook=INSTALL;;
+                "BOM Validator")            playbook=playbook_bom_validator.yaml;;
                 "Quit")                     break;;
         esac
 

@@ -22,15 +22,9 @@
 #   
 
 
-
 # Steps:
 #   01) Register BOM
-#   02) Create static download directories
-#   03) Download media from bom
-#   04) Upload files to Azure blob storage
-#   05) Purge BOM file from Ansible Controller
-
-
+#   02) Validate media from bom
 
 #   01) Register BOM
 - name:         "Register BOM: {{ bom_name }}"
@@ -45,68 +39,34 @@
 #------------------</DEBUGGING>------------------
 
 
-
-#   02) Create static download directories
-- name:     "BOM: Create SAP download directories"
-  file:
-    path:   "{{ item.path }}"
-    state:  directory
-    mode:   0755
-  loop:
-    - { path: '/usr/sap/install/downloads' }
-
-
-
-#   03) Download media from bom
-- name: "BOM: Create BOM directories"
-  file:
-    path:   "{{ target_media_location }}/{{ item.extractDir }}"
-    state:  directory
-    mode:   0755
-  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
-  when:     not (    (item.extractDir is undefined)
-                  or (item.extractDir == '') )
-
-
-
-
-# Download Files
+# Files to download
 #------------------<DEBUGGING>-------------------
 # - debug:  
 #     msg:      
-#       - "URL : {{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/archives/{{ item.archive }}{% if sapbits_sas_token is not undefined %}{{ sapbits_sas_token }}{% endif %}"
-#       - "DEST: {{ target_media_location }}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
-#       - "MODE: {% if item.permissions is undefined %}0644{% else %}{{ item.permissions }}{% endif %}"
+#       - "URL : {{ item.url }}"
 #   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
 #------------------</DEBUGGING>------------------
 
 
 
-#   04) Download media from bom
-# Loop throough BOM media files and download to correct location
-- name: "BOM: Download Files"
-  get_url:
-    url:    item.url
-    dest:   "/usr/sap/install/downloads/{{ item.archive }}""
-    username: S0020871714
-    password: 'SL0s€n0rd2021'
+#   02) Validate media from SAP
+# Loop through BOM media files 
+- name: "BOM: Check Files"
+  uri:
+    url:              "{{ item.url }}"
+    url_username:     "{{ S_user }}"
+    url_password:     "{{ S_password }}"
     force_basic_auth: yes
-
+    follow_redirects: all
+    http_agent:       'SAP Software Download'
+    timeout:          300
+  
   register: result
   until:    result is succeeded
-  retries:  10
-  delay:    6
+  retries:  2
+  delay:    1
   loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
   when:     item.url is defined
-
-
-
-# #   08) Purge BOM file from Ansible Controller
-# - name:         "Ensure {{ bom_name }} is absent"
-#   file:
-#     path:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
-#     state:      absent
-#   delegate_to:  localhost
 
 # -------------------------------------+---------------------------------------8
 

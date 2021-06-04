@@ -4,9 +4,9 @@
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 # Description:  Download the specified BOM file to the ansible controller.
-#               Download any dependent BOM files to the ansible controller.
 #               Create Download directories, both static and dynamic.
-#               Download all media from BOMs to the SCS
+#               Download all media from SAP to Ansible Controller
+#               Upload the media to Azure
 #
 #
 # Objects:
@@ -26,7 +26,6 @@
 # -------------------------------------+---------------------------------------8
 # Reviews:
 #
-# 04/22/2021  Morgan Deegan       Reviewed - Complete
 #
 # -------------------------------------+---------------------------------------8
 ---
@@ -45,7 +44,7 @@
 # -------------------------------------+---------------------------------------8
 #
 # Description:  Download specified BOM and Register as an object.
-#
+
 - name:             "Download Main BOM: {{ bom_base_name }}"
   get_url:
     url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/{{ bom_base_name }}.yaml{{ sapbits_sas_token }}"
@@ -74,34 +73,6 @@
 #------------------</DEBUGGING>------------------
 # -------------------------------------+---------------------------------------8
 
-
-
-# -------------------------------------+---------------------------------------8
-#
-# Description:  Check the Main BOM for dependencies under materials
-#                 (bom.materials.dependencies).
-#               Download dependent BOM files.
-#
-# Example:      materials:
-#                 dependencies:
-#                   - name:      HANA_2_00_055_v1
-#
-- name:             "Download Dependent BOM(s)"
-  get_url:
-    url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ item.name }}/{{ item.name }}.yaml{{ sapbits_sas_token }}"
-    dest:           "{{ inventory_dir }}/{{ item.name }}.yaml"
-    mode:           0644
-  register:         result
-  until:            result is succeeded
-  retries:          10
-  delay:            6
-  delegate_to:      localhost                                                     # Causes action to happen  on the Ansible Controller
-  become:           no
-  loop:             "{{ bom.materials.dependencies | flatten(levels=1) }}"
-  when:             
-    - bom.materials.dependencies is defined
-    - bom.materials.dependencies|length>0
-# -------------------------------------+---------------------------------------8
 
 
 

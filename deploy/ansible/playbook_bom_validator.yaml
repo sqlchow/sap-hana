@@ -12,10 +12,10 @@
 - hosts:          localhost
 
   name:           BOM Validator
-  remote_user:    "{{ orchestration_ansible_user }}"                
+  gather_facts:   false
+  connection:     local
   become:         yes
   become_user:    root
-  gather_facts:   true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
 

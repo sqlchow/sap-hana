@@ -20,6 +20,8 @@ sapbits_bom_files:            "sapfiles"                                        
 bom_base_name:                ""                                                        # REQUIRED
 target_media_location:        "/usr/sap/install"                                        # Default
 sapbits_sas_token:            ""                                                        # Optional
+S_user:                       ""
+S_password:                   ""
 
 # SAP Configuration for templates and install
 aas_hostname:                 ""
