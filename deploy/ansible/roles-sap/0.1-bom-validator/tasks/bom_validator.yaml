@@ -4,7 +4,7 @@
 #
 # Inputs:
 #   target_media_location             Default     /usr/sap/install
-#   inventory_dir
+#   download_directory
 #   bom_name
 #   sapbits_location_base_path
 #   sapbits_bom_files
@@ -29,13 +29,13 @@
 #   01) Register BOM
 - name:         "Register BOM: {{ bom_name }}"
   include_vars:
-    file:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
+    file:       "{{ download_directory }}/bom/{{ bom_name }}.yaml"
     name:       _bom
 
 #------------------<DEBUGGING>-------------------
-# - debug:  
-#     msg:      "Archive: {{ item.archive }}"
-#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+- debug:  
+    msg:      "Archive: {{ item.archive }} Url: {{ item.url }} Dest: {{ download_directory }}/{{ item.archive }}"
+  loop:       "{{ bom.materials.media|flatten(levels=1) }}"
 #------------------</DEBUGGING>------------------
 
 
@@ -54,7 +54,8 @@
 - name: "BOM: Check Files"
   get_url:
     url:              "{{ item.url }}"
-    dest:             "{{ inventory_dir }}/{{ item.archive }}"
+    dest:             "{{ download_directory }}/bom/{{ item.archive }}"
+    tmp_dest:         "{{ download_directory }}/tmp"
     url_username:     "{{ S_user }}"
     url_password:     "{{ S_password }}"
     force_basic_auth: yes
