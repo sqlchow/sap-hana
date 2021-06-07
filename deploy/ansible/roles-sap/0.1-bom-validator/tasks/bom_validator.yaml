@@ -52,14 +52,13 @@
 #   02) Validate media from SAP
 # Loop through BOM media files 
 - name: "BOM: Check Files"
-  uri:
+  get_url:
     url:              "{{ item.url }}"
+    dest:             "{{ inventory_dir }}/{{ item.archive }}"
     url_username:     "{{ S_user }}"
     url_password:     "{{ S_password }}"
     force_basic_auth: yes
-    follow_redirects: all
     http_agent:       'SAP Software Download'
-    timeout:          300
   
   register: result
   until:    result is succeeded
