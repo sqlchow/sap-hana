@@ -51,7 +51,7 @@
 
 #   02) Validate media from SAP
 # Loop through BOM media files 
-- name: "BOM: Check Files"
+- name: "BOM: Check/Download Files"
   get_url:
     url:              "{{ item.url }}"
     dest:             "{{ download_directory }}/bom/{{ item.archive }}"
@@ -67,6 +67,25 @@
   delay:    1
   loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
   when:     item.url is defined
+
+#   03) Upload files to Azure
+# Loop through BOM media files 
+- name: "BOM: Upload files"
+  azure_rm_storageblob:
+    resource_group:       PERM-WEEU-DEP00-INFRASTRUCTURE
+    storage_account_name: kfosapuploader
+    container:            bits
+    subscription_id:      dcb2713e-5dc8-4139-a9af-9768287bbb8d
+    client_id:            6369757e-23c9-4fe6-87b8-fe30dca45de1
+    secret:               lL3ps3Lqp_wa.Au92w_yyafRrs1scV-5q4
+    tenant:               72f988bf-86f1-41af-91ab-2d7cd011db47               
+    blob:                 "{{ item.archive }}"
+    src:                  "{{ download_directory }}/bom/{{ item.archive }}"
+  
+  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:     item.archive is defined
+
+
 
 # -------------------------------------+---------------------------------------8
 

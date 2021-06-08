@@ -15,7 +15,7 @@
 #             sapbits_bom_files               - path to the root of the sap file store
 #             bom_base_name                   - Name of BOM
 #             sapbits_sas_token               - SAS Token
-#             download_directory                   - Path to the inventory location on the ansible controller
+#             download_directory              - Path to the inventory location on the ansible controller
 #
 #   Internal:
 #             result                          - objet to store the results of a task execution

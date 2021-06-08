@@ -22,7 +22,7 @@ target_media_location:        "/usr/sap/install"                                
 sapbits_sas_token:            ""                                                        # Optional
 S_user:                       ""
 S_password:                   ""
-download_directory            "/downloads"
+download_directory:           "/downloads"
 
 # SAP Configuration for templates and install
 aas_hostname:                 ""

@@ -51,6 +51,7 @@ options=(                           \
         "Pacemaker HANA Setup"      \
         "Install SAP (1-7)"         \
         "BOM Validator"             \
+        "BOM Uploader"              \
         "Quit"                      \
 )
 
@@ -73,6 +74,7 @@ do
                 "Pacemaker HANA Setup")     playbook=playbook_06_00_03_pacemaker_hana.yaml;;
                 "Install SAP (1-7)")        playbook=INSTALL;;
                 "BOM Validator")            playbook=playbook_bom_validator.yaml;;
+                "BOM Uploader")             playbook=playbook_bom_downloader.yaml;;
                 "Quit")                     break;;
         esac
 
