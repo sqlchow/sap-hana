@@ -3,10 +3,8 @@
 # |                          Role to process the BOM                           |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
-# Description:  Download the specified BOM file to the ansible controller.
-#               Create Download directories, both static and dynamic.
-#               Download all media from SAP to Ansible Controller
-#               Upload the media to Azure
+# Description:  Downloads the files specified in BOM file from SAP to the 
+#               ansible controller and uploads them to the storage account.
 #
 #
 # Objects:
@@ -15,7 +13,7 @@
 #             sapbits_bom_files               - path to the root of the sap file store
 #             bom_base_name                   - Name of BOM
 #             sapbits_sas_token               - SAS Token
-#             download_directory              - Path to the inventory location on the ansible controller
+#             download_directory              - Path to the download location on the ansible controller
 #
 #   Internal:
 #             result                          - objet to store the results of a task execution
@@ -51,8 +49,11 @@
     state:  directory
     mode:   0755
   loop:
+    - { path: "{{ download_directory }}" }
     - { path: "{{ download_directory }}/tmp" }
     - { path: "{{ download_directory }}/bom" }
+    - { path: "{{ download_directory }}/files" }
+
 
 
 # -------------------------------------+---------------------------------------8
@@ -77,17 +78,19 @@
     file:           "{{ download_directory }}/bom/{{ bom_base_name }}.yaml"
     name:           bom
 #------------------<DEBUGGING>-------------------
-- debug:  
-    msg:      "{{ item.archive }}"
-  loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+# - name:             "Show URL: {{ bom_base_name }}"
+#   debug:
+#     msg:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/{{ bom_base_name }}.yaml{{ sapbits_sas_token }}"
 
-- debug:  
-    msg:      "{{ item.name }}"
-  loop:       "{{ bom.materials.dependencies|flatten(levels=1) }}"
+# - debug:  
+#     msg:      "{{ item.archive }}"
+#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+
+# - debug:  
+#     msg:      "{{ item.name }}"
+#   loop:       "{{ bom.materials.dependencies|flatten(levels=1) }}"
 #------------------</DEBUGGING>------------------
 # -------------------------------------+---------------------------------------8
-
-
 
 
 # -------------------------------------+---------------------------------------8
