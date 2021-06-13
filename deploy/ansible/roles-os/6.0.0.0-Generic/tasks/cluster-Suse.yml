@@ -2,15 +2,41 @@
 
 # SLES Clustering
 # Ref: https://documentation.suse.com/sle-ha/12-SP4/html/SLE-HA-install-quick/index.html
-# Ref: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-suse-pacemaker
 
 - name: Ensure a list of package version is available for checking the cloud-netconfig-azure version
   package_facts:
 
 # If iSCSI devices are provisioned and the os is Suse, SBD will be set up
-- name: Ensure SBD devices are set up on hanadbnodes when provided
-  when: groups['iscsi'] | length > 0
-  include_tasks: sbd_device_setup.yml
+#- name: Ensure SBD devices are set up on hanadbnodes when provided
+#  when: groups['iscsi'] | length > 0
+#  include_tasks: sbd_device_setup.yml
+
+# Pacemaker can create a large number of processes
+- name: Ensure Process limit is raised
+  lineinfile:
+    path: /etc/systemd/system.conf
+    state: present
+    regexp: "^#?\\s*DefaultTasksMax="
+    line: "DefaultTasksMax=4096"
+  register: raise_process_limit
+
+# Reduce the size of Dirty Cache Parameter 1
+- name: Ensure Process limit is raised
+  lineinfile:
+    path: /etc/sysctl.conf
+    state: present
+    regexp: "^#?\\s*vm.dirty_bytes="
+    line: "vm.dirty_bytes=629145600"
+  register: reduce_dirty_cache_1
+
+# Reduce the size of Dirty Cache Parameter 2
+- name: Ensure Process limit is raised
+  lineinfile:
+    path: /etc/sysctl.conf
+    state: present
+    regexp: "^#?\\s*vm.dirty_background="
+    line: "vm.dirty_background_bytes=314572800"
+  register: reduce_dirty_cache_2
 
 # eth1 is the "db" NIC
 - name: Ensure clustering can manage Virtual IPs on the Database Interface
@@ -20,6 +46,21 @@
     state: present
     regexp: "^#?\\s*CLOUD_NETCONFIG_MANAGE="
     line: "CLOUD_NETCONFIG_MANAGE='no'"
+
+# SLES 12 Activate public cloud extension & Install Azure Python SDK
+- name: Ensure Primary node initiates the Cluster
+  when: ansible_distribution_major_version == "12"
+  shell: |
+    SUSEConnect -p sle-module-public-cloud/12/x86_64
+    sudo zypper install python-azure-mgmt-compute
+
+# SLES 15 Activate public cloud extension & Install Azure Python SDK
+- name: Ensure Primary node initiates the Cluster
+  when: ansible_distribution_major_version == "15"
+  shell: |
+    SUSEConnect -p sle-module-public-cloud/15.1/x86_64
+    sudo zypper install python3-azure-mgmt-compute
+
 
 # https://rpm.pbone.net/index.php3/stat/45/idpl/27916721/numer/8/nazwa/ha-cluster-init
 - name: Ensure Primary node initiates the Cluster
@@ -72,36 +113,49 @@
 - pause:
     seconds: 15
 
-- name: Ensure the STONITH SBD is created
-  when:
-    - inventory_hostname == primary_instance.ip_admin
-    - groups['iscsi'] | length > 0
-  block:
+##########################################################################
+#- name: Ensure the STONITH SBD is created
+#  when:
+#    - inventory_hostname == primary_instance.ip_admin
+#    - groups['iscsi'] | length > 0
+#  block:
+#
+#    - name: Check if SBD resource exists
+#      shell: crm resource list | grep 'sbd' | awk '{ print $1; }'
+#      register: sbd_device
+#      failed_when: false
 
-    - name: Check if SBD resource exists
-      shell: crm resource list | grep 'sbd' | awk '{ print $1; }'
-      register: sbd_device
-      failed_when: false
+#    # "stonith-sbd" is the sbd device in most cases if there has already existed a SBD
+#    - name: Ensure current SBD device is stoped and removed if exists
+#      shell: |
+#        crm resource stop {{ sbd_device.stdout }}
+#        crm configure delete {{ sbd_device.stdout }}
+#      when: sbd_device.stdout | length > 0
 
-    # "stonith-sbd" is the sbd device in most cases if there has already existed a SBD
-    - name: Ensure current SBD device is stoped and removed if exists
-      shell: |
-        crm resource stop {{ sbd_device.stdout }}
-        crm configure delete {{ sbd_device.stdout }}
-      when: sbd_device.stdout | length > 0
+#    - name: Ensure SBD disk STONITH resource is created
+#      shell: >
+#        crm configure primitive stonith-sbd stonith:external/sbd \
+#        params pcmk_delay_max="15" \
+#        op monitor interval="15" timeout="15"
+#############################################################################
 
-    - name: Ensure SBD disk STONITH resource is created
+- name: Ensure the STONITH Azure fence agent is created when SBD not used
+      when: 
+        - hdb_size != "LargeInstance"
+        - groups['iscsi'] | length == 0
       shell: >
-        crm configure primitive stonith-sbd stonith:external/sbd \
-        params pcmk_delay_max="15" \
-        op monitor interval="15" timeout="15"
+        crm configure primitive rsc_st_azure stonith:fence_azure_arm params
+        subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
+        resourceGroup="{{ resource_group_name }}"
+        tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
+        login="{{ sap_hana_fencing_agent_client_id }}"
+        passwd="{{ sap_hana_fencing_agent_client_password }}"
 
-    - name: Check the current SBD status
-      shell: crm_mon -1 | grep sbd
-      register: sbd_report
-      changed_when: False
-      failed_when: False
-
+- name: Check the current SBD status
+    shell: crm_mon -1 | grep sbd
+    register: sbd_report
+    changed_when: False
+    failed_when: False
     - debug:
         msg: "{{ sbd_report.stdout }}"
 
@@ -118,6 +172,11 @@
 
     - name: Ensure clone resource azure-events is configure
       shell: crm configure clone cln_azure-events rsc_azure-events
+      
+- name: Ensure maintenance mode is disabled
+      shell: "crm configure property maintenance-mode=false"
+
+#END of Generic Packemaker Tasks 
 
 - name: Ensure the Cluster STONITH is configured
   when: inventory_hostname == primary_instance.ip_admin
@@ -144,18 +203,6 @@
       shell: >
         crm configure op_defaults \$id="op-options"
         timeout="600"
-
-    - name: Ensure the STONITH Azure fence agent is created when SBD not used
-      when: 
-        - hdb_size != "LargeInstance"
-        - groups['iscsi'] | length == 0
-      shell: >
-        crm configure primitive rsc_st_azure stonith:fence_azure_arm params
-        subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
-        resourceGroup="{{ resource_group_name }}"
-        tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
-        login="{{ sap_hana_fencing_agent_client_id }}"
-        passwd="{{ sap_hana_fencing_agent_client_password }}"
 
     - name: Ensure SAP HANA Topology resource is configured
       shell: >

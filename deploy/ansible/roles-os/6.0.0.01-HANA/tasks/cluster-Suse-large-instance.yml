@@ -2,46 +2,27 @@
 
 # SLES Clustering
 # Ref: https://documentation.suse.com/sle-ha/12-SP4/html/SLE-HA-install-quick/index.html
-# Ref: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-suse-pacemaker
-
-- name: Ensure a list of package version is available for checking the cloud-netconfig-azure version
-  package_facts:
-
-# If iSCSI devices are provisioned and the os is Suse, SBD will be set up
-- name: Ensure SBD devices are set up on hanadbnodes when provided
-  when: groups['iscsi'] | length > 0
-  include_tasks: sbd_device_setup.yml
-
-# eth1 is the "db" NIC
-- name: Ensure clustering can manage Virtual IPs on the Database Interface
-  when: ansible_facts.packages["cloud-netconfig-azure"] and (ansible_facts.packages["cloud-netconfig-azure"][0].version | float) < 1.3
-  lineinfile:
-    path: /etc/sysconfig/network/ifcfg-eth1
-    state: present
-    regexp: "^#?\\s*CLOUD_NETCONFIG_MANAGE="
-    line: "CLOUD_NETCONFIG_MANAGE='no'"
-
 # https://rpm.pbone.net/index.php3/stat/45/idpl/27916721/numer/8/nazwa/ha-cluster-init
 - name: Ensure Primary node initiates the Cluster
   when: inventory_hostname == primary_instance.ip_admin
   block:
     - name: Ensure csync2 is configured
-      shell: crm cluster init -y csync2 --interface eth1
+      shell: crm cluster init -y csync2
 
     - name: Ensure corosync is configured
-      shell: crm cluster init -y -u corosync --interface eth1
+      shell: crm cluster init -y -u corosync
 
     - name: Ensure cluster (hdb_{{ sid | upper }}) is configured
-      shell: "crm cluster init -y cluster --name 'hdb_{{ sid | upper }}' --interface eth1"
+      shell: "crm cluster init -y cluster --name 'hdb_{{ sid | upper }}'"
 
 - name: Ensure Secondary node joins the Cluster
   when: inventory_hostname == secondary_instance.ip_admin
   block:
     - name: Ensure the configuration files are synchronised
-      shell: "crm cluster join -y -c {{ primary_instance.ip_db }} csync2 --interface eth1"
+      shell: "crm cluster join -y -c {{ primary_instance.ip_db }} csync2"
 
     - name: Ensure the cluster is joined
-      shell: "crm cluster join -y -c {{ primary_instance.ip_db }} cluster --interface eth1"
+      shell: "crm cluster join -y -c {{ primary_instance.ip_db }} cluster"
 
 - name: Ensure HA Cluster password is set to something secure
   user:
@@ -72,10 +53,8 @@
 - pause:
     seconds: 15
 
-- name: Ensure the STONITH SBD is created
-  when:
-    - inventory_hostname == primary_instance.ip_admin
-    - groups['iscsi'] | length > 0
+- name: Ensure the cluster STONITH is created
+  when: inventory_hostname == primary_instance.ip_admin
   block:
 
     - name: Check if SBD resource exists
@@ -105,23 +84,6 @@
     - debug:
         msg: "{{ sbd_report.stdout }}"
 
-- name: Ensure Azure scheduled events is configured
-  when: inventory_hostname == primary_instance.ip_admin
-  block:
-  # After configuring the Pacemaker resources for azure-events agent, when you place the cluster in or out of maintenance mode, you may get warning messages like:
-  # WARNING: cib-bootstrap-options: unknown attribute 'hostName_ hostname'
-  # WARNING: cib-bootstrap-options: unknown attribute 'azure-events_globalPullState'
-  # WARNING: cib-bootstrap-options: unknown attribute 'hostName_ hostname'
-  # These warning messages can be ignored.
-    - name:  Ensure Pacemaker resources for the Azure agent is created
-      shell: crm configure primitive rsc_azure-events ocf:heartbeat:azure-events op monitor interval=10s
-
-    - name: Ensure clone resource azure-events is configure
-      shell: crm configure clone cln_azure-events rsc_azure-events
-
-- name: Ensure the Cluster STONITH is configured
-  when: inventory_hostname == primary_instance.ip_admin
-  block:
     - name: Ensure maintenance mode is enabled
       shell: "crm configure property maintenance-mode=true"
 
@@ -144,18 +106,6 @@
       shell: >
         crm configure op_defaults \$id="op-options"
         timeout="600"
-
-    - name: Ensure the STONITH Azure fence agent is created when SBD not used
-      when: 
-        - hdb_size != "LargeInstance"
-        - groups['iscsi'] | length == 0
-      shell: >
-        crm configure primitive rsc_st_azure stonith:fence_azure_arm params
-        subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
-        resourceGroup="{{ resource_group_name }}"
-        tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
-        login="{{ sap_hana_fencing_agent_client_id }}"
-        passwd="{{ sap_hana_fencing_agent_client_password }}"
 
     - name: Ensure SAP HANA Topology resource is configured
       shell: >
@@ -205,11 +155,10 @@
         op monitor interval="10s" timeout="20s"
         params ip="{{ hdb_lb_feip }}"
 
-    # socat is recommended in place of netcat on Azure: https://www.suse.com/support/kb/doc/?id=000019536
-    - name: Ensure SAP HANA Heartbeat socat resource is configured
+    - name: Ensure SAP HANA Heartbeat netcat resource is configured
       shell: >
         crm configure primitive rsc_nc_{{ sid | upper }}_HDB{{ instance_number }} anything
-        params binfile="/usr/bin/socat" cmdline_options="-U TCP-LISTEN:625{{ instance_number }},backlog=10,fork,reuseaddr /dev/null"
+        params binfile="/usr/bin/nc" cmdline_options="-l -k 62500"
         op monitor timeout=20s interval=10 depth=0
 
     - name: Ensure Group IP Address resource is configured
