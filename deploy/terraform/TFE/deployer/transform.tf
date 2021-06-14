@@ -1,31 +1,30 @@
 locals {
   infrastructure = {
-                                    environment       = coalesce(var.environment, try(var.infrastructure.environment, ""))
-                                    region            = coalesce(var.location, try(var.infrastructure.region, ""))
-                                    codename          = try(var.codename, try(var.infrastructure.codename, ""))
+                                    environment                 = coalesce(var.environment, try(var.infrastructure.environment, ""))
+                                    region                      = coalesce(var.location, try(var.infrastructure.region, ""))
+                                    codename                    = try(var.codename, try(var.infrastructure.codename, ""))
     resource_group = {
-                                    name              = try(coalesce(var.resourcegroup_name, try(var.infrastructure.resource_group.name, "")), "")
-                                    arm_id            = try(coalesce(var.resourcegroup_arm_id, try(var.infrastructure.resource_group.arm_id, "")), "")
+                                    name                        = try(coalesce(var.resourcegroup_name, try(var.infrastructure.resource_group.name, "")), "")
+                                    arm_id                      = try(coalesce(var.resourcegroup_arm_id, try(var.infrastructure.resource_group.arm_id, "")), "")
     }
     vnets = {
       management = {
-                                    name              = try(coalesce(var.management_network_name, try(var.infrastructure.vnets.management.name, "")), "")
-                                    arm_id            = try(coalesce(var.management_network_arm_id, try(var.infrastructure.vnets.management.arm_id, "")), "")
-                                    address_space     = try(coalesce(var.management_network_address_space, try(var.infrastructure.vnets.management.address_space, "")), "")
-
+                                    name                        = try(coalesce(var.management_network_name, try(var.infrastructure.vnets.management.name, "")), "")
+                                    arm_id                      = try(coalesce(var.management_network_arm_id, try(var.infrastructure.vnets.management.arm_id, "")), "")
+                                    address_space               = try(coalesce(var.management_network_address_space, try(var.infrastructure.vnets.management.address_space, "")), "")
         subnet_mgmt = {
-                                    name   = try(coalesce(var.management_subnet_name, try(var.infrastructure.vnets.management.subnet_mgmt.name, "")), "")
-                                    arm_id = try(coalesce(var.management_subnet_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, "")), "")
-                                    prefix = try(coalesce(var.management_subnet_address_prefix, try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")), "")
+                                    name                        = try(coalesce(var.management_subnet_name, try(var.infrastructure.vnets.management.subnet_mgmt.name, "")), "")
+                                    arm_id                      = try(coalesce(var.management_subnet_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, "")), "")
+                                    prefix                      = try(coalesce(var.management_subnet_address_prefix, try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")), "")
           nsg = {
-                                    name        = try(coalesce(var.deployer_sub_mgmt_nsg_name, try(var.infrastructure.vnets.management.nsg_mgmt.name, "")), "")
-                                    arm_id      = try(coalesce(var.management_subnet_nsg_arm_id, try(var.infrastructure.vnets.management.nsg_mgmt.arm_id, "")), "")
-                                    allowed_ips = try(coalesce(var.management_subnet_nsg_allowed_ips, try(var.management_subnet_nsg_arm_id, "")), [])
+                                    name                        = try(coalesce(var.deployer_sub_mgmt_nsg_name, try(var.infrastructure.vnets.management.nsg_mgmt.name, "")), "")
+                                    arm_id                      = try(coalesce(var.management_subnet_nsg_arm_id, try(var.infrastructure.vnets.management.nsg_mgmt.arm_id, "")), "")
+                                    allowed_ips                 = try(coalesce(var.management_subnet_nsg_allowed_ips, try(var.management_subnet_nsg_arm_id, "")), [])
           }
         }
         subnet_fw = {
-                                    arm_id = try(coalesce(var.management_firewall_subnet_arm_id, try(var.infrastructure.vnets.management.subnet_fw.arm_id, "")), "")
-                                    prefix = try(coalesce(var.management_firewall_subnet_address_prefix, try(var.infrastructure.vnets.management.subnet_fw.prefix, "")), "")
+                                    arm_id                      = try(coalesce(var.management_firewall_subnet_arm_id, try(var.infrastructure.vnets.management.subnet_fw.arm_id, "")), "")
+                                    prefix                      = try(coalesce(var.management_firewall_subnet_address_prefix, try(var.infrastructure.vnets.management.subnet_fw.prefix, "")), "")
         }
       }
     }
@@ -62,7 +61,6 @@ locals {
                                     kv_sshkey_pub               = try(coalesce(var.deployer_public_key_secret_name, try(var.key_vault.kv_sshkey_pub, "")), "")
                                     kv_username                 = try(coalesce(var.deployer_username_secret_name, try(var.key_vault.kv_username, "")), "")
                                     kv_pwd                      = try(coalesce(var.deployer_password_secret_name, try(var.key_vault.kv_pwd, "")), "")
-
   }
   options = {
                                     enable_deployer_public_ip   = try(coalesce(var.enable_deployer_public_ip, try(var.options.enable_deployer_public_ip, false)), "")

@@ -1,0 +1,12 @@
+{
+    "infrastructure": {
+        "region": "westeurope",
+        "environment": "np"
+    },
+    "deployer": {
+        "environment": "np",
+        "region": "westeurope",
+        "vnet": "DEP00",
+        "use" : "true"
+    }
+}
