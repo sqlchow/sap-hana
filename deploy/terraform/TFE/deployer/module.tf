@@ -14,7 +14,7 @@ module "sap_deployer" {
   naming                          = module.sap_namegenerator.naming
   firewall_deployment             = local.firewall_deployment
   assign_subscription_permissions = local.assign_subscription_permissions
-  # bootstrap                       = true
+  bootstrap                       = false
 }
 
 module "sap_namegenerator" {
