@@ -1,6 +1,6 @@
 ---
 
-# RHEL Clustering - TODO - Need to split the playbook into generic and hana specific. Also we need to add the commands for rhel7 and rhel8
+# RHEL Clustering 
 # Azure ref: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
 
 # @TODO Subscribe to subscriptions/repos if required
@@ -78,8 +78,13 @@
         resourceGroup="{{ resource_group_name }}"
         tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
         subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
-        power_timeout=240
+        power_timeout=240 
         pcmk_reboot_timeout=900
+        pcmk_monitor_timeout=120
+        pcmk_monitor_retries=4 
+        pcmk_action_limit=3
+        op monitor interval=3600
+        
     
     - name: Ensure the STONTIH device is configured
       when: ansible_distribution_major_version == "8"
@@ -92,6 +97,10 @@
         subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
         power_timeout=240
         pcmk_reboot_timeout=900
+        pcmk_monitor_timeout=120
+        pcmk_monitor_retries=4 
+        pcmk_action_limit=3
+        op monitor interval=3600
 
     - name: Ensure the STONITH action is set to reboot
       shell: pcs property set stonith-action=reboot
@@ -101,52 +110,3 @@
 
 
 #End of Generic Pacemaker setup 
-
-# SAP HANA Cluster resources
-# https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability-rhel#create-sap-hana-cluster-resources
-- name: Optimise the Pacemaker cluster for SAP HANA
-  when: ansible_hostname == primary_instance.name
-  block:
-    - name: Enable Maintenance mode for the cluster
-      shell: pcs property set maintenance-mode=true
-
-    - name: Ensure the SAP HANA Topology resource is created
-      shell: >
-        pcs resource create SAPHanaTopology_{{ sid | upper }}_{{ instance_number }} SAPHanaTopology
-        SID={{ sid | upper }} InstanceNumber={{ instance_number }}
-        op start timeout=600
-        op stop timeout=300
-        op monitor interval=10 timeout=600
-        --clone clone-max=2 clone-node-max=1 interleave=true
-
-    - name: Ensure the SAP HANA resource is created
-      shell: >
-        pcs resource create SAPHana_{{ sid | upper }}_{{ instance_number }} SAPHana
-        SID={{ sid | upper }} InstanceNumber={{ instance_number }}
-        PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
-        AUTOMATED_REGISTER=false
-        op start timeout={{ cluster_SAPHana_timeouts.start }}
-        op stop timeout={{ cluster_SAPHana_timeouts.stop }}
-        op monitor interval=59 role="Master" timeout={{ cluster_SAPHana_timeouts.monitor_master }}
-        op monitor interval=61 role="Slave" timeout={{ cluster_SAPHana_timeouts.monitor_slave }}
-        op promote timeout={{ cluster_SAPHana_timeouts.promote }}
-        op demote timeout={{ cluster_SAPHana_timeouts.demote }}
-        master notify=true clone-max=2 clone-node-max=1 interleave=true
-
-    - name: Ensure the Virtual IP resource for the Load Balancer Front End IP is created
-      shell: pcs resource create vip_{{ sid | upper }}_{{ instance_number }} IPaddr2 ip="{{ hdb_lb_feip }}"
-
-    - name: Ensure the netcat resource for the Load Balancer Healthprobe is created
-      shell: pcs resource create nc_{{ sid | upper }}_{{ instance_number }} azure-lb port=625{{ instance_number }}
-
-    - name: Ensure the Virtual IP group resource is created
-      shell: pcs resource group add g_ip_{{ sid | upper }}_{{ instance_number }} nc_{{ sid | upper }}_{{ instance_number }} vip_{{ sid | upper }}_{{ instance_number }}
-
-    - name: Ensure the order constraint for the SAP HANA Topology is configured
-      shell: pcs constraint order SAPHanaTopology_{{ sid | upper }}_{{ instance_number }}-clone then SAPHana_{{ sid | upper }}_{{ instance_number }}-master symmetrical=false
-
-    - name: Ensure the Virtual IP is configured to the Master node
-      shell: pcs constraint colocation add g_ip_{{ sid | upper }}_{{ instance_number }} with master SAPHana_{{ sid | upper }}_{{ instance_number }}-master 4000
-
-    - name: Disable Maintenance mode for the cluster
-      shell: pcs property set maintenance-mode=false

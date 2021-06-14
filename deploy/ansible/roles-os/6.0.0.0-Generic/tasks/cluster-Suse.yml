@@ -284,3 +284,5 @@
 
     - name: Ensure maintenance mode is disabled
       shell: "crm configure property maintenance-mode=false"
+
+#End of Generic Pacemaker Setup
