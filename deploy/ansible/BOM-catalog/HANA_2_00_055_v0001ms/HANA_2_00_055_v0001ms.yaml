@@ -47,6 +47,7 @@ materials:
       extract:      true
       extractDir:   CD_HDBSERVER/COMPONENTS
       creates:      COMPONENTS/SAP_HANA_AFL/packages
+      url:          https://softwaredownloads.sap.com/file/0020000000458262021
 
     - name:         X
       archive:      IMDB_LCAPPS_2055_0-20010426.SAR
