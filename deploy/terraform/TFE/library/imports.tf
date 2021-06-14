@@ -7,7 +7,7 @@
 |                                                                              |
 +--------------------------------------4--------------------------------------*/
 data terraform_remote_state deployer {
-  backend                               = "local"
+  backend                               = "remote"
   # count                                 = length(var.deployer_statefile_foldername) > 0 || local.use_deployer ? 1 : 0
   config = {
     hostname                            = "app.terraform.io"
