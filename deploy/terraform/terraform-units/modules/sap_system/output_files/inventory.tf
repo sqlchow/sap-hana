@@ -189,20 +189,21 @@ resource "local_file" "ansible_inventory_new_yml" {
   directory_permission = "0770"
 }
 
-resource "local_file" "sap-parameters_yml" {
-  content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
-    sid           = var.hdb_sid,
-    kv_uri        = local.kv_name,
-    secret_prefix = local.secret_prefix,
-    disks         = var.disks
-    scs_ha        = var.scs_ha
-    db_ha         = var.db_ha
-    }
-  )
-  filename             = format("%s/ansible_config_files/sap-parameters.yaml", path.cwd)
-  file_permission      = "0660"
-  directory_permission = "0770"
-}
+# resource "local_file" "sap-parameters_yml" {
+#   content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
+#     sid           = var.hdb_sid,
+#     kv_uri        = local.kv_name,
+#     secret_prefix = local.secret_prefix,
+#     disks         = var.disks
+#     scs_ha        = var.scs_ha
+#     db_ha         = var.db_ha
+#     }
+#   )
+#   filename             = format("%s/ansible_config_files/sap-parameters.yaml", path.cwd)
+#   file_permission      = "0660"
+#   directory_permission = "0770"
+# }
+
 
 
 resource "azurerm_storage_blob" "hosts_yaml" {
@@ -212,4 +213,43 @@ resource "azurerm_storage_blob" "hosts_yaml" {
   storage_container_name = local.ansible_container_name
   type                   = "Block"
   source                 = local_file.ansible_inventory_new_yml.filename
+}
+
+resource "null_resource" "create-parameters-file" {
+  provisioner "local-exec" {
+    command = "ansible localhost --module-name lineinfile --args ${local.argsempty}"
+  }
+  triggers = {
+    val = local.argsempty
+  }
+
+}
+
+
+resource "null_resource" "update-parameters-file" {
+  depends_on = [
+    null_resource.create-parameters-file
+  ]
+  triggers = {
+    val = local.args
+  }
+
+  provisioner "local-exec" {
+    command = "ansible localhost --module-name blockinfile --args ${local.args}"
+  }
+}
+
+locals {
+  sid        = var.hdb_sid
+  kv_uri     = local.kv_name
+  scs_ha     = var.scs_ha
+  db_ha      = var.db_ha
+  diskstring = format("disks:\n  - %s", join("\n  - ", var.disks))
+  # scs_high_availability:         ${scs_ha}
+  # db_high_availability:          ${db_ha}
+  parameters = format("sid:                   %s\nkv_uri:                %s\nsecret_prefix:         %s\nscs_high_availability: %s\ndb_high_availability:  %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha)
+
+  args      = format("\"create=true path=%s state=present mode='0660' marker='# {mark} TERRAFORM CREATED BLOCK' insertbefore='^...' block='%s\n\n%s'\"", format("%s/sap-parameters.yaml", path.cwd), local.parameters, local.diskstring)
+  argsempty = format("\"create=true path=%s state=present mode='0660' line='%s'\"", format("%s/sap-parameters.yaml", path.cwd), "---\n...")
+
 }
