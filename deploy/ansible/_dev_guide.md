@@ -21,7 +21,7 @@
 
 ## Input Parameters
 
-The file `sap-parameters.yaml` must be maintained in the `ansible_config_files` sub-directory of the SDU deployment working directory.
+The file `sap-parameters.yaml` must be maintained in the SDU deployment working directory.
 
 The format of the file is as follows (example):
 ```

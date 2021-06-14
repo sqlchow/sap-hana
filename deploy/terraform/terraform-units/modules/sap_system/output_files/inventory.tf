@@ -184,7 +184,7 @@ resource "local_file" "ansible_inventory_new_yml" {
     ansible_user      = var.ansible_user
     }
   )
-  filename             = format("%s/ansible_config_files/%s_hosts.yaml", path.cwd, var.hdb_sid)
+  filename             = format("%s/%s_hosts.yaml", path.cwd, var.hdb_sid)
   file_permission      = "0660"
   directory_permission = "0770"
 }
@@ -199,7 +199,7 @@ resource "local_file" "sap-parameters_yml" {
     db_ha         = var.db_ha
     }
   )
-  filename             = format("%s/ansible_config_files/sap-parameters.yaml", path.cwd)
+  filename             = format("%s/sap-parameters.yaml", path.cwd)
   file_permission      = "0660"
   directory_permission = "0770"
 }

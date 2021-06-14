@@ -55,9 +55,9 @@ Future Steps will include:
 ### Post Deployment Configuration - Ansible
 <br/>
 
-1. From the SAP Deployment Workspace directory, change to the `ansible_config_files` directory.
+1. From the SAP Deployment Workspace directory, change to the `DEMO-EUS2-SAP00-X00` directory.
     ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-EUS2-SAP00-X00/ansible_config_files
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-EUS2-SAP00-X00
     ```
     <br/><br/>
 
