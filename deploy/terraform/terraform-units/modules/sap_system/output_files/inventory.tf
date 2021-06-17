@@ -189,20 +189,20 @@ resource "local_file" "ansible_inventory_new_yml" {
   directory_permission = "0770"
 }
 
-resource "local_file" "sap-parameters_yml" {
-  content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
-    sid           = var.hdb_sid,
-    kv_uri        = local.kv_name,
-    secret_prefix = local.secret_prefix,
-    disks         = var.disks
-    scs_ha        = var.scs_ha
-    db_ha         = var.db_ha
-    }
-  )
-  filename             = format("%s/sap-parameters.yaml", path.cwd)
-  file_permission      = "0660"
-  directory_permission = "0770"
-}
+# resource "local_file" "sap-parameters_yml" {
+#   content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
+#     sid           = var.hdb_sid,
+#     kv_uri        = local.kv_name,
+#     secret_prefix = local.secret_prefix,
+#     disks         = var.disks
+#     scs_ha        = var.scs_ha
+#     db_ha         = var.db_ha
+#     }
+#   )
+#   filename             = format("%s/sap-parameters.yaml", path.cwd)
+#   file_permission      = "0660"
+#   directory_permission = "0770"
+# }
 
 
 resource "azurerm_storage_blob" "hosts_yaml" {
@@ -246,9 +246,10 @@ locals {
   diskstring = format("disks:\n  - %s", join("\n  - ", var.disks))
   # scs_high_availability:         ${scs_ha}
   # db_high_availability:          ${db_ha}
-  parameters = format("sid:                   %s\nkv_uri:                %s\nsecret_prefix:         %s\nscs_high_availability: %s\ndb_high_availability:  %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha)
+  parameters = format("\nsap_sid:                   %s\nkv_uri:                    %s\nsecret_prefix:             %s\nscs_high_availability:     %s\ndb_high_availability:      %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha)
+  parametersempty = format("---\n\nbom_base_name:               \nsapbits_location_base_path:  \npassword_master:             \nsap_fqdn:                    \n\n...",)
 
   args      = format("\"create=true path=%s state=present mode='0660' marker='# {mark} TERRAFORM CREATED BLOCK' insertbefore='^...' block='%s\n\n%s'\"", format("%s/sap-parameters.yaml", path.cwd), local.parameters, local.diskstring)
-  argsempty = format("\"create=true path=%s state=present mode='0660' line='%s'\"", format("%s/sap-parameters.yaml", path.cwd), "---\n...")
+  argsempty = format("\"create=true path=%s state=present mode='0660' line='%s'\"", format("%s/sap-parameters.yaml", path.cwd), local.parametersempty)
 
 }
