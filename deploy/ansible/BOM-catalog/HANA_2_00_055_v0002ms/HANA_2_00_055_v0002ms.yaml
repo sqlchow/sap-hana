@@ -50,11 +50,11 @@ materials:
       url:          https://softwaredownloads.sap.com/file/0020000000458262021
 
     - name:         X
-      archive:      IMDB_LCAPPS_2055_0-20010426.SAR
+      archive:      IMDB_LCAPPS_2055_4-20010426.SAR
       extract:      true
       extractDir:   CD_HDBSERVER/COMPONENTS
       creates:      COMPONENTS/SAP_HANA_LCAPPS/packages
-      url:          https://softwaredownloads.sap.com/file/0020000000393992021
+      url:          https://softwaredownloads.sap.com/file/0020000000833822021
 
     - name:         X
       archive:      VCH190900_2055_0-80004631.SAR
