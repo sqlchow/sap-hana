@@ -239,14 +239,9 @@ resource "null_resource" "update-parameters-file" {
 }
 
 locals {
-  sid        = var.hdb_sid
-  kv_uri     = local.kv_name
-  scs_ha     = var.scs_ha
-  db_ha      = var.db_ha
+
   diskstring = format("disks:\n  - %s", join("\n  - ", var.disks))
-  # scs_high_availability:         ${scs_ha}
-  # db_high_availability:          ${db_ha}
-  parameters = format("\nsap_sid:                   %s\nkv_uri:                    %s\nsecret_prefix:             %s\nscs_high_availability:     %s\ndb_high_availability:      %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha)
+  parameters = format("\nsap_sid:                   %s\nkv_uri:                    %s\nsecret_prefix:             %s\nscs_high_availability:     %s\ndb_high_availability:      %s", var.hdb_sid, local.kv_name, local.secret_prefix, var.scs_ha, var.db_ha)
   parametersempty = format("---\n\nbom_base_name:               \nsapbits_location_base_path:  \npassword_master:             \nsap_fqdn:                    \n\n...",)
 
   args      = format("\"create=true path=%s state=present mode='0660' marker='# {mark} TERRAFORM CREATED BLOCK' insertbefore='^...' block='%s\n\n%s'\"", format("%s/sap-parameters.yaml", path.cwd), local.parameters, local.diskstring)
