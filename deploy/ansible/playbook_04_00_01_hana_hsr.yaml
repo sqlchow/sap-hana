@@ -1,18 +1,17 @@
 # /*----------------------------------------------------------------------------8
 # |                                                                            |
-# |                      Playbook for PACEMAKER General Config                 |
-# | This playbook will setup a generic pacemaker cluster on DB and SCS hosts   | 
+# |                      Playbook for HANA DB Install                           |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
 
-# TODO: Playbook not yet written
-#       This is a placeholder 
+# Steps:
+#   01) NFS: Mount
+#
 
-- hosts:          "{{ sap_sid|upper }}_DB  :
-                   {{ sap_sid|upper }}_SCS"                                           
+- hosts:          "{{ sap_sid|upper }}_DB"
 
-  name:           PACEMAKER - General Config
+  name:           DB Installation - HANA
   remote_user:    "{{ orchestration_ansible_user }}"                
   become:         yes
   become_user:    root
@@ -22,24 +21,34 @@
 
 
   tasks:
-
-  # - name: Test Connection                                     # Simple connection test for troubleshooting
-  #   ping:
-
-
-  tasks:
 # -------------------------------------+---------------------------------------8
 #
 # Build the list of tasks to be executed in order here. 
 #
 # -------------------------------------+---------------------------------------8
 
-# Specify the active tier for this playbook run
   - set_fact:
-     tier:     hdb
+      tier:     hdb                                                             # Actions for HANA DB Servers
+
+# -------------------------------------+---------------------------------------8
+# Role: sap-mounts
+#
+# Description: Mount Filesystems
+#              Mount NFS Filesystems
+#
+#  - include_role:
+#      name:     roles-sap-os/sap-mounts
+# -------------------------------------+---------------------------------------8
+
+
 
   - include_role:
-      name:     roles-os/6.0.0.0-Generic
+      name:     roles-db/4.0.1-hdb-hsr
+      
+
+
+
+
 
 #----------------------------------------
 # BEGIN
@@ -48,21 +57,32 @@
 # SOURCE: sap-playbook
 #----------------------------------------
 
-# # Only SLES support SBD fencing
-# - hosts: iscsi
+
+#----------------------------------------
+# BEGIN: Commented Section to enable BOM
+#        Process
+#
+# TODO: evaluate and refactor. DB install, HSR, HA
+#----------------------------------------
+
+# # Hana DB components install
+# - hosts: hanadbnodes
 #   become: true
 #   become_user: root
+#   any_errors_fatal: true
+#   vars_files:
+#     - "vars/ha-packages.yaml"
+#   pre_tasks:
+#     - name: Include SAP HANA DB sizes
+#       include_vars:
+#         file: "{{ configs_path }}/hdb_sizes.json"
+#         name: hdb_sizes
 #   roles:
-#    - role: iscsi-target-install
-#      when:
-#        - hana_database.size != "LargeInstance"
-#        - hana_database.high_availability
-#        - hostvars[hana_database.nodes[0].ip_admin_nic].ansible_os_family == 'Suse'
+#     - role: hdb-server-install
 
 #----------------------------------------
 # END
 #----------------------------------------
-
 
 ...
 # /*----------------------------------------------------------------------------8
