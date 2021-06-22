@@ -17,12 +17,12 @@ module "sap_library" {
 }
 
 module "sap_namegenerator" {
-  source               = "../../terraform-units/modules/sap_namegenerator"
-  environment          = local.infrastructure.environment
-  codename             = try(local.infrastructure.codename, "")
-  location             = local.infrastructure.region
-  deployer_environment = try(local.deployer.environment, local.infrastructure.environment)
-  deployer_location    = try(local.deployer.region, local.infrastructure.region)
-  management_vnet_name = local.deployer.vnet
-  random_id            = module.sap_library.random_id
+  source                  = "../../terraform-units/modules/sap_namegenerator"
+  environment             = local.infrastructure.environment
+  codename                = try(local.infrastructure.codename, "")
+  location                = local.infrastructure.region
+  deployer_environment    = try(local.deployer.environment, local.infrastructure.environment)
+  deployer_location       = try(local.deployer.region, local.infrastructure.region)
+  management_vnet_name    = local.deployer.vnet
+  random_id               = module.sap_library.random_id
 }
