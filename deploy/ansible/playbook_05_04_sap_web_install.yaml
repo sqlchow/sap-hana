@@ -1,6 +1,6 @@
 # /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |                 Playbook for SAP Web Dispatcher Install                |
+# |                 Playbook for SAP Web Dispatcher Install                    |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
@@ -8,7 +8,7 @@
 - hosts:          "{{ sap_sid|upper }}_WEB"
 
   name:           SAP Installation - WebDispatcher
-  remote_user:    "{{ orchestration_ansible_user }}"     
+  remote_user:    "{{ orchestration_ansible_user }}"
   serial:         1                                                             # /usr/sap/install is an NFS and we share SID/instance number - must be ran serially    
   become:         yes
   become_user:    root
