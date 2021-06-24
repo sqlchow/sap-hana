@@ -271,7 +271,6 @@ resource "azurerm_key_vault_secret" "witness_name" {
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
-
 resource "azurerm_key_vault_access_policy" "kv_user_msi" {
   provider = azurerm.main
   count = local.user_kv_exist ? (
