@@ -2,32 +2,28 @@
 {#
     Outer Loop: Loop over disk types
 #}
-{% for type in disktypes %}
+{% for disktype in disktypes %}
 {%     set pvlist = [] %}
-{%     set disk_count = namespace(value=0) %}
+{#
+    Initialise VG dictionary with VG name derived from disk type
+#}
+{%     set vg = {'vg': 'vg_' ~ (disk_type_to_name_map[disktype] |
+                                default(disktype))} %}
 {#
     Inner Loop: Loop over list of disks that match the execution host and the disk type
+    Note: '_' used as dummy variable that can be ignored
 #}
-{%     for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
-{%         set disk_count.value = loop.index %}
-{%         set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
+{%     for disk in disks if (disk.host == inventory_hostname) and (disk.type == disktype) %}
+{%         set _ = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
 {%     endfor %}
 {#
-    Map disk type to volume group name
+    Add list of pvs and diskcount to VG dictionary
+    Note: '_' used as dummy variable that can be ignored
 #}
-{%     if   type.type == 'sap' %}
-{%         set vg = { 'vg': 'vg_sap', 'pvs': pvlist|join(','), 'diskcount': disk_count.value } %}
-{%     elif type.type == 'data' %}
-{%         set vg = { 'vg': 'vg_hana_data', 'pvs': pvlist|join(','), 'diskcount': disk_count.value  } %}
-{%     elif type.type == 'log' %}
-{%         set vg = { 'vg': 'vg_hana_log', 'pvs': pvlist|join(',') , 'diskcount': disk_count.value  } %}
-{%     elif type.type == 'backup' %}
-{%         set vg = { 'vg': 'vg_hana_backup', 'pvs': pvlist|join(','), 'diskcount': disk_count.value  } %}
-{%     else %}
-{%         set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'diskcount': disk_count.value  } %}
-{%     endif %}
+{%     set _ = vg.update({'pvs': pvlist}) %}
 {#
-    Write Dictionary to List
+    Append VG dictionary to list of VGs
+    Note: '_' used as dummy variable that can be ignored
 #}
 {%     set _ = vgs.append(vg) %}
 {% endfor %}

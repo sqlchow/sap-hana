@@ -27,6 +27,8 @@
 
   - set_fact:
       tier:     scs
+    tags:
+      - always
 
   - include_role:
       name:     roles-sap/5.0.0-scs-install
