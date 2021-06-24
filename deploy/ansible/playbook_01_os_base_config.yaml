@@ -37,6 +37,8 @@
   # Specify the active tier for this playbook run
   - set_fact:
       tier:     os
+    tags:
+      - always
 
   - block:
       - include_role:

@@ -25,7 +25,9 @@
 #
 # -------------------------------------+---------------------------------------8
   - set_fact:
-      tier:     pas                                                          # SAP Install phase: PAS - Primary Application Server
+      tier:     pas                                                             # SAP Install phase: PAS - Primary Application Server
+    tags:
+      - always
 
 
 

@@ -65,31 +65,13 @@
 
 # -------------------------------------+---------------------------------------8
 #
-- name:                           Get the unique disk types
-  set_fact:
-    disktypes:                    "{{ 
-                                      (disktypes|default([])
-                                      +
-                                      [ { 'type': item.type }])|unique
-                                    }}"
-    cacheable:                    yes
-  loop:                           "{{ disks }}"
-  when:
-                                  - item.host is defined
-                                  - item.host == inventory_hostname
+- name:                           Load the disk configuration settings
+  include_vars:                   disks_config.yml
 
 - name:                           "print unique disks"
   debug:
     var:                          disktypes
     verbosity:                    2
-
-
-
-# -------------------------------------+---------------------------------------8
-#
-- name:                           "Define volume groups"
-  set_fact:
-    volume_groups:                "{{ lookup ('template', 'volume_groups.j2') }}"
 
 - name:                           "Print volume group details"
   debug:
@@ -107,7 +89,9 @@
     pesize:                       4M
     state:                        present
   loop:                           "{{ volume_groups }}"
-  when:                           tier == 'sapos'
+  when:
+    - tier == "sapos"
+
 
 
 # -------------------------------------+---------------------------------------8
@@ -117,58 +101,30 @@
     lv:                           "{{ item.lv }}"
     vg:                           "{{ item.vg }}"
     size:                         "{{ item.size }}"
-    opts:                         "{{ item.opts }}"
+    opts:                         "{{ lvol_opts_from_lv_item }}"
     active:                       yes
     state:                        present
     shrink:                       no
     resizefs:                     no
-  loop:
-    - { tier: 'all',         lv: 'lv_usrsap',        vg: 'vg_sap',         size: '64g',       opts: ''                                }
-    - { tier: 'scs',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '128g',      opts: ''                                }
-    - { tier: 'scs',         lv: 'lv_usrsapinstall', vg: 'vg_sap',         size: '100%FREE',  opts: ''                                }
-    - { tier: 'hana',        lv: 'lv_hana_shared',   vg: 'vg_sap',         size: '100%FREE',  opts: ''                                }
-    - { tier: 'hana',        lv: 'lv_hana_data',     vg: 'vg_hana_data',   size: '100%FREE',  opts: '-i {{ count_hana_data }} -I 256' }
-    - { tier: 'hana',        lv: 'lv_hana_log',      vg: 'vg_hana_log',    size: '100%FREE',  opts: '-i {{ count_hana_log  }}  -I 64' }
-    - { tier: 'hana',        lv: 'lv_hana_backup',   vg: 'vg_hana_backup', size: '100%FREE',  opts: ''                                }
-    - { tier: 'web',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '1g',        opts: ''                                }
-  when:                           ( item.tier == "all" or item.tier == node_tier) and tier == 'sapos'
-  vars:
-  # count_hana_data:        "{{ (                                                       # Integer; Number of disk devices.
-  #                               (
-  #                                 volume_groups                                       # Analyze List of Dictionaries.
-  #                                 | selectattr('vg', 'search', 'vg_hana_data')        # Find Dictionary for 'vg_hana_data'.
-  #                                 | list
-  #                                 | first
-  #                               ).pvs                                                 # Get value of 'pvs' key - List of disksdevices.
-  #                               | default('NOT_FOUND')
-  #                             ).split(',')                                            # Split on the comma.
-  #                             | count                                                 # Count the elements
-  #                         }}"
-  #
-    # count_hana_data:        "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs|default('NOT_FOUND')).count(',')+1 }}"
-    count_hana_data:        "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs|default('NOT_FOUND')).split(',')|count }}"
-    count_hana_log:         "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_log') |list|first).pvs|default('NOT_FOUND')).split(',')|count }}"
+  loop: "{{ logical_volumes }}"
+  when:
+    - item.tier in ["all", tier]
+    - item.node_tier in ["all", node_tier]
 
 
 
 # -------------------------------------+---------------------------------------8
 #
-# TODO: make the dev constant a global variable since it is used in multiple places (sap-mounts)
-#
 - name:                           "Filesystem creation"
   filesystem:
-    dev:                          "{{ item.dev }}"
+    dev:                          "{{ dev_path_from_lv_item }}"
     fstype:                       "{{ item.fstype }}"
-  loop:                           
-   - { tier: 'all',          fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsap' }
-   - { tier: 'scs',          fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
-   - { tier: 'scs',          fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsapinstall' }
-   - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_sap/lv_hana_shared' }
-   - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_hana_data/lv_hana_data' }
-   - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_hana_log/lv_hana_log' }
-   - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_hana_backup/lv_hana_backup' }
-   - { tier: 'web',          fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
-  when:                           (item.tier == "all" or item.tier == node_tier) and tier == 'sapos'
+    opts:                         "{{ item.fsopts | default('') }}"
+  loop: "{{ logical_volumes }}"
+  when:
+    - item.tier in ["all", tier]
+    - item.node_tier in ["all", node_tier]
+    - item.fstype is defined
 
 ...
 # /*---------------------------------------------------------------------------8

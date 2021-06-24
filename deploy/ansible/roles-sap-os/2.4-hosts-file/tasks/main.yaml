@@ -3,6 +3,13 @@
 #
 # TODO:
 
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Validation for Prerequisites 
+#
+- import_tasks:     pre_checks.yaml
+# -------------------------------------+---------------------------------------8
+
 ---
 #   OS: hosts file, Entries - /etc/hosts
 - name:           "OS: Common, Entries - /etc/hosts"
