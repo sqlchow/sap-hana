@@ -1,6 +1,6 @@
 # /*----------------------------------------------------------------------------8
 # |                                                                            |
-# |                      Playbook for HANA DB Install                           |
+# |                      Playbook for HANA DB HSR                          |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
@@ -29,6 +29,9 @@
 
   - set_fact:
       tier:     hdb                                                             # Actions for HANA DB Servers
+      primary_instance_name : "{{ ansible_play_hosts_all[0] }}"
+      secondary_instance_name: "{{ ansible_play_hosts_all[1] }}"
+
 
 # -------------------------------------+---------------------------------------8
 # Role: sap-mounts
