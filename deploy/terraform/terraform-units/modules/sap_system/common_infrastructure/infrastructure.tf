@@ -134,14 +134,14 @@ resource "azurerm_application_security_group" "db" {
 
 // Define a cloud-init config that disables the automatic expansion
 // of the root partition.
-data "template_cloudinit_config" "disable_growpart" {
+data "template_cloudinit_config" "config_growpart" {
   gzip          = true
   base64_encode = true
 
   # Main cloud-config configuration file.
   part {
     content_type = "text/cloud-config"
-    content      = "growpart: {'mode': 'off'}"
+    content      = "growpart: {'mode': 'auto'}"
   }
 }
 

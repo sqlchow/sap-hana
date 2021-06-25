@@ -92,6 +92,6 @@ output "use_local_credentials" {
   value = local.use_local_credentials
 }
 
-output "cloudinit_disable_growpart" {
-  value = local.cloudinit_disable_growpart
+output "cloudinit_growpart_config" {
+  value = local.cloudinit_growpart_config
 }

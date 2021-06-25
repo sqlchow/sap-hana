@@ -138,7 +138,7 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
 
   size = local.hdb_vms[count.index].size
 
-  custom_data = var.cloudinit_disable_growpart
+  custom_data = var.cloudinit_growpart_config
 
   dynamic "os_disk" {
     iterator = disk

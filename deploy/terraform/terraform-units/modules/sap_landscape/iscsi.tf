@@ -86,7 +86,7 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   admin_password                  = local.iscsi_auth_password
   disable_password_authentication = local.enable_iscsi_auth_key
 
-  custom_data = try(data.template_cloudinit_config.disable_growpart.rendered, "Cg==")
+  custom_data = try(data.template_cloudinit_config.config_growpart.rendered, "Cg==")
 
   os_disk {
     name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[count.index], local.resource_suffixes.osdisk)
@@ -124,13 +124,13 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
 
 // Define a cloud-init config that disables the automatic expansion
 // of the root partition.
-data "template_cloudinit_config" "disable_growpart" {
+data "template_cloudinit_config" "config_growpart" {
   gzip          = true
   base64_encode = true
 
   # Main cloud-config configuration file.
   part {
     content_type = "text/cloud-config"
-    content      = "growpart: {'mode': 'off'}"
+    content      = "growpart: {'mode': 'auto'}"
   }
 }
