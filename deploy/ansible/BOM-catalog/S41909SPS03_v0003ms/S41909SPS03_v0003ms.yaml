@@ -95,8 +95,8 @@ materials:
       url:          https://softwaredownloads.sap.com/file/0020000000703122018
 
     # SWPM
-    - name:         "KIMMO -SWPM20SP08 ; OS: Linux on x86_64 64bit"
-      archive:      SWPM20SP08_6-80003424.SAR
+    - name:         "SWPM20SP09 ; OS: Linux on x86_64 64bit"
+      archive:      SWPM20SP09_0-80003424.SAR
       extract:      true
       extractDir:   SWPM
       creates:      SIGNATURE.SMF

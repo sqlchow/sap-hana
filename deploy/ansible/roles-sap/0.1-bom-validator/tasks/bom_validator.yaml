@@ -38,7 +38,7 @@
     name:                         roles-sap/3.3.1-bom-utility
     tasks_from:                   bom-register
   vars:
-    inventory_dir:                "{{ download_directory }}"
+    inventory_dir:                "{{ download_directory }}/bom"
 
 #------------------<DEBUGGING>-------------------
 # - debug:  
