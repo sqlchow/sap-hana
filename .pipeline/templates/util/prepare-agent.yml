@@ -1,5 +1,7 @@
 steps:
   - script: |
+
+  
       echo "=== Install fixed version of Terraform ==="
       wget -q https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
       unzip terraform_0.14.7_linux_amd64.zip -d terraform_0.14.7/
@@ -17,9 +19,9 @@ steps:
       ansible_collections=$${ansible_base}/collections
       ansible_pip3=$${ansible_venv_bin}/pip3
 
-      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-pip
-      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-virtualenv
-      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm virtualenv
+      sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-pip
+      sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-virtualenv
+      sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm virtualenv
 
       #
       # Install latest Ansible revision of specified version for all users.
