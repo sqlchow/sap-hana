@@ -17,6 +17,10 @@ steps:
       ansible_collections=$${ansible_base}/collections
       ansible_pip3=$${ansible_venv_bin}/pip3
 
+      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-pip
+      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-virtualenv
+      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm virtualenv
+
       #
       # Install latest Ansible revision of specified version for all users.
       #
