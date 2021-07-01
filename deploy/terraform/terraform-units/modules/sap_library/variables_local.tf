@@ -72,6 +72,10 @@ locals {
   sa_tfstate_container_exists = try(var.storage_account_tfstate.tfstate_blob_container.is_existing, false)
   sa_tfstate_container_name   = try(var.storage_account_tfstate.tfstate_blob_container.name, local.resource_suffixes.tfstate)
 
+  //Ansible
+  sa_ansible_container_exists = try(var.storage_account_tfstate.ansible_blob_container.is_existing, false)
+  sa_ansible_container_name   = try(var.storage_account_tfstate.ansible_blob_container.name, local.resource_suffixes.ansible)
+
   // deployer
   deployer      = try(var.deployer, {})
   deployer_vnet = try(local.deployer.vnet, "")
@@ -84,7 +88,8 @@ locals {
 
   // deployer terraform.tfstate
   deployer_tfstate          = var.deployer_tfstate
-  deployer_msi_principal_id = local.deployer_tfstate.outputs.deployer_uai.principal_id
+  deployer_defined          = length(var.deployer_tfstate) > 0
+  deployer_msi_principal_id = local.deployer_defined ? try(local.deployer_tfstate.deployer_uai.principal_id, local.deployer_tfstate.deployer_uai) : ""
 
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")
@@ -99,10 +104,11 @@ locals {
   prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.keyvault_names.private_access
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
 
-}
-
-locals {
   rg_library_location           = local.rg_exists ? data.azurerm_resource_group.library[0].location : azurerm_resource_group.library[0].location
   storagecontainer_sapbits_name = local.sa_sapbits_blob_container_enable ? local.sa_sapbits_blob_container_name : null
   fileshare_sapbits_name        = local.sa_sapbits_file_share_enable ? local.sa_sapbits_file_share_name : null
+
+
+  deployer_kv_user_arm_id = local.deployer_defined ? try(local.deployer_tfstate.deployer_kv_user_arm_id, "") : ""
+  
 }

@@ -44,7 +44,8 @@ output "deployer_pip" {
 
 // Details of deployer(s)
 output "deployers" {
-  value = local.deployers_updated
+  sensitive = true
+  value     = local.deployers_updated
 }
 
 output "random_id" {
@@ -94,4 +95,12 @@ output "deployer_public_ip_address" {
 
 output "deployer_private_ip_address" {
   value = local.enable_deployers ? azurerm_network_interface.deployer[*].private_ip_address : []
+}
+
+output "firewall_ip" {
+  value = var.firewall_deployment ? azurerm_firewall.firewall[0].ip_configuration[0].private_ip_address : ""
+}
+
+output "firewall_id" {
+  value = var.firewall_deployment ? azurerm_firewall.firewall[0].id : ""
 }
