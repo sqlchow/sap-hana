@@ -5,6 +5,114 @@ steps:
       unzip terraform_0.14.7_linux_amd64.zip -d terraform_0.14.7/
       sudo mv terraform_0.14.7/terraform /usr/local/bin/terraform
 
+      ansible_version="$${ansible_version:-2.9}"
+      ansible_major="$${ansible_version%%.*}"
+      ansible_minor=$(echo "$${ansible_version}." | cut -d . -f 2)
+
+      # Ansible installation directories
+      ansible_base=/opt/ansible
+      ansible_bin=$${ansible_base}/bin
+      ansible_venv=$${ansible_base}/venv/$${ansible_version}
+      ansible_venv_bin=$${ansible_venv}/bin
+      ansible_collections=$${ansible_base}/collections
+      ansible_pip3=$${ansible_venv_bin}/pip3
+
+      #
+      # Install latest Ansible revision of specified version for all users.
+      #
+      sudo mkdir -p \
+          $${ansible_bin} \
+          $${ansible_collections}
+
+      # Create a Python3 based venv into which we will install Ansible.
+      if [[ ! -e "$${ansible_venv_bin}/activate" ]]; then
+          sudo rm -rf $${ansible_venv}
+          sudo virtualenv --python python3 $${ansible_venv}
+      fi
+
+      # Fail if pip3 doesn't exist in the venv
+      if [[ ! -x "$${ansible_venv_bin}/pip3" ]]; then
+          echo "Using the wrong pip3: '$${found_pip3}' != '$${ansible_venv_bin}/pip3'"
+          exit 1
+      fi
+
+      # Ensure that standard tools are up to date
+      sudo $${ansible_venv_bin}/pip3 install --upgrade \
+          pip \
+          wheel \
+          setuptools
+
+      # Install latest MicroSoft Authentication Library
+      # TODO(rtamalin): Do we need this? In particular do we expect to integrated
+      # Rust based tools with the Python/Ansible envs that we are using?
+      sudo $${ansible_venv_bin}/pip3 install \
+          setuptools-rust
+
+      # Install latest revision of target Ansible version, along with additional
+      # useful/supporting Python packages such as ansible-lint, yamllint,
+      # argcomplete, pywinrm.
+      sudo $${ansible_venv_bin}/pip3 install \
+          "ansible>=$${ansible_major}.$${ansible_minor},<$${ansible_major}.$((ansible_minor + 1))" \
+          ansible-lint \
+          argcomplete \
+          'pywinrm>=0.3.0' \
+          yamllint \
+          msal
+
+      # Install Ansible collections under the ANSIBLE_COLLECTIONS_PATHS for all users.
+      sudo mkdir -p $${ansible_collections}
+      sudo -H $${ansible_venv_bin}/ansible-galaxy collection install azure.azcollection --force --collections-path $${ansible_collections}
+
+      # Install the Python requirements associated with the Ansible Azure collection
+      # that was just installed into the Ansible venv.
+      azure_azcollection_version=$(jq -r '.collection_info.version' $${ansible_collections}/ansible_collections/azure/azcollection/MANIFEST.json)
+      wget -nv -O /tmp/requirements-azure.txt https://raw.githubusercontent.com/ansible-collections/azure/v$${azure_azcollection_version}/requirements-azure.txt
+      sudo $${ansible_venv_bin}/pip3 install \
+          -r /tmp/requirements-azure.txt
+
+      # Create symlinks for all relevant commands that were installed in the Ansible
+      # venv's bin so that they are available in the /opt/ansible/bin directory, which
+      # will be added to the system PATH. This ensures that we expose only those tools
+      # that we need from the Ansible venv bin directory without superceding standard
+      # system versions of the commands that are also found there, e.g. python3.
+      ansible_venv_commands=(
+          # Ansible 2.9 command set
+          ansible
+          ansible-config
+          ansible-connection
+          ansible-console
+          ansible-doc
+          ansible-galaxy
+          ansible-inventory
+          ansible-playbook
+          ansible-pull
+          ansible-test
+          ansible-vault
+
+          # ansible-lint
+          ansible-lint
+
+          # argcomplete
+          activate-global-python-argcomplete
+
+          # yamllint
+          yamllint
+      )
+
+      relative_path="$(realpath --relative-to $${ansible_bin} $${ansible_venv_bin})"
+      for vcmd in "$${ansible_venv_commands[@]}"
+      do
+          sudo ln -vfs $${relative_path}/$${vcmd} $${ansible_bin}/$${vcmd}
+      done
+
+      # Ensure that Python argcomplete is enabled for all users interactive shell sessions
+      sudo $${ansible_bin}/activate-global-python-argcomplete
+
+      # Set env for ansible
+      echo export ANSIBLE_HOST_KEY_CHECKING=False | sudo tee -a /etc/profile.d/deploy_server.sh
+      echo export ANSIBLE_COLLECTIONS_PATHS=$${ansible_collections} | sudo tee -a /etc/profile.d/deploy_server.sh
+
+
       terraform --version
 
       echo "=== Set SSH keypair ==="
