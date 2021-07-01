@@ -1,5 +1,108 @@
 steps:
   - script: |
+
+  distro_name=""
+  distro_version=""
+  distro_name_version=""
+  error()
+  {
+      echo 1>&2 "ERROR: $${@}"
+  }
+
+  get_distro_name()
+  {
+      typeset -g distro_name
+
+      if [[ -z "$${distro_name:-}" ]]; then
+          distro_name="$(. /etc/os-release; echo "$${ID,,}")"
+      fi
+
+      echo "$${distro_name}"
+  }
+
+  get_distro_version()
+  {
+      typeset -g distro_version
+
+      if [[ -z "$${distro_version:-}" ]]; then
+          distro_version="$(. /etc/os-release; echo "$${VERSION_ID,,}")"
+      fi
+
+      echo "$${distro_version}"
+  }
+
+  get_distro_name_version()
+  {
+      typeset -g distro_name_version
+
+      if [[ -z "$${distro_name_version:-}" ]]; then
+          distro_name_version="$(get_distro_name)_$(get_distro_version)"
+      fi
+
+      echo "$${distro_name_version}"
+  }
+
+  #
+  # Package Management Functions
+  #
+  pkg_mgr_init()
+  {
+      typeset -g pkg_mgr
+
+      case "$(get_distro_name)" in
+      (ubuntu|debian)
+          pkg_mgr="apt-get"
+          ;;
+      (sles|opensuse*)
+          pkg_mgr="zypper"
+          ;;
+      (*)
+          error "Unsupported distibution: '$${distro_name}'"
+          exit 1
+          ;;
+      esac
+  }
+
+  pkg_mgr_refresh()
+  {
+      typeset -g pkg_mgr pkg_mgr_refreshed
+
+      if [[ -z "$${pkg_mgr:-}" ]]; then
+          pkg_mgr_init
+      fi
+
+      if [[ -n "$${pkg_mgr_refreshed:-}" ]]; then
+          return
+      fi
+
+      case "$${pkg_mgr}" in
+      (apt-get)
+          sudo $${pkg_mgr} update --quiet
+          ;;
+      (zypper)
+          sudo $${pkg_mgr} --gpg-auto-import-keys --quiet refresh 
+          ;;
+      esac
+
+      pkg_mgr_refreshed=true
+  }
+
+  pkg_mgr_install()
+  {
+      typeset -g pkg_mgr
+
+      pkg_mgr_refresh
+
+      case "$${pkg_mgr}" in
+      (apt-get)
+          sudo env DEBIAN_FRONTEND=noninteractive $${pkg_mgr} --quiet --yes install "$${@}"
+          ;;
+      (zypper)
+          sudo $${pkg_mgr} --gpg-auto-import-keys --quiet --non-interactive install --no-confirm "$${@}"
+          ;;
+      esac
+  }
+
       echo "=== Install fixed version of Terraform ==="
       wget -q https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
       unzip terraform_0.14.7_linux_amd64.zip -d terraform_0.14.7/
@@ -17,9 +120,50 @@ steps:
       ansible_collections=$${ansible_base}/collections
       ansible_pip3=$${ansible_venv_bin}/pip3
 
-      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-pip
-      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-virtualenv
-      sudo zypper --gpg-auto-import-keys --quiet --non-interactive install --no-confirm virtualenv
+      case "$(get_distro_name_version)" in
+      (sles_12*)
+          error "Unsupported distro: $${distro_name_version} doesn't provide virtualenv in standard repos."
+          exit 1
+          ;;
+      (ubuntu*|sles*)
+          echo "$${distro_name_version} is supported."
+          ;;
+      (*)
+          error "Unsupported distro: $${distro_name_version} not currently supported."
+          exit 1
+          ;;
+      esac
+
+      # List of required packages whose names are common to all supported distros
+      required_pkgs=(
+          jq
+          unzip
+      )
+
+      # Include distro version agnostic packages into required packages list
+      case "$(get_distro_name)" in
+      (ubuntu|sles)
+          required_pkgs+=(
+              python3-pip
+              python3-virtualenv
+          )
+          ;;
+      esac
+
+      # Include distro version specific packages into required packages list
+      case "$(get_distro_name_version)" in
+      (ubuntu_18.04)
+          required_pkgs+=(
+              virtualenv
+          )
+          ;;
+      esac
+
+      # Ensure our package metadata cache is up to date
+      pkg_mgr_refresh
+
+      # Install required packages as determined above
+      pkg_mgr_install "$${required_pkgs[@]}"
 
       #
       # Install latest Ansible revision of specified version for all users.
