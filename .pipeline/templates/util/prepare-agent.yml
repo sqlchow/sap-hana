@@ -19,6 +19,7 @@ steps:
       ansible_collections=$${ansible_base}/collections
       ansible_pip3=$${ansible_venv_bin}/pip3
 
+
       sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-pip
       sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-virtualenv
       sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm virtualenv
