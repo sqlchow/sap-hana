@@ -20,9 +20,9 @@ steps:
       ansible_pip3=$${ansible_venv_bin}/pip3
 
 
-      sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-pip
-      sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm python3-virtualenv
-      sudo apt-get --gpg-auto-import-keys --quiet --non-interactive install --no-confirm virtualenv
+      sudo apt-get  --quiet --non-interactive install --no-confirm python3-pip
+      sudo apt-get  --quiet --non-interactive install --no-confirm python3-virtualenv
+      sudo apt-get  --quiet --non-interactive install --no-confirm virtualenv
 
       #
       # Install latest Ansible revision of specified version for all users.
