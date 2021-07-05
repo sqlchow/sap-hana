@@ -1,23 +1,23 @@
 ---
 
-- name: Ensure backup directory exists for HANA database with System Identifier {{ sid }}
+- name: Ensure backup directory exists for HANA database with System Identifier {{ hdb_sid }}
   file:
-    path: "{{ sid_backup_dir }}"
+    path: "{{ hdb_sid_backup_dir }}"
     state: directory
-    owner: "{{ sid_admin_user }}"
+    owner: "{{ hdb_sid_admin_user }}"
 
 - name: Ensure backup is taken on primary node
   # If HSR is already enabled, we don't need to do this
   when: ansible_hostname == primary_instance.name and not hana_system_replication_enabled
-  become_user: "{{ sid_admin_user }}"
+  become_user: "{{ hdb_sid_admin_user }}"
   block:
-    - name: Check whether backup exists for SYSTEMDB database for System Identifier {{ sid }}
+    - name: Check whether backup exists for SYSTEMDB database for System Identifier {{ hdb_sid }}
       shell: >
         . ~/.bashrc && {{ hdbsql_systemdb_command }} "{{ backup_exists_cmd_for_systemdb }}"
       register: backup_exists_cmd_for_systemdb_result
       changed_when: false
 
-    - name: Ensure backup exists for SYSTEMDB database for System Identifier {{ sid }}
+    - name: Ensure backup exists for SYSTEMDB database for System Identifier {{ hdb_sid }}
       shell: >
         . ~/.bashrc && {{ hdbsql_systemdb_command }} "{{ backup_cmd_for_systemdb }}"
       vars:
@@ -29,13 +29,13 @@
       when: hana_has_tenant_db
       block:
 
-        - name: Check whether backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ sid }}
+        - name: Check whether backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ hdb_sid }}
           shell: >
             . ~/.bashrc && {{ hdbsql_tenant_command }} "{{ backup_exists_cmd_for_tenant }}"
           register: backup_exists_cmd_for_tenant_result
           changed_when: false
 
-        - name: Ensure backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ sid }}
+        - name: Ensure backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ hdb_sid }}
           shell: >
             . ~/.bashrc && {{ hdbsql_tenant_command }} "{{ backup_cmd_for_tenant }}"
           vars:
