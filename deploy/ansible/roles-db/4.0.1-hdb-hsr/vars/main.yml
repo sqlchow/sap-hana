@@ -8,6 +8,7 @@
 hana_group: "sapsys"
 hana_dir: "/hana"
 sap_dir: "/usr/sap"
+hdb_sid_backup_dir: "/hana/backup"
 
 hdb_sid_admin_user: "{{ hdb_sid | lower }}adm"
 

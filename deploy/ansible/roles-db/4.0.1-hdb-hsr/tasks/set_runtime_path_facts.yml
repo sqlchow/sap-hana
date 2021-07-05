@@ -19,11 +19,12 @@
     path_xsa_ssfs_dat: "{{ hana_global_dir }}/xsa/security/ssfs/data/SSFS_{{ hdb_sid | upper }}.DAT"
     path_xsa_ssfs_key: "{{ hana_global_dir }}/xsa/security/ssfs/key/SSFS_{{ hdb_sid | upper }}.KEY"
 
-- name: Determine path of hdb_sid backup directory from hdb_sizes.json
-  set_fact:
-    hdb_sid_backup_dir: "{{ item.mount_point }}/{{ hdb_sid | upper }}"
-  loop: "{{ hdb_disks }}"
-  when: item.name == "backup"
+# Deprecating this task - By default the HANA backup dir is /hana/backup
+#- name: Determine path of hdb_sid backup directory from hdb_sizes.json
+#  set_fact:
+#    hdb_sid_backup_dir: "{{ item.mount_point }}/{{ hdb_sid | upper }}"
+#  loop: "{{ hdb_disks }}"
+#  when: item.name == "backup"
 
 - name: Ensure HANA backup file names are set
   set_fact:
