@@ -66,3 +66,13 @@
         var: hdb_version
     - debug:
         var: hdb_version[0:2]
+
+- name: set the primary intance db nic and admin nic IP
+  set_fact:
+    primary_instance_ip_db: "{{ hostvars[primary_instance_name]['ansible_eth0']['ipv4']['address'] }}"
+    primary_instance_ip_admin: "{{ hostvars[primary_instance_name]['ansible_eth1']['ipv4']['address'] }}"
+
+- name: set the secondary intance db nic and admin nic IP
+  set_fact:
+    secondary_instance_ip_db: "{{ hostvars[secondary_instance_name]['ansible_eth0']['ipv4']['address'] }}"
+    secondary_instance_ip_admin: "{{ hostvars[secondary_instance_name]['ansible_eth1']['ipv4']['address'] }}"

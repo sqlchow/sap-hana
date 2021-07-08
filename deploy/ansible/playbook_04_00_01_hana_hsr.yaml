@@ -6,7 +6,7 @@
 ---
 
 # Steps:
-#   01) NFS: Mount
+#   01) Hana DB system replication 
 #
 
 - hosts:          "{{ sap_sid|upper }}_DB"
@@ -29,63 +29,14 @@
 
   - set_fact:
       tier:     hdb                                                             # Actions for HANA DB Servers
-      primary_instance_name : "{{ ansible_play_hosts_all[0] }}"
-      secondary_instance_name: "{{ ansible_play_hosts_all[1] }}"
-
-
-# -------------------------------------+---------------------------------------8
-# Role: sap-mounts
-#
-# Description: Mount Filesystems
-#              Mount NFS Filesystems
-#
-#  - include_role:
-#      name:     roles-sap-os/sap-mounts
-# -------------------------------------+---------------------------------------8
-
+      primary_instance_name : "{{ ansible_play_hosts_all[0] }}"                 # Setting up Primary Instance Name 
+      secondary_instance_name: "{{ ansible_play_hosts_all[1] }}"                # Setting up Secondary Instance Name
 
 
   - include_role:
       name:     roles-db/4.0.1-hdb-hsr
       
 
-
-
-
-
-#----------------------------------------
-# BEGIN
-#
-# TODO: evaluate for inclusion and refactor.
-# SOURCE: sap-playbook
-#----------------------------------------
-
-
-#----------------------------------------
-# BEGIN: Commented Section to enable BOM
-#        Process
-#
-# TODO: evaluate and refactor. DB install, HSR, HA
-#----------------------------------------
-
-# # Hana DB components install
-# - hosts: hanadbnodes
-#   become: true
-#   become_user: root
-#   any_errors_fatal: true
-#   vars_files:
-#     - "vars/ha-packages.yaml"
-#   pre_tasks:
-#     - name: Include SAP HANA DB sizes
-#       include_vars:
-#         file: "{{ configs_path }}/hdb_sizes.json"
-#         name: hdb_sizes
-#   roles:
-#     - role: hdb-server-install
-
-#----------------------------------------
-# END
-#----------------------------------------
 
 ...
 # /*----------------------------------------------------------------------------8
