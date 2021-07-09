@@ -254,7 +254,7 @@ locals {
   app_os = {
     "os_type"         = local.app_ostype
     "source_image_id" = local.app_custom_image ? var.application.os.source_image_id : ""
-    "publisher"       = try(var.application.os.publisher, local.app_custom_image ? "" : "suse")
+    "publisher"       = try(var.application.os.publisher, local.app_custom_image ? "" : "SUSE")
     "offer"           = try(var.application.os.offer, local.app_custom_image ? "" : "sles-sap-12-sp5")
     "sku"             = try(var.application.os.sku, local.app_custom_image ? "" : "gen1")
     "version"         = try(var.application.os.version, local.app_custom_image ? "" : "latest")

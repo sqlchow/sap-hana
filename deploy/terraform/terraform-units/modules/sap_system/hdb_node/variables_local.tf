@@ -150,7 +150,7 @@ locals {
   hdb_custom_image = length(try(local.hdb.os.source_image_id, "")) > 0
   hdb_os = {
     "source_image_id" = local.hdb_custom_image ? local.hdb.os.source_image_id : ""
-    "publisher"       = try(local.hdb.os.publisher, local.hdb_custom_image ? "" : "suse")
+    "publisher"       = try(local.hdb.os.publisher, local.hdb_custom_image ? "" : "SUSE")
     "offer"           = try(local.hdb.os.offer, local.hdb_custom_image ? "" : "sles-sap-12-sp5")
     "sku"             = try(local.hdb.os.sku, local.hdb_custom_image ? "" : "gen1")
     "version"         = try(local.hdb.os.version, local.hdb_custom_image ? "" : "latest")
