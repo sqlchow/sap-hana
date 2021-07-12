@@ -48,7 +48,7 @@ It is possible to add multiple nodes in the structure to create additional disks
 
 ```json
 {
-  "type" : {
+  "db" : {
     "Default": {
       "compute": {
         "vm_size"                 : "Standard_D4s_v3",
@@ -107,7 +107,7 @@ If there is a need to grow the system by adding additional disks to an already d
 
 ```json
 {
-  "type" : {
+  "db" : {
     "Default": {
       "compute": {
         "vm_size"                 : "Standard_D4s_v3",
