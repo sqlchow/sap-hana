@@ -217,9 +217,9 @@ if [ ! -n "${region}" ]; then
     exit 64                                                                                           #script usage wrong
 fi
 
-automation_config_directory=~/.sap_deployment_automation/
-generic_config_information="${automation_config_directory}"config
-deployer_config_information="${automation_config_directory}""${environment}""${region}"
+automation_config_directory=~/.sap_deployment_automation
+generic_config_information="${automation_config_directory}"/config
+deployer_config_information="${automation_config_directory}"/"${environment}""${region}"
 
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]; then
@@ -354,8 +354,6 @@ if [ 0 == $step ]; then
 
     cd "${deployer_dirname}" || exit
 
-    rm -Rf .terraform terraform.tfstate*
-
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
 
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_deployer.sh $allParams
@@ -401,8 +399,7 @@ if [ 1 == $step ]; then
             read -p "Do you want to specify the SPN Details Y/N?" ans
             answer=${ans^^}
             if [ "$answer" == 'Y' ]; then
-
-                allParams="${env_param}""${keyvault_param}""${region_param}"
+                allParams=$(printf " -e %s -r %s -v %s " "${environment}" "${region}" "${keyvault}" )
 
                 "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
                 if (($? > 0)); then
