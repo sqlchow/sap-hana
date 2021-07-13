@@ -420,9 +420,6 @@ if [ 1 == $step ]; then
         cd "${curdir}" || exit
         step=2
         save_config_var "step" "${deployer_config_information}"
-    else
-        unset TF_DATA_DIR
-        exit 77
 
     fi
 fi
