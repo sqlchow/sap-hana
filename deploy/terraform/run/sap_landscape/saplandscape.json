@@ -27,7 +27,7 @@
             }
         },
         "iscsi": {
-            "iscsi_count": 3
+            "iscsi_count": 0
         }
     },
     "authentication": {
