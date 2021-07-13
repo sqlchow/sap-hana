@@ -333,18 +333,8 @@ if [ 0 == $step ]; then
     echo "#########################################################################################"
     echo ""
 
-    # Cleanup any old  info
-    if [ -f "${deployer_config_information}" ]; then
-        rm "${deployer_config_information}"
-    fi
-    
-    init "${automation_config_directory}" "${generic_config_information}" "${deployer_config_information}"
-
-    if [ ! -z "${subscription}" ]; then
-        ARM_SUBSCRIPTION_ID="${subscription}"
-        save_config_var "ARM_SUBSCRIPTION_ID" "${deployer_config_information}"
-        save_config_var "subscription" "${deployer_config_information}"
-        export ARM_SUBSCRIPTION_ID=$subscription
+    if [ $force == 1 ]; then
+        rm -Rf .terraform terraform.tfstate*
     fi
 
     #Persist the parameters
