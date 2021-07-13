@@ -13,7 +13,7 @@ steps:
       echo -e "$(hana-pipeline-rsa-pub)" > $HOME/.ssh/id_rsa.pub
       chmod 400 $HOME/.ssh/id_rsa
 
-      sudo apt -y install python3-pip"
+      sudo apt -y install python3-pip
       sudo pip3 install --upgrade pip
       sudo apt-get update
       sudo apt-get install python-setuptools
