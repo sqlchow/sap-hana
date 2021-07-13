@@ -333,7 +333,7 @@ then
         load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
     fi
 
-    if [ -z $STATE_SUBSCRIPTION]
+    if [ -z "${STATE_SUBSCRIPTION}" ]
     then
         # Retain post processing in case tfstate_resource_id was set by earlier
         # version of script tools.
