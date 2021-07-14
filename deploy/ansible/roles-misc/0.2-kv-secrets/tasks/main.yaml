@@ -25,15 +25,9 @@
 # ----------------------------------------
 
 
-  # -------------------------------------+---------------------------------------8
+# -------------------------------------+---------------------------------------8
 #
-- name:                           ""
-  lvg:
-    vg:                           "{{ item.vg }}"
-    pvs:                          "{{ item.pvs }}"
-    pesize:                       4M
-    state:                        present
-  loop:                           "{{ volume_groups }}"
+
 
 
 - name: "BoM Secrets: Retrieve S User details"
@@ -59,7 +53,8 @@
 - name: Show S User
   debug:
     var:                          SUser
-    verbosity:                    2  when:
+    verbosity:                    2  
+  when:
     - tier == "bom"
 
 
