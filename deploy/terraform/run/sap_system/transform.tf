@@ -47,26 +47,26 @@ locals {
 
   dbnodes = try(compact(var.database_vm_nodes, var.databases[0].dbnodes), {})
 
-  databases_temp = [
-    {
-      high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
-      use_DHCP          = var.database_vm_use_DHCP || try(var.databases[0].use_DHCP, false)
+  databases_temp = {
+    high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
+    use_DHCP          = var.database_vm_use_DHCP || try(var.databases[0].use_DHCP, false)
 
-      platform = try(coalesce(var.database_platform, try(var.databases[0].platform, "HANA")), "")
-      size     = try(coalesce(var.database_size, try(var.databases[0].size, "")), "")
+    platform = try(coalesce(var.database_platform, try(var.databases[0].platform, "HANA")), "")
+    size     = try(coalesce(var.database_size, try(var.databases[0].size, "")), "")
 
-      authentication = {
-        type     = try(coalesce(var.database_vm_authentication_type, try(var.databases[0].authentication.type, "key")), "key")
-        username = try(coalesce(var.automation_username, try(var.databases[0].authentication.username, "azureadm")), "azureadm")
-      }
-      avset_arm_ids = distinct(concat(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])))
-
-      use_ANF  = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
-      no_ppg   = var.database_no_ppg || try(var.databases[0].no_ppg, false)
-      no_avset = var.database_no_avset || try(var.databases[0].no_avset, false)
-
+    authentication = {
+      type     = try(coalesce(var.database_vm_authentication_type, try(var.databases[0].authentication.type, "key")), "key")
+      username = try(coalesce(var.automation_username, try(var.databases[0].authentication.username, "azureadm")), "azureadm")
     }
-  ]
+    avset_arm_ids = distinct(concat(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])))
+
+    use_ANF   = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
+    dual_nics = var.database_dual_nics || try(var.databases[0].dual_nics, false)
+    no_ppg    = var.database_no_ppg || try(var.databases[0].no_ppg, false)
+    no_avset  = var.database_no_avset || try(var.databases[0].no_avset, false)
+
+  }
+
 
   db_os = {
     os_type         = try(coalesce(var.database_vm_image.os_type, try(var.databases[0].os.os_type, "")), "LINUX")
@@ -127,7 +127,7 @@ locals {
     app_no_avset             = var.application_server_no_avset || try(var.application.app_no_avset, false)
 
     scs_server_count      = max(var.scs_server_count, try(var.application.scs_server_count, 1))
-    scs_high_availability = try(coalesce(var.scs_high_availability, try(var.application.scs_high_availability, false)), false)
+    scs_high_availability = var.scs_high_availability || try(var.application.scs_high_availability, false)
     scs_instance_number   = try(coalesce(var.scs_instance_number, var.application.scs_instance_number), "01")
     ers_instance_number   = try(coalesce(var.ers_instance_number, var.application.ers_instance_number), "02")
 
@@ -239,7 +239,7 @@ locals {
 
   db_zones_temp = distinct(concat(var.database_vm_zones, try(var.databases[0].zones, [])))
 
-  databases = [merge(local.databases_temp[0], (
+  databases = [merge(local.databases_temp, (
     local.db_os_specified ? { "os" = local.db_os } : null), (
     length(local.dbnodes) > 0 ? { "dbnodes" = local.dbnodes } : null), (
     length(local.db_zones_temp) > 0 ? { "zones" = local.db_zones_temp } : null
@@ -319,10 +319,5 @@ locals {
     length(local.scs_tags) > 0 ? { "scs_tags" = local.scs_tags } : null), (
     length(local.web_tags) > 0 ? { "web_tags" = local.web_tags } : null
     )
-
   )
-
-
-
-
 }
