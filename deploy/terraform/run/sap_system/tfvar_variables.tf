@@ -267,6 +267,15 @@ variable "database_vm_zones" {
   default = []
 }
 
+variable "database_no_avset" {
+  default = false
+}
+
+variable "database_no_ppg" {
+  default = false
+}
+
+
 variable "database_vm_nodes" {
   default = [{
     "name"            = ""
@@ -334,6 +343,14 @@ variable "application_server_zones" {
   default = []
 }
 
+variable "application_server_no_avset" {
+  default = false
+}
+
+variable "application_server_no_ppg" {
+  default = false
+}
+
 variable "application_server_image" {
   default = {
     "os_type"         = ""
@@ -371,6 +388,14 @@ variable "webdispatcher_server_tags" {
 
 variable "webdispatcher_server_zones" {
   default = []
+}
+
+variable "webdispatcher_server_no_avset" {
+  default = false
+}
+
+variable "webdispatcher_server_no_ppg" {
+  default = false
 }
 
 
@@ -414,6 +439,13 @@ variable "scs_server_zones" {
   default = []
 }
 
+variable "scs_server_no_avset" {
+  default = false
+}
+
+variable "scs_server_no_ppg" {
+  default = false
+}
 
 variable "scs_server_image" {
   default = {

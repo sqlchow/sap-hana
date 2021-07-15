@@ -61,12 +61,15 @@ locals {
       }
       avset_arm_ids = distinct(concat(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])))
 
-      use_ANF = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
+      use_ANF  = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
+      no_ppg   = var.database_no_ppg || try(var.databases[0].no_ppg, false)
+      no_avset = var.database_no_avset || try(var.databases[0].np_avset, false)
 
     }
   ]
 
   db_os = {
+    os_type         = try(coalesce(var.database_vm_image.os_type, try(var.databases[0].os.os_type, "")), "")
     source_image_id = try(coalesce(var.database_vm_image.source_image_id, try(var.databases[0].os.source_image_id, "")), "")
     publisher       = try(coalesce(var.database_vm_image.publisher, try(var.databases[0].os.publisher, "")), "")
     offer           = try(coalesce(var.database_vm_image.offer, try(var.databases[0].os.offer, "")), "")
@@ -77,6 +80,7 @@ locals {
 
 
   app_os = {
+    os_type         = try(coalesce(var.application_server_image.os_type, try(var.application.app_os.os_type, try(var.application.os.os_type, ""))), "")
     source_image_id = try(coalesce(var.application_server_image.source_image_id, try(var.application.app_os.source_image_id, try(var.application.os.source_image_id, ""))), "")
     publisher       = try(coalesce(var.application_server_image.publisher, try(var.application.app_os.publisher, try(var.application.os.publisher, ""))), "")
     offer           = try(coalesce(var.application_server_image.offer, try(var.application.app_os.offer, try(var.application.os.offer, ""))), "")
@@ -86,6 +90,7 @@ locals {
   app_os_specified = (length(local.app_os.source_image_id) + length(local.app_os.publisher)) > 0
 
   scs_os = {
+    os_type         = try(coalesce(var.scs_server_image.os_type, try(var.application.scs_os.os_type, "")), "")
     source_image_id = try(coalesce(var.scs_server_image.source_image_id, try(var.application.scs_os.source_image_id, "")), "")
     publisher       = try(coalesce(var.scs_server_image.publisher, try(var.application.scs_os.publisher, "")), "")
     offer           = try(coalesce(var.scs_server_image.offer, try(var.application.scs_os.offer, "")), "")
@@ -95,6 +100,7 @@ locals {
   scs_os_specified = (length(local.scs_os.source_image_id) + length(local.scs_os.publisher)) > 0
 
   web_os = {
+    os_type         = try(coalesce(var.webdispatcher_server_image.os_type, try(var.application.web_os.os_type, "")), "")
     source_image_id = try(coalesce(var.webdispatcher_server_image.source_image_id, try(var.application.web_os.source_image_id, "")), "")
     publisher       = try(coalesce(var.webdispatcher_server_image.publisher, try(var.application.web_os.publisher, "")), "")
     offer           = try(coalesce(var.webdispatcher_server_image.offer, try(var.application.web_os.offer, "")), "")
@@ -117,16 +123,22 @@ locals {
 
     application_server_count = max(var.application_server_count, try(var.application.application_server_count, 0))
     app_sku                  = try(coalesce(var.application_server_sku, var.application.app_sku), "")
+    app_no_ppg               = var.application_server_no_ppg || try(var.application.app_no_ppg, false)
+    app_no_avset             = var.application_server_no_avset || try(var.application.app_no_avset, false)
 
     scs_server_count      = max(var.scs_server_count, try(var.application.scs_server_count, 1))
     scs_high_availability = try(coalesce(var.scs_high_availability, try(var.application.scs_high_availability, false)), false)
     scs_instance_number   = try(coalesce(var.scs_instance_number, var.application.scs_instance_number), "01")
     ers_instance_number   = try(coalesce(var.ers_instance_number, var.application.ers_instance_number), "02")
 
-    scs_sku = try(coalesce(var.scs_server_sku, var.application.scs_sku), "")
+    scs_sku      = try(coalesce(var.scs_server_sku, var.application.scs_sku), "")
+    scs_no_ppg   = var.scs_server_no_ppg || try(var.application.scs_no_ppg, false)
+    scs_no_avset = var.scs_server_no_avset || try(var.application.scs_no_avset, false)
 
     webdispatcher_count = max(var.webdispatcher_server_count, try(var.application.webdispatcher_count, 0))
     web_sku             = try(coalesce(var.webdispatcher_server_sku, var.application.web_sku), "")
+    web_no_ppg          = var.webdispatcher_no_ppg || try(var.application.web_no_ppg, false)
+    web_no_avset        = var.webdispatcher_no_avset || try(var.application.web_no_avset, false)
 
   }
 
@@ -136,6 +148,7 @@ locals {
     accelerated_networking = var.anchor_vm_accelerated_networking || try(var.infrastructure.anchor_vms.accelerated_networking, false)
     sku                    = try(coalesce(var.anchor_vm_sku, try(var.infrastructure.anchor_vms.sku, "Standard_D2s_v3")), "Standard_D2s_v3")
     os = {
+      os_type         = try(coalesce(var.anchor_vm_image.os_type, try(var.infrastructure.anchor_vms.os.os_type, "")), "")
       source_image_id = try(coalesce(var.anchor_vm_image.source_image_id, try(var.infrastructure.anchor_vms.os.source_image_id, "")), "")
       publisher       = try(coalesce(var.anchor_vm_image.publisher, try(var.infrastructure.anchor_vms.os.publisher, "")), "")
       offer           = try(coalesce(var.anchor_vm_image.offer, try(var.infrastructure.anchor_vms.os.offer, "")), "")
