@@ -314,12 +314,10 @@ then
     account_set=1
 fi
 
-echo "1"
 
 if [ -n $REMOTE_STATE_SA ]
 then
     # Ask for deployer environment name and try to read the deployer state file and resource group details from the configuration file
-    echo "2"
     if [ -n $deployer_environment ]
     then
         read -p "Deployer environment name: " deployer_environment
