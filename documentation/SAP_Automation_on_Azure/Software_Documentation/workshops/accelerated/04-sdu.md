@@ -77,7 +77,7 @@
         "region"                              : "southcentralus",
         "vnets": {
           "sap": {
-            "name"                            : "SAP00"
+            "name"                            : "SAP00",
             "subnet_db": {
               "prefix"                        : "10.1.1.0/28"
             },
