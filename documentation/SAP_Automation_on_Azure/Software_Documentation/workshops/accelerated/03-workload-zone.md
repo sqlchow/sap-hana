@@ -86,28 +86,13 @@
     ```
     <br/>
 
-4. Terraform
-    1. Initialization
-       ```bash
-       terraform init  --backend-config backend                                        \
-                       ../../../sap-hana/deploy/terraform/run/sap_landscape/
-       ```
-
-    2. Plan
-       <br/>*`Observe Naming Convention`*<br/>
-       ```bash
-       terraform plan  --var-file=NP-EUS2-SAP00-INFRASTRUCTURE.json                     \
-                       ../../../sap-hana/deploy/terraform/run/sap_landscape/
-       ```
-
-    3. Apply
-       <br/>*`Observe Naming Convention`*<br/>
-       ```bash
-       terraform apply --auto-approve                                                  \
-                       --var-file=NP-EUS2-SAP00-INFRASTRUCTURE.json                     \
-                       ../../../sap-hana/deploy/terraform/run/sap_landscape/
-       ```
-       <br/>
+4. Deployment
+     ```bash
+     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh          \
+     --parameterfile NP-EUS2-SAP00-INFRASTRUCTURE.json                     \
+     --deployer_tfstate_key NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate \
+     --storageaccountname demoscustfstate###
+     ```
 
 
 <br/><br/><br/><br/>
