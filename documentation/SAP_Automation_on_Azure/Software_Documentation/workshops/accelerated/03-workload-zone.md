@@ -84,8 +84,6 @@
     EOF
     ```
     <br/>
-    ```
-    <br/>
 
 3. Deployment
     <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
