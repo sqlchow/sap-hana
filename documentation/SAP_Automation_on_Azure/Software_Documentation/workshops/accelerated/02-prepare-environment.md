@@ -34,11 +34,11 @@
 
     | Field             | Legnth   | Value  |
     | ----------------- | -------- | ------ |
-    | `<ENV>`           | [5 CHAR] | NP     |
+    | `<ENV>`           | [5 CHAR] | DEMO     |
     | `<REGION>`        | [4 CHAR] | EUS2   |
     | `<DEPLOYER_VNET>` | [7 CHAR] | DEP00  |
   
-    Which becomes this: **NP-EUS2-DEP00-INFRASTRUCTURE**
+    Which becomes this: **DEMO-EUS2-DEP00-INFRASTRUCTURE**
     
     This is used in several places:
     - The path of the Workspace Directory.
