@@ -195,7 +195,7 @@ locals {
   // As either of the arm_id or the prefix need to be specified to create a subnet the lack of both indicate that the subnet is to be created in the SDU
 
 
-  sub_admin_defined  = (length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "")) + length(var.infrastructure.vnets.sap.subnet_admin.prefix)) > 0
+  sub_admin_defined  = (length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_admin.prefix, ""))) > 0
   sub_admin_arm_id   = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "") : ""
   sub_admin_existing = length(local.sub_admin_arm_id) > 0
   sub_admin_name = local.sub_admin_existing ? (
@@ -207,7 +207,7 @@ locals {
   )
   sub_admin_prefix = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.prefix, "") : ""
 
-  sub_db_defined  = (length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, "")) + length(var.infrastructure.vnets.sap.subnet_db.prefix)) > 0
+  sub_db_defined  = (length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_db.prefix, ""))) > 0
   sub_db_arm_id   = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.arm_id, "") : ""
   sub_db_existing = length(local.sub_db_arm_id) > 0
   sub_db_name = local.sub_db_existing ? (
@@ -219,7 +219,7 @@ locals {
   )
   sub_db_prefix = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.prefix, "") : ""
 
-  sub_app_defined  = (length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, "")) + length(var.infrastructure.vnets.sap.subnet_app.prefix)) > 0
+  sub_app_defined  = (length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_app.prefix, ""))) > 0
   sub_app_arm_id   = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.arm_id, "") : ""
   sub_app_existing = length(local.sub_app_arm_id) > 0
   sub_app_name = local.sub_app_existing ? (
@@ -232,7 +232,7 @@ locals {
   )
   sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, "") : ""
 
-  sub_web_defined  = (length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, "")) + length(var.infrastructure.vnets.sap.subnet_web.prefix)) > 0
+  sub_web_defined  = (length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_web.prefix, ""))) > 0
   sub_web_arm_id   = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.arm_id, "") : ""
   sub_web_existing = length(local.sub_web_arm_id) > 0
   sub_web_name = local.sub_web_existing ? (
