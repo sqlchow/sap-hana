@@ -134,6 +134,8 @@ landscape_tfstate_key_exists=false
 
 deployment_system=sap_landscape
 
+echo "Deployer environment: $deployer_environment"
+
 workload_dirname=$(dirname "${parameterfile}")
 workload_file_parametername=$(basename "${parameterfile}")
 

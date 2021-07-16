@@ -200,7 +200,7 @@ locals {
   sub_admin_existing = length(local.sub_admin_arm_id) > 0
   sub_admin_name = local.sub_admin_existing ? (
     try(split("/", local.sub_admin_arm_id)[10], "")) : (
-    length(var.infrastructure.vnets.sap.subnet_admin.name) > 0 ? (
+    length(try(var.infrastructure.vnets.sap.subnet_admin.name, "")) > 0 ? (
       var.infrastructure.vnets.sap.subnet_admin.name) : (
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet)
     )
@@ -212,7 +212,7 @@ locals {
   sub_db_existing = length(local.sub_db_arm_id) > 0
   sub_db_name = local.sub_db_existing ? (
     try(split("/", local.sub_db_arm_id)[10], "")) : (
-    length(var.infrastructure.vnets.sap.subnet_db.name) > 0 ? (
+    length(try(var.infrastructure.vnets.sap.subnet_db.name, "")) > 0 ? (
       var.infrastructure.vnets.sap.subnet_db.name) : (
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet)
     )
@@ -224,7 +224,7 @@ locals {
   sub_app_existing = length(local.sub_app_arm_id) > 0
   sub_app_name = local.sub_app_existing ? (
     try(split("/", local.sub_app_arm_id)[10], "")) : (
-    length(var.infrastructure.vnets.sap.subnet_app.name) > 0 ? (
+    length(try(var.infrastructure.vnets.sap.subnet_app.name, "")) > 0 ? (
       var.infrastructure.vnets.sap.subnet_app.name) : (
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet)
     )
@@ -237,7 +237,7 @@ locals {
   sub_web_existing = length(local.sub_web_arm_id) > 0
   sub_web_name = local.sub_web_existing ? (
     try(split("/", local.sub_web_arm_id)[10], "")) : (
-    length(var.infrastructure.vnets.sap.subnet_web.name) > 0 ? (
+    length(try(var.infrastructure.vnets.sap.subnet_web.name, "")) > 0 ? (
       var.infrastructure.vnets.sap.subnet_web.name) : (
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet)
     )
