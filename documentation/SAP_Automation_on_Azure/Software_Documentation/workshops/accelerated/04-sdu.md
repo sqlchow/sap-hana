@@ -61,14 +61,14 @@
 1. Create Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/DEMO-SCUS-SAP00-X00; cd $_
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-SCUS-SAP00-X00; cd $_
     ```
     <br/>
 
 2. Create input parameter [JSON](templates/NP-EUS2-SAP00-X00.json)
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/SYSTEM/LANDSCAPE/DEMO-SCUS-SAP00-X00; cd $_
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-SCUS-SAP00-X00; cd $_
 
     cat <<EOF > DEMO-SCUS-SAP00-X00.json
     {
