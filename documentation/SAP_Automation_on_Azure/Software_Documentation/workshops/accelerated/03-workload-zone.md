@@ -66,7 +66,6 @@
 2. Create input parameter 
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEMO-SCUS-SAP00-INFRASTRUCTURE; cd $_
 
     cat <<EOF > DEMO-SCUS-SAP00-INFRASTRUCTURE.json
