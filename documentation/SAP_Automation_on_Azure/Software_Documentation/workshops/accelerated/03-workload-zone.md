@@ -79,19 +79,40 @@
     | key                  | A composit of the `SAP Workload VNET` Resource Group name and the `.terraform.tfstate` extension. |
     <br/>
 
-3. Create input parameter [JSON](templates/NP-EUS2-SAP00-INFRASTRUCTURE.json)
+3. Create input parameter 
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    vi NP-EUS2-SAP00-INFRASTRUCTURE.json
+     ```bash
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEMO-SCUS-SAP00-INFRASTRUCTURE; cd $_
+
+    cat <<EOF > DEMO-SCUS-SAP00-INFRASTRUCTURE.json
+    {
+      "infrastructure": {
+        "environment"                         : "DEMO",
+        "region"                              : "southcentralus",
+        "vnets": {
+          "sap": {
+            "name"                            : "SAP00",
+            "address_space"                   : "10.1.0.0/16"
+          }
+        }
+      }
+    }
+    EOF
+    ```
+    <br/>
     ```
     <br/>
 
 4. Deployment
+    <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
      ```bash
-     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh          \
-     --parameterfile NP-EUS2-SAP00-INFRASTRUCTURE.json                     \
-     --deployer_tfstate_key NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate \
-     --storageaccountname demoscustfstate###
+     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
+     --parameterfile DEMO-SCUS-SAP00-INFRASTRUCTURE.json                     \
+     --deployer_tfstate_key DEMO-SCUS-DEP00-INFRASTRUCTURE.terraform.tfstate \
+     --storageaccountname demoscustfstate###                                 \
+     --deployer_environment DEMO                                             \
+     --vault DEMOSCUSDEP00user###                                            \
      ```
 
 
