@@ -62,24 +62,8 @@
     ```
     <br/>
 
-2. Create *backend* parameter file.
-    <br/>*`Observe Naming Convention`*<br/>
-    ```bash
-    cat <<EOF > backend
-    resource_group_name   = "NP-EUS2-SAP_LIBRARY"
-    storage_account_name  = "<tfstate_storage_account_name>"
-    container_name        = "tfstate"
-    key                   = "NP-EUS2-SAP00-INFRASTRUCTURE.terraform.tfstate"
-    EOF
-    ```
-    |                      |           |
-    | -------------------- | --------- |
-    | resource_group_name  | The name of the Resource Group where the TFSTATE Storage Account is located. |
-    | storage_account_name | The name of the Storage Account that was deployed durring the SAP_LIBRARY deployment, used used for the TFSTATE files. |
-    | key                  | A composit of the `SAP Workload VNET` Resource Group name and the `.terraform.tfstate` extension. |
-    <br/>
 
-3. Create input parameter 
+2. Create input parameter 
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
      ```bash
@@ -104,7 +88,7 @@
     ```
     <br/>
 
-4. Deployment
+3. Deployment
     <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
      ```bash
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
