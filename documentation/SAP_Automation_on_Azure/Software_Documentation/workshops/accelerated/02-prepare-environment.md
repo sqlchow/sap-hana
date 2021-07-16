@@ -63,7 +63,6 @@
 
 2. Ensure that you are authenticated with the correct subscription.
     ```bash
-    az login
     az account list --output=table | grep -i true
     ```
 
