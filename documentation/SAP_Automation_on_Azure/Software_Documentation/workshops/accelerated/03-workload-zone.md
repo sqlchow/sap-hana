@@ -29,7 +29,7 @@
 
 ## Notes
 
-- For the workshop the *default* naming convention is referenced and used. For the **Deployer** there are three fields.
+- For the workshop the *default* naming convention is referenced and used. For the **Landscape** there are three fields.
   - `<ENV>`-`<REGION>`-`<SAP_VNET>`-INFRASTRUCTURE
 
     | Field        | Legnth   | Value  |
@@ -112,4 +112,4 @@
 
 <br/><br/><br/><br/>
 
-# Next: [SAP Deployment Unit - SDU](06-sdu.md) <!-- omit in toc -->
+# Next: [SAP Deployment Unit - SDU](04-sdu.md) <!-- omit in toc -->

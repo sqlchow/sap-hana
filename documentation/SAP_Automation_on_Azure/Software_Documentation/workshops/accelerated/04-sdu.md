@@ -31,7 +31,7 @@
 
 ## Notes
 
-- For the workshop the *default* naming convention is referenced and used. For the **Deployer** there are three fields.
+- For the workshop the *default* naming convention is referenced and used. For the **System** there are three fields.
   - `<ENV>`-`<REGION>`-`<SAP_VNET>`-`<SAP_SID>`
 
     | Field        | Legnth   | Value  |
