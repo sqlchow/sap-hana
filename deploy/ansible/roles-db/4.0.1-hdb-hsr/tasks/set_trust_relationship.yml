@@ -34,7 +34,7 @@
       when: ansible_hostname == primary_instance_name
       authorized_key:
         user: "root"
-        key: "{{ hostvars[secondary_instance.name].public_ssh_key.stdout }}"
+        key: "{{ hostvars[secondary_instance_name].public_ssh_key.stdout }}"
 
     - name: Ensure trust relationship is working from primary to secondary
       when: ansible_hostname == primary_instance_name
