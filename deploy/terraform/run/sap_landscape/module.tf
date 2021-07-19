@@ -21,6 +21,7 @@ module "sap_landscape" {
   use_deployer                = length(var.deployer_tfstate_key) > 0
   dns_label                   = var.dns_label
   dns_resource_group_name     = length(var.dns_resource_group_name) > 0 ? var.dns_resource_group_name : local.saplib_resource_group_name
+  enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
 
 }
 

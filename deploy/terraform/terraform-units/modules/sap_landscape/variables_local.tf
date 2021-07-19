@@ -19,6 +19,10 @@ variable "use_deployer" {
   description = "Use the deployer"
 }
 
+variable "enable_purge_control_for_keyvaults" {
+  description = "Allow the deployment to control the purge protection"
+}
+
 variable "dns_label" {
   description = "DNS label"
   default = ""
