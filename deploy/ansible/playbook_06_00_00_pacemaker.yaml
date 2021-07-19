@@ -1,6 +1,7 @@
 # /*----------------------------------------------------------------------------8
 # |                                                                            |
-# |                      Playbook for PACEMAKER General Config                  |
+# |                      Playbook for PACEMAKER General Config                 |
+# | This playbook will setup a generic pacemaker cluster on DB and SCS hosts   | 
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
@@ -8,7 +9,8 @@
 # TODO: Playbook not yet written
 #       This is a placeholder 
 
-- hosts:          scs                                           # TODO: Replace this with new inventory group; Change to correct group
+- hosts:          "{{ sap_sid|upper }}_DB  :
+                   {{ sap_sid|upper }}_SCS"                                           
 
   name:           PACEMAKER - General Config
   remote_user:    "{{ orchestration_ansible_user }}"                
@@ -25,7 +27,19 @@
   #   ping:
 
 
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
 
+# Specify the active tier for this playbook run
+  - set_fact:
+     tier:     hdb
+
+  - include_role:
+      name:     roles-os/6.0.0.0-Generic
 
 #----------------------------------------
 # BEGIN

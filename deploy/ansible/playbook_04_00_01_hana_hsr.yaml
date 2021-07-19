@@ -1,19 +1,17 @@
 # /*----------------------------------------------------------------------------8
 # |                                                                            |
-# |                      Playbook for PACEMAKER config of ERS                   |
+# |                      Playbook for HANA DB HSR                          |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
 
-# TODO: Playbook not yet written
-#       This is a placeholder 
-#       This should probably be two playbooks:
-#       1) ERS Install and Config
-#       2) PACEMAKER Config of SCS and ERS
+# Steps:
+#   01) Hana DB system replication 
+#
 
-- hosts:          "{{ sap_sid|upper }}_DB"                                           
+- hosts:          "{{ sap_sid|upper }}_DB"
 
-  name:           PACEMAKER - SCS and ERS
+  name:           DB Installation - HANA
   remote_user:    "{{ orchestration_ansible_user }}"                
   become:         yes
   become_user:    root
@@ -23,23 +21,22 @@
 
 
   tasks:
-
-  # - name: Test Connection                                     # Simple connection test for troubleshooting
-  #   ping:
-
-  tasks:
 # -------------------------------------+---------------------------------------8
 #
 # Build the list of tasks to be executed in order here. 
 #
 # -------------------------------------+---------------------------------------8
 
-  # Specify the active tier for this playbook run
- # - set_fact:
- #     tier:     os
+  - set_fact:
+      tier:     hdb                                                             # Actions for HANA DB Servers
+      primary_instance_name : "{{ ansible_play_hosts_all[0] }}"                 # Setting up Primary Instance Name 
+      secondary_instance_name: "{{ ansible_play_hosts_all[1] }}"                # Setting up Secondary Instance Name
 
-   - include_role:
-      name:     roles-os/6.0.0.01-HANA
+
+  - include_role:
+      name:     roles-db/4.0.1-hdb-hsr
+      
+
 
 ...
 # /*----------------------------------------------------------------------------8

@@ -1,6 +1,6 @@
 ---
 
-# Variables in this file are required by the role, but are computed from default variables (e.g. hdb_sid),
+# Variables in this file are required by the role, but are computed from default variables (e.g. sid),
 # from the playbook/environment (e.g. hana_database), or are "SAP standard" values.
 #
 # They may be overridden, if required, but normally are not
@@ -8,17 +8,18 @@
 hana_group: "sapsys"
 hana_dir: "/hana"
 sap_dir: "/usr/sap"
+hdb_sid_backup_dir: "/hana/backup"
 
-sid_admin_user: "{{ sid | lower }}adm"
+hdb_sid_admin_user: "{{ hdb_sid | lower }}adm"
 
 # HANA
-hana_tenant_database_name: "{{ sid | upper }}"
+hana_tenant_database_name: "{{ hdb_sid | upper }}"
 
 # HANA utility commands
-hdbsql_systemdb_command: "hdbsql -n localhost -i {{ instance_number }} -d SYSTEMDB -u SYSTEM -p {{ hana_system_user_password }}"
-hdbsql_tenant_command: "hdbsql -n localhost -i {{ instance_number }} -d {{ hana_tenant_database_name }} -u SYSTEM -p {{ hana_system_user_password }}"
+hdbsql_systemdb_command: "hdbsql -n localhost -i {{ hdb_instance_number }} -d SYSTEMDB -u SYSTEM -p {{ password_master }}"
+hdbsql_tenant_command: "hdbsql -n localhost -i {{ hdb_instance_number }} -d {{ hana_tenant_database_name }} -u SYSTEM -p {{ password_master }}"
 hdbnsutil_command: "hdbnsutil"
-sapcontrol_command: "sapcontrol -nr {{ instance_number }}"
+sapcontrol_command: "sapcontrol -nr {{ hdb_instance_number }}"
 
 # SQL Commands
 
