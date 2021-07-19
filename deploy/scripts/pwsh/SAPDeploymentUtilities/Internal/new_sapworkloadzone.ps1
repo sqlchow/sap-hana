@@ -357,6 +357,7 @@ Licensed under the MIT license.
 
     if ($null -eq $tfstate_resource_id -or "" -eq $tfstate_resource_id) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         $rID = Get-AzResource -Name $saName 
         $rgName = $rID.ResourceGroupName
         $tfstate_resource_id = $rID.ResourceId
@@ -364,6 +365,8 @@ Licensed under the MIT license.
         $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
 =======
+=======
+>>>>>>> d265c161bce5c4b29e8f5799af8dc35a4c3fdc70
         if ($null -ne $saName -and "" -ne $saName) {
             $rID = Get-AzResource -Name $saName -ResourceType Microsoft.Storage/storageAccounts
             $rgName = $rID.ResourceGroupName
@@ -372,6 +375,7 @@ Licensed under the MIT license.
             $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
             Out-IniFile -InputObject $iniContent -Path $fileINIPath
         }
+<<<<<<< HEAD
 >>>>>>> 76788828... TFVars support for landscape (#1179)
     }
 
@@ -382,6 +386,11 @@ Licensed under the MIT license.
     $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
 
     Write-Host -ForegroundColor green "Initializing Terraform"
+=======
+    }
+
+    Write-Host -ForegroundColor green "Initializing Terraform  New-SAPWorkloadZone"
+>>>>>>> d265c161bce5c4b29e8f5799af8dc35a4c3fdc70
 
     $Command = " init -upgrade=true -backend-config ""subscription_id=$state_subscription_id"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" "
     if (Test-Path ".terraform" -PathType Container) {
@@ -391,12 +400,6 @@ Licensed under the MIT license.
 
             if ("azurerm" -eq $jsonData.backend.type) {
                 $Command = " init -upgrade=true"
-
-                $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
-                if ("Y" -ne $ans) {
-                    $Env:TF_DATA_DIR = $null
-                    return
-                }
             }
         }
     } 
@@ -421,6 +424,7 @@ Licensed under the MIT license.
             $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
         }
     }
+<<<<<<< HEAD
 =======
     $Command = " init -upgrade=true -backend-config ""subscription_id=$state_subscription_id"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" "
     if (Test-Path ".terraform" -PathType Container) {
@@ -454,6 +458,8 @@ Licensed under the MIT license.
             $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
         }
     }
+=======
+>>>>>>> d265c161bce5c4b29e8f5799af8dc35a4c3fdc70
 
     Write-Host -ForegroundColor green "Running refresh, please wait"
     $Command = " refresh -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
@@ -462,7 +468,10 @@ Licensed under the MIT license.
     Add-Content -Path "deployment.log" -Value $Cmd
     Write-Verbose $Cmd
 
+<<<<<<< HEAD
 >>>>>>> 76788828... TFVars support for landscape (#1179)
+=======
+>>>>>>> d265c161bce5c4b29e8f5799af8dc35a4c3fdc70
     
     $Command = " output automation_version"
 
