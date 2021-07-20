@@ -1,0 +1,44 @@
+environment                                  = "MKD01"
+location                                     = "eastus2"
+management_network_name                      = "DEP00"
+management_network_address_space             = "10.0.0.0/25"
+management_subnet_address_prefix             = "10.0.0.64/28"
+management_firewall_subnet_address_prefix    = "10.0.0.0/26"
+enable_deployer_public_ip                    = true
+firewall_deployment                          = true
+
+
+# codename                                     =
+# resourcegroup_name                           =
+# resourcegroup_arm_id                         =
+# management_subnet_name                       = 
+# management_subnet_arm_id                     = 
+# management_firewall_subnet_arm_id            = 
+# management_subnet_nsg_name                   = 
+# management_subnet_nsg_arm_id                 = 
+# management_subnet_nsg_allowed_ips            = 
+# vm_size                                      = Standard_D4ds_v4
+# vm_disk_type                                 = Premium_LRS
+# use_DHCP                                     = false
+# vm_image                                     = {
+#                                                  "source_image_id" = ""
+#                                                  "publisher"       = "Canonical"
+#                                                  "offer"           = "0001-com-ubuntu-server-focal"
+#                                                  "sku"             = "20_04-lts"
+#                                                  "version"         = "latest"
+#                                                }
+# private_ip_address                           = 
+# vm_authentication_type                       = key
+# vm_authentication_username                   = azureadm
+# vm_authentication_password                   = 
+# vm_authentication_path_to_public_key         = 
+# vm_authentication_path_to_private_key        = 
+# user_keyvault_id                             = 
+# automation_keyvault_id                       = 
+# deployer_private_key_secret_name             = 
+# deployer_public_key_secret_name              = 
+# deployer_username_secret_name                = 
+# deployer_password_secret_name                = 
+# firewall_rule_subnets                        = null
+# firewall_allowed_ipaddresses                 = null
+# deployer_assign_subscription_permissions     = null

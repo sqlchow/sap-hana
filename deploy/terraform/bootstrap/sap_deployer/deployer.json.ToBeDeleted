@@ -1,0 +1,21 @@
+{
+  "infrastructure": {
+    "region": "westeurope",
+    "environment": "np",
+    "vnets": {
+      "management": {
+        "address_space": "10.0.0.0/26",
+        "subnet_mgmt": {
+          "prefix": "10.0.0.16/28"
+        }
+      }
+    }
+  },
+  "deployers": [
+    {
+      "size": "Standard_D4ds_v4",
+      "disk_type" : "Premium_LRS",
+      "use_DHCP" : true
+    }
+  ]
+}
