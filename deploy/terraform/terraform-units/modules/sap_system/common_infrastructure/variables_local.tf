@@ -387,5 +387,5 @@ locals {
 
 locals {
   // 'Cg==` is empty string, base64 encoded.
-  cloudinit_growpart_config = try(data.template_cloudinit_config.config_growpart.rendered, "Cg==")
+  cloudinit_growpart_config = null # This needs more though as changing of it is a destructive action try(data.template_cloudinit_config.config_growpart.rendered, "Cg==")
 }
