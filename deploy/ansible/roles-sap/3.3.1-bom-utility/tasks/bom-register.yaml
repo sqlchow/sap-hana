@@ -13,9 +13,11 @@
 #               If not, download from storage account location.
 #
 - name:             Check for Microsoft Supplied BOM ({{ bom_name }})
-  local_action:     stat path=BOM-catalog/{{ bom_name }}/{{ bom_name }}.yaml
+  local_action:     stat path={{ item.dirPath }}/{{ bom_name }}/{{ bom_name }}.yaml
   register:         microsoft_supplied_bom
-
+  loop:
+    - { dirPath: 'BOM-catalog'         }
+    - { dirPath: 'BOM-catalog/archive' }
 
 # If Microsoft supplied BOM found
 - name:             Register Microsoft Supplied BOM {{ bom_name }}
