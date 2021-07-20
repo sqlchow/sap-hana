@@ -152,25 +152,21 @@ fi
 
 
 
-if [ $force == 1 ]
-then
-    if [ -d ./.terraform/ ]; then
-        rm .terraform -r
-    fi
-
-    if [ -f terraform.tfstate ]; then
-        rm terraform.tfstate
-    fi
-
-    if [ -f terraform.tfstate.backup ]; then
-        rm terraform.tfstate.backup
-    fi
+if [ $force == 1 ]; then
+    rm -Rf .terraform terraform.tfstate*
 fi
 
+ext=$(echo ${parameterfile_name} | cut -d. -f2)
 
-# Read environment
-environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+else
+    load_config_vars "${param_dirname}"/"${parameterfile}" "environment"
+    load_config_vars "${param_dirname}"/"${parameterfile}" "location"
+    region=$(echo ${location} | xargs)
+fi
 
 if [ ! -n "${environment}" ]
 then
@@ -205,6 +201,9 @@ key=$(echo "${parameterfile_name}" | cut -d. -f1)
 automation_config_directory=~/.sap_deployment_automation/
 generic_config_information="${automation_config_directory}"config
 system_config_information="${automation_config_directory}""${environment}""${region}"
+
+deployer_tfstate_key_parameter=''
+landscape_tfstate_key_parameter=''
 
 
 #Plugins
@@ -244,39 +243,11 @@ load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
 
 echo "Terraform storage " "${REMOTE_STATE_SA}"
 
-deployer_tfstate_key_parameter=''
-if [ "${deployment_system}" != sap_deployer ]
-then
-    if [ -z "${deployer_tfstate_key}" ]; then
-        deployer_tfstate_key_parameter=" "
-    else
-        deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
-    fi
-else
-    STATE_SUBSCRIPTION=$ARM_SUBSCRIPTION_ID
-    
-fi
-
-landscape_tfstate_key_parameter=''
-if [ "${deployment_system}" == sap_system ]
-then
-    if [ -n "$=${landscape_tfstate_key}" ]; then
-        landscape_tfstate_key_parameter=" -var landscape_tfstate_key=${landscape_tfstate_key}"
-        landscape_tfstate_key_exists=true
-    else
-        read -p "Workload terraform statefile name :" landscape_tfstate_key
-        landscape_tfstate_key_parameter=" -var landscape_tfstate_key=${landscape_tfstate_key}"
-        save_config_var "landscape_tfstate_key" "${system_config_information}"
-        landscape_tfstate_key_exists=true
-    fi
-fi
-
 if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
     option="DEPLOYMENT_REPO_PATH"
     missing
-    exit -1
+    exit 1
 fi
-
 
 # Checking for valid az session
 az account show > stdout.az 2>&1
@@ -293,7 +264,7 @@ if [ -n "${temp}" ]; then
     then
         rm stdout.az
     fi
-    exit -1
+    exit 1
 else
     if [ -f stdout.az ]
     then
@@ -312,9 +283,12 @@ fi
 
 if [ ! -n "${REMOTE_STATE_SA}" ]; then
     read -p "Terraform state storage account name:"  REMOTE_STATE_SA
-    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
-    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+
+    get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+    load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+    load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
+    load_config_vars "${system_config_information}" "tfstate_resource_id"
+
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
         if [ $account_set==0 ] 
@@ -322,35 +296,22 @@ if [ ! -n "${REMOTE_STATE_SA}" ]; then
             $(az account set --sub "${STATE_SUBSCRIPTION}")
             account_set=1
         fi
-        
-        save_config_vars "${workload_config_information}" \
-        REMOTE_STATE_RG \
-        REMOTE_STATE_SA \
-        tfstate_resource_id \
-        STATE_SUBSCRIPTION
     fi
-
-    tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
-    
-    if [ "${deployment_system}" != sap_deployer ]
-    then
-        tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
-    fi
-    
 fi
 
 
 if [ -z "${REMOTE_STATE_SA}" ]; then
     option="REMOTE_STATE_SA"
     missing
-    exit -1
+    exit 1
 fi
 
 if [ -z "${REMOTE_STATE_RG}" ]; then
-    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
-    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
-    
+    get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+    load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+    load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
+    load_config_vars "${system_config_information}" "tfstate_resource_id"
+
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
         if [ $account_set==0 ] 
@@ -359,53 +320,51 @@ if [ -z "${REMOTE_STATE_RG}" ]; then
             account_set=1
         fi
         
-        save_config_vars "${workload_config_information}" \
-        REMOTE_STATE_RG \
-        tfstate_resource_id \
-        STATE_SUBSCRIPTION
     fi
     
-    tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
-    
-    if [ "${deployment_system}" != sap_deployer ]
-    then
-        tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
-    fi
 fi
 
 if [ "${deployment_system}" != sap_deployer ]
 then
     if [ ! -n "${tfstate_resource_id}" ]; then
-        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-        STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+        get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+        load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+        load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
+        load_config_vars "${system_config_information}" "tfstate_resource_id"
         
-        save_config_vars "${system_config_information}" \
-        tfstate_resource_id \
-        STATE_SUBSCRIPTION
-        
-        tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
-        
+    fi
+    tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
+
+    if [ -z "${deployer_tfstate_key}" ]; then
+        deployer_tfstate_key_parameter=" "
+    else
+        deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
+    fi
+
+else
+    tfstate_parameter=" "
+
+    save_config_vars "${system_config_information}" deployer_tfstate_key
+fi
+
+if [ "${deployment_system}" == sap_system ]
+then
+    if [ -n "${landscape_tfstate_key}" ]; then
+        landscape_tfstate_key_parameter=" -var landscape_tfstate_key=${landscape_tfstate_key}"
+        landscape_tfstate_key_exists=true
+    else
+        read -p "Workload terraform statefile name :" landscape_tfstate_key
+        landscape_tfstate_key_parameter=" -var landscape_tfstate_key=${landscape_tfstate_key}"
+        save_config_var "landscape_tfstate_key" "${system_config_information}"
+        landscape_tfstate_key_exists=true
     fi
 else
-    save_config_vars "${system_config_information}" \
-    deployer_tfstate_key
-fi
-
-if [ "${deployment_system}" != sap_system ]
-then
     landscape_tfstate_key_parameter=""
-fi
 
-if [ ! -z "${tfstate_resource_id}" ]
-then
-    if [ "${deployment_system}" != sap_deployer ]
-    then
-        tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
-    fi
 fi
 
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 if [ ! -d "${terraform_module_directory}" ]
@@ -423,7 +382,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 1
 fi
 
 ok_to_proceed=false
@@ -593,7 +552,7 @@ then
         rm plan_output.log
     fi
     unset TF_DATA_DIR
-    exit -1
+    exit 1
 fi
 
 if [ ! $new_deployment ]
@@ -640,7 +599,7 @@ then
             ok_to_proceed=true
         else
             unset TF_DATA_DIR
-            exit -1
+            exit 1
         fi
     else
         ok_to_proceed=true
@@ -683,7 +642,7 @@ if [ $ok_to_proceed ]; then
         cat error.log
         rm error.log
         unset TF_DATA_DIR
-        exit -1
+        exit 1
     fi
         
 fi
@@ -698,15 +657,8 @@ if [ "${deployment_system}" == sap_library ]
 then
 
     REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
-    REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
-    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
-    
-    save_config_vars "${system_config_information}" \
-    REMOTE_STATE_RG \
-    REMOTE_STATE_SA \
-    tfstate_resource_id \
-    STATE_SUBSCRIPTION
+
+    get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
     
 fi
 

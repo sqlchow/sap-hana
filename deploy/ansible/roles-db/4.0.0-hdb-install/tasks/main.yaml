@@ -19,15 +19,6 @@
     dir_params:                   "{{ target_media_location }}/.params"
 
 
-# #   SAP: Register BOM
-- name:             "Register BOM: {{ bom_base_name }}"
-  include_vars:
-    file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
-    name:           bom
-
-
-
-
 
 #   0x) Create hidden directory for parameter files
 - name:     "Create hidden directory"
@@ -38,13 +29,18 @@
   loop:
     - { state: 'directory', mode: '0755', path: '{{ dir_params }}' }
 
+- name:     "Create run flag directory"
+  file:
+    path:   /etc/sap_deployment_automation
+    state:  directory
+    mode:   0755
 
 # TODO: Move the template to the BOM Directory
 #   SAP HANA: deploy hdblcm password file
 - name:               "SAP HANA: deploy hdblcm password file"
   template:
     src:              HANA_2_00_055_v1_install.rsp.xml.j2
-    dest:             "{{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml"
+    dest:             "{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml"
     mode:             0644
     force:            yes
   # Template parameter mapping
@@ -68,7 +64,7 @@
 - name:               "SAP HANA: deploy hdblcm install response file"
   template:
     src:              HANA_2_00_055_v1_install.rsp.j2
-    dest:             "{{ dir_params }}/hdbserver_{{ sap_sid }}_install.rsp"
+    dest:             "{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_install.rsp"
     mode:             0644
     force:            yes
   # Template parameter mapping
@@ -76,7 +72,7 @@
     _rsp_component_root:              "../COMPONENTS"
     _rsp_components:                  "all"
     _rsp_sapmnt:                      "/hana/shared"                              # Default Value
-    _rsp_hostname:                    "{{ inventory_hostname_short }}"            # TODO: needs to be tested with HA and scale out
+    _rsp_hostname:                    "{{ ansible_hostname }}"            # TODO: needs to be tested with HA and scale out
     _rsp_sid:                         "{{ hdb_sid|upper }}"
     _rsp_number:                      "{{ hdb_instance_number }}"
     _rsp_system_usage:                "custom"
@@ -84,15 +80,20 @@
 
 
 #   SAP HANA: Install
+
+#ToDo make the code more robust
 - name:               "Execute hdblcm"
   # shell:              "pwd=$(<../hdbserver_{{ sap_sid }}_passwords.xml); rm ../hdbserver_{{ sap_sid }}_passwords.xml; echo $pwd | ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
   shell: |
-                      pwd=$(<{{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml)
-                      rm {{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml
+                      pwd=$(<{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml)
                       echo $pwd | \
-                      ./hdblcm --batch --action=install --configfile='{{ dir_params }}/hdbserver_{{ sap_sid }}_install.rsp' --read_password_from_stdin=xml
+                        ./hdblcm --batch --action=install --configfile='{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_install.rsp' --read_password_from_stdin=xml
+                      rm {{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml
+                      touch /etc/sap_deployment_automation/sap_deployment_hdb.txt
+                      
   args:
     chdir:            "/usr/sap/install/CD_HDBSERVER/SAP_HANA_DATABASE"
+    creates:          /etc/sap_deployment_automation/sap_deployment_hdb.txt
 
 
 
@@ -108,123 +109,7 @@
 #   loop:
 #     - { state: 'absent',    mode: '0755', path: '{{ dir_params }}' }
 
-
-
-
-
-
 ...
 # /*---------------------------------------------------------------------------8
 # |                                   END                                      |
 # +------------------------------------4--------------------------------------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# - name:             "Register BOM: {{ bom_base_name }}"
-#   include_vars:
-#     file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
-#     name:           bom
-
-# # *====================================4=======================================8
-
-# - name:  
-#   set_fact:
-#     sap_inifile:                  "{{ bom_base_name }}-pas-inifile-param.j2"
-
-# # -------------------------------------+---------------------------------------8
-# #
-# # Description:  Download specified BOM Template File
-# #S41909SPS03_v1-scs-inifile-param.j2
-# - name:             "Download BOM Template: {{ sap_inifile }}"
-#   get_url:
-#     url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/templates/{{ sap_inifile }}{{ sapbits_sas_token }}"
-#     dest:           "{{ inventory_dir }}/{{ sap_inifile }}"
-#     mode:           0644
-#   register:         result
-#   until:            result is succeeded
-#   retries:          10
-#   delay:            6
-#   delegate_to:      localhost                                                     # Causes action to occur on the Ansible Controller
-#   become:           no
-
-
-
-# # *====================================4=======================================8
-# #   SAP PAS: deploy PAS Parameter file install template
-# - name:               "SAP PAS: deploy PAS Parameter file install template"
-#   template:
-#     src:              "{{ inventory_dir }}/{{ sap_inifile }}"
-#     dest:             /usr/sap/install/downloads/{{ bom_base_name }}-pas-{{ ansible_hostname }}.params
-#     mode:             0644
-#     force:            yes
-#   # Template parameter mapping
-#   vars:
-#     sap_ciDialogWPNumber:         12
-#     sap_ciBtcWPNumber:            8
-#     sap_installSAPHostAgent:      "false"
-#     sap_ciInstanceNumber:         '00'
-#     sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-#     sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
-#     sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
-#     sap_ciVirtualHostname:        x01app00lab3
-#     sap_cd_package_hdbclient:     
-#     sap_cd_package_cd1:           
-#     sap_cd_package_cd2:           
-#     sap_cd_package_cd3:           
-#     sap_cd_package_cd4:           
-#     sap_cd_package_cd5:           
-
-# # *====================================4=======================================8
-
-
-# #------------------<DEBUGGING>-------------------
-# - name:       Parameters
-#   debug:  
-#     msg:
-#       - "Product              : {{ bom.product_ids.scs }}"
-#       - "SAP SID              : {{ sap_sid }}"
-#       - "Instance Number - SCS: {{ scs_instance_number }}"
-#       - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
-#       - "DB Hostname          : {{ sap_db_hostname }}"
-#       - "FQDN                 : {{ sap_fqdn }}"
-#       - "Master Password      : {{ password_master }}"
-#       - "sapadm UID           : {{ sapadm_uid }}"
-#       - "sapsys GID           : {{ sapsys_gid }}"
-#       - "<sid>adm UID         : {{ sidadm_uid }}"
-# #------------------</DEBUGGING>------------------
-
-
-# # *====================================4=======================================8
-# #   SAP PAS: Install
-# # 2230669 - System Provisioning Using a Parameter Input File
-# #
-# - name:               "SAP PAS Install"
-#   shell: |
-#                       export TMPDIR=/usr/sap/install
-#                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ bom_base_name }}-pas-{{ ansible_hostname }}.params \
-#                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.pas }}                                                             \
-#                                 SAPINST_SKIP_DIALOGS=true                                                                                        \
-#                                 SAPINST_START_GUISERVER=false
-#   args:
-#     chdir:            /usr/sap/install/SWPM
-#   # Skip when TRUE (test mode)
-#   # when: not test_new_bom
-# # *====================================4=======================================8
-
-

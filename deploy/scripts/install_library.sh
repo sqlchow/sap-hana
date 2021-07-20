@@ -94,12 +94,30 @@ if [ $param_dirname != '.' ]; then
     exit 3
 fi
 
-# Read environment
-environment=$(jq .infrastructure.environment "${parameterfile}" | tr -d \")
-region=$(jq .infrastructure.region "${parameterfile}" | tr -d \")
+ext=$(echo ${parameterfile} | cut -d. -f2)
+
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+    use_deployer=$(jq --raw-output .deployer.use "${parameterfile}")
+else
+    
+    load_config_vars "${param_dirname}"/"${parameterfile}" "library_environment"
+    environment=$(echo ${library_environment} | xargs)
+    load_config_vars "${param_dirname}"/"${parameterfile}" "library_location"
+    region=$(echo ${library_location} | xargs)
+
+    load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_use"
+    use_deployer=$deployer_use
+fi
+
 key=$(echo "${parameterfile}" | cut -d. -f1)
 
-use_deployer=$(jq .deployer.use "${parameterfile}" | tr -d \")
+
+if [ "${use_deployer}" == "null" ]; then
+    use_deployer=false
+fi
 
 if [ ! -n "${environment}" ]
 then
@@ -128,7 +146,7 @@ then
 fi
 
 
-echo $use_deployer
+echo "Use Deployer: $use_deployer"
 
 if [ false != $use_deployer ]
 then
@@ -204,7 +222,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     exit 3
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/"${deployment_system}"/
 
 if [ ! -d ${terraform_module_directory} ]
 then
@@ -340,7 +358,6 @@ then
     exit -1
 fi
 return_value=-1
-
 REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
 temp=$(echo "${REMOTE_STATE_SA}" | grep -m1 "Warning")
 if [ -z "${temp}" ]
@@ -348,18 +365,36 @@ then
     temp=$(echo "${REMOTE_STATE_SA}" | grep "Backend reinitialization required")
     if [ -z "${temp}" ]
     then
-        REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
-        tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
-        STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
-        
-        save_config_vars "${library_config_information}" \
-            REMOTE_STATE_RG \
-            REMOTE_STATE_SA \
-            tfstate_resource_id \
-            STATE_SUBSCRIPTION
-        
+        echo "save"
+        save_config_var "REMOTE_STATE_SA" "${library_config_information}"
         return_value=0
     fi
 fi
+
+tfstate_resource_id=$(terraform -chdir="${terraform_module_directory}" output tfstate_resource_id| tr -d \")
+temp=$(echo $tfstate_resource_id | grep -m1 "Warning")
+if [ -z "${temp}" ]
+then
+    temp=$(echo "${tfstate_resource_id}" | grep "Backend reinitialization required")
+    if [ -z "${temp}" ]
+    then
+        save_config_var "tfstate_resource_id" "${library_config_information}"
+        return_value=0
+    fi
+fi
+
+REMOTE_STATE_RG=$(terraform -chdir="${terraform_module_directory}" output remote_state_resource_group_name| tr -d \")
+temp=$(echo "${REMOTE_STATE_RG}" | grep -m1 "Warning")
+if [ -z "${temp}" ]
+then
+    temp=$(echo "${REMOTE_STATE_RG}" | grep "Backend reinitialization required")
+    if [ -z "${temp}" ]
+    then
+        echo "save"
+        save_config_var "REMOTE_STATE_RG" "${library_config_information}"
+        return_value=0
+    fi
+fi
+
 
 exit $return_value

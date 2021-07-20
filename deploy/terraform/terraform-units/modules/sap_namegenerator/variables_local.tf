@@ -227,6 +227,7 @@ variable "resource_suffixes" {
     "deployer_state"      = "_DEPLOYER.terraform.tfstate"
     "deployer_subnet"     = "_deployment-subnet"
     "deployer_subnet_nsg" = "_deployment-nsg"
+    "dns_link"            = "dns-link"
     "firewall_rule_db"    = "firewall-rule-db"
     "firewall_rule_app"   = "firewall-rule-app"
     "iscsi_subnet"        = "iscsi-subnet"
@@ -275,6 +276,8 @@ variable "resource_suffixes" {
     "web_subnet"          = "web-subnet"
     "web_subnet_nsg"      = "webSubnet-nsg"
     "witness"             = "-witness"
+    "witness_accesskey"   = "-witness-accesskey"
+    "witness_name"        = "-witness-name"
 
   }
 }

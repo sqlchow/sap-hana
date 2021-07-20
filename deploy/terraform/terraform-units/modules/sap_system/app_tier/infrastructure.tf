@@ -231,11 +231,11 @@ resource "azurerm_lb" "web" {
   frontend_ip_configuration {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_feip)
     subnet_id = local.sub_web_deployed.id
-    private_ip_address = local.use_DHCP ? (
+    private_ip_address = var.application.use_DHCP ? (
       null) : (
       try(local.web_lb_ips[0], cidrhost(local.sub_web_deployed.address_prefixes[0], local.ip_offsets.web_lb))
     )
-    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+    private_ip_address_allocation = var.application.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -284,44 +284,6 @@ resource "azurerm_availability_set" "web" {
   managed                      = true
 }
 
-# FIREWALL
-
-# The following example shows how to generate a random priority
-# between 1 and 50000 for a aws_alb_listener_rule resource:
-
-resource "random_integer" "app_priority" {
-  min = 3000
-  max = 3999
-  keepers = {
-    # Generate a new ID only when a new resource group is defined
-    resource_group = var.resource_group[0].name
-  }
-}
-
-# Create a Azure Firewall Network Rule for Azure Management API and Outbound Internet
-resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
-  provider            = azurerm.deployer
-  count               = local.firewall_exists && local.sub_app_defined && !local.sub_app_exists ? 1 : 0
-  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_app)
-  azure_firewall_name = local.firewall_name
-  resource_group_name = local.firewall_rgname
-  priority            = random_integer.app_priority.result
-  action              = "Allow"
-  rule {
-    name                  = "Azure-Cloud"
-    source_addresses      = local.sub_web_defined ? [local.sub_app_prefix, local.sub_web_prefix] : [local.sub_app_prefix]
-    destination_ports     = ["*"]
-    destination_addresses = [local.firewall_service_tags]
-    protocols             = ["Any"]
-  }
-  rule {
-    name                  = "ToInternet"
-    source_addresses      = local.sub_web_defined ? [local.sub_app_prefix, local.sub_web_prefix] : [local.sub_app_prefix]
-    destination_ports     = ["*"]
-    destination_addresses = ["*"]
-    protocols             = ["Any"]
-  }
-}
 
 //ASG
 

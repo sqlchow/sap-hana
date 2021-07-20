@@ -21,7 +21,7 @@ output "anydb_db_ip" {
   value = local.enable_deployment ? azurerm_network_interface.anydb_db[*].private_ip_address : []
 }
 
-output "anydb_lb_ip" {
+output "db_lb_ip" {
   value = local.enable_deployment ? azurerm_lb.anydb[0].frontend_ip_configuration[0].private_ip_address : ""
 }
 
@@ -65,4 +65,9 @@ output "anydb_vm_ids" {
 
 output "dbtier_disks" {
   value = local.enable_deployment ? local.db_disks_ansible : []
+}
+
+
+output "db_ha" {
+  value = local.anydb_ha
 }

@@ -20,6 +20,10 @@ sapbits_bom_files:            "sapfiles"                                        
 bom_base_name:                ""                                                        # REQUIRED
 target_media_location:        "/usr/sap/install"                                        # Default
 sapbits_sas_token:            ""                                                        # Optional
+sapbits_access_key:           ""                                                        # Optional
+S_user:                       ""
+S_password:                   ""
+download_directory:           "/mnt/downloads"
 
 # SAP Configuration for templates and install
 aas_hostname:                 ""
@@ -40,6 +44,8 @@ sapsys_gid:                   2000
 scs_hostname:                 ""
 scs_instance_number:          "00"                                                      # SAP Install
 sidadm_uid:                   2000
+scs_lb_ip:                    ""                                                        # SAP HA   
+db_lb_ip:                     ""                                                        # SAP HA
 
 orchestration_ansible_user:   azureadm
 

@@ -66,16 +66,10 @@ output "fileshare_lb_ip" {
   value = local.enable_deployment && local.scs_server_count > 0 && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? azurerm_lb.scs[0].frontend_ip_configuration[3].private_ip_address : ""
 }
 
-
-output "application" {
-  sensitive = false
-  value     = local.application
-}
-
 // Output for DNS
 output "dns_info_vms" {
   value = local.enable_deployment ? (
-    local.apptier_dual_nics ? (
+    var.application.dual_nics ? (
       zipmap(
         compact(concat(
           local.full_appserver_names,
@@ -115,15 +109,36 @@ output "dns_info_loadbalancers" {
       compact([
         local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "scs") : "",
         local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "ers") : "",
-        local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? format("%s%s%s", local.prefix, var.naming.separator, "clst") : "",
-        local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? format("%s%s%s", local.prefix, var.naming.separator, "fs") : "",
+        local.scs_server_count > 0 ? (
+          local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
+            format("%s%s%s", local.prefix, var.naming.separator, "clst")) : (
+            ""
+          )) : (
+          ""
+        ),
+        local.scs_server_count > 0 ? (
+          local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
+            format("%s%s%s", local.prefix, var.naming.separator, "fs")) : (
+            ""
+          )) : (
+          ""
+        ),
         local.webdispatcher_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb) : ""
       ]),
       compact([
         local.scs_server_count > 0 ? azurerm_lb.scs[0].private_ip_addresses[0] : "",
         local.scs_server_count > 0 ? azurerm_lb.scs[0].private_ip_addresses[1] : "",
-        local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? azurerm_lb.scs[0].private_ip_addresses[2] : "",
-        local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? azurerm_lb.scs[0].private_ip_addresses[3] : "",
+        local.scs_server_count > 0 ? (
+          local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
+            azurerm_lb.scs[0].private_ip_addresses[2]) : (
+            ""
+          )) : (
+          ""
+        ),
+        local.scs_server_count > 0 ? (
+          local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? azurerm_lb.scs[0].private_ip_addresses[3] : "") : (
+          ""
+        ),
         local.webdispatcher_count > 0 ? azurerm_lb.web[0].private_ip_address : ""
       ])
     )
@@ -148,4 +163,8 @@ output "app_tier_os_types" {
 
 output "apptier_disks" {
   value = local.enable_deployment ? compact(concat(local.app_disks_ansible, local.scs_disks_ansible, local.web_disks_ansible)) : []
+}
+
+output "scs_ha" {
+  value = local.scs_high_availability
 }

@@ -62,6 +62,8 @@ resource "azurerm_linux_virtual_machine" "observer" {
   ]
   size = local.observer_size
 
+  custom_data = var.deployment == "new" ? var.cloudinit_growpart_config : null
+
   os_disk {
     name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
     caching                = "ReadWrite"
@@ -85,6 +87,8 @@ resource "azurerm_linux_virtual_machine" "observer" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
+  license_type = length(var.license_type) > 0 ? var.license_type : null
+  
   tags = local.tags
 }
 
@@ -139,5 +143,7 @@ resource "azurerm_windows_virtual_machine" "observer" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
+#ToDo: Remove once feature is GA  patch_mode = "Manual"
+  license_type = length(var.license_type) > 0 ? var.license_type : null
   tags = local.tags
 }

@@ -134,8 +134,8 @@ if [ ! -n "${deployment_system}" ]; then
 fi
 
 # Read environment
-environment=$(jq .infrastructure.environment "${parameterfile}" | tr -d \")
-region=$( jq .infrastructure.region "${parameterfile}" | tr -d \")
+environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+region=$(jq --raw-output .infrastructure.region "${parameterfile}")
 
 if [ ! -n "${environment}" ]; then
     echo "#########################################################################################"
@@ -161,7 +161,6 @@ if [ ! -n "${region}" ]; then
     exit 65 #data format error
 fi
 
-#key=$(echo "${parameterfile_name}" | cut -d. -f1)
 
 if [ ! -f "${parameterfile}" ]; then
     printf -v val %-40.40s "$parameterfile"
@@ -178,6 +177,9 @@ fi
 automation_config_directory="$HOME/.sap_deployment_automation/"
 generic_config_information="${automation_config_directory}"config
 system_config_information="${automation_config_directory}""${environment}""${region}"
+
+key=$(echo "${parameterfile}" | cut -d. -f1)
+
 
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]; then
@@ -248,7 +250,7 @@ fi
 
 export TF_DATA_DIR="${parameterfile_dirname}"/.terraform
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 
 if [ ! -d "${terraform_module_directory}" ]; then
     printf -v val %-40.40s "$deployment_system"
@@ -279,6 +281,23 @@ fi
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
+echo "#                             Running Terraform init                                    #"
+echo "#                                                                                       #"
+echo "#########################################################################################"
+echo ""
+
+
+
+terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
+--backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
+--backend-config "resource_group_name=${REMOTE_STATE_RG}" \
+--backend-config "storage_account_name=${REMOTE_STATE_SA}" \
+--backend-config "container_name=tfstate" \
+--backend-config "key=${key}.terraform.tfstate"
+
+echo ""
+echo "#########################################################################################"
+echo "#                                                                                       #"
 echo "#                             Running Terraform destroy                                 #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
@@ -296,7 +315,7 @@ if [ "$deployment_system" == "sap_deployer" ]; then
 elif [ "$deployment_system" == "sap_library" ]; then
     echo -e "#$cyan processing $deployment_system removal as defined in $parameterfile_name $resetformatting"
 
-    terraform_bootstrap_directory="${DEPLOYMENT_REPO_PATH}deploy/terraform/bootstrap/${deployment_system}/"
+    terraform_bootstrap_directory="${DEPLOYMENT_REPO_PATH}/deploy/terraform/bootstrap/${deployment_system}/"
     if [ ! -d "${terraform_bootstrap_directory}" ]; then
         printf -v val %-40.40s "$terraform_bootstrap_directory"
         echo "#########################################################################################"

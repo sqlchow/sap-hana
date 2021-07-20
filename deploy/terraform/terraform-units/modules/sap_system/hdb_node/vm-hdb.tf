@@ -22,7 +22,7 @@ resource "azurerm_network_interface" "nics_dbnodes_admin" {
 
   ip_configuration {
     name      = "ipconfig1"
-    subnet_id = var.admin_subnet.id
+    subnet_id = var.admin_subnet
     private_ip_address = local.use_DHCP ? (
       null) : (
       lookup(local.hdb_vms[count.index], "admin_nic_ip", false) != false ? (
@@ -48,7 +48,7 @@ resource "azurerm_network_interface" "nics_dbnodes_db" {
   ip_configuration {
     primary   = true
     name      = "ipconfig1"
-    subnet_id = var.db_subnet.id
+    subnet_id = var.db_subnet
 
     private_ip_address = local.use_DHCP ? (
       null) : (
@@ -117,7 +117,11 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     }
   }
 
-  proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+  //If no ppg defined do not put the database in a proximity placement group
+  proximity_placement_group_id = local.no_ppg ? (
+    null) : (
+    local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+  )
 
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   availability_set_id = local.use_avset ? (
@@ -137,6 +141,8 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   )
 
   size = local.hdb_vms[count.index].size
+
+  custom_data = var.deployment == "new" ? var.cloudinit_growpart_config : null
 
   dynamic "os_disk" {
     iterator = disk
@@ -160,7 +166,7 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
       publisher = local.hdb_vms[count.index].os.publisher
       offer     = local.hdb_vms[count.index].os.offer
       sku       = local.hdb_vms[count.index].os.sku
-      version   = try(local.hdb_vms[count.index].os.version, "latest")
+      version   = local.hdb_vms[count.index].os.version
     }
   }
 
@@ -171,6 +177,8 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
+
+  license_type = length(var.license_type) > 0 ? var.license_type : null
 
   tags = local.tags
 }
@@ -190,7 +198,7 @@ resource "azurerm_managed_disk" "data_disk" {
 
   disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
 
-  zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
+  zones = !local.use_avset  ? (
     [azurerm_linux_virtual_machine.vm_dbnode[local.data_disk_list[count.index].vm_index].zone]) : (
     null
   )

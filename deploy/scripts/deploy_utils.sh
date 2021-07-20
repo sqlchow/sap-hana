@@ -75,3 +75,44 @@ function init() {
     
     
 }
+
+function error_msg {
+    echo "Error!!! ${@}"
+}
+
+function fail_if_null {
+    local var_name="${1}"
+
+    # return immeditaely if no action required
+    if [ "${!var_name}" != "null" ]; then
+        return
+    fi
+
+    shift 1
+
+    if (( $# > 0 )); then
+        error_msg "${@}"
+    else
+        error_msg "Got a null value for '${var_name}'"
+    fi
+
+    exit 1
+}
+
+function get_and_store_sa_details {
+    local REMOTE_STATE_SA="${1}"
+    local config_file_name="${2}"
+
+    save_config_vars "${config_file_name}" REMOTE_STATE_SA
+    tfstate_resource_id=$(az resource list --name "${REMOTE_STATE_SA}" --resource-type Microsoft.Storage/storageAccounts | jq --raw-output '.[0].id')
+    fail_if_null tfstate_resource_id
+    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    REMOTE_STATE_RG=$(echo $tfstate_resource_id | cut -d/ -f5 | tr -d \" | xargs)
+
+    
+    save_config_vars "${config_file_name}" \
+        REMOTE_STATE_RG \
+        tfstate_resource_id \
+        STATE_SUBSCRIPTION
+
+}
