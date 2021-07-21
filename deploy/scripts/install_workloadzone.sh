@@ -132,7 +132,7 @@ landscape_tfstate_key=""
 landscape_tfstate_key_parameter=""
 landscape_tfstate_key_exists=false
 
-deployment_system=sap_landscape
+deployment_system="sap_landscape"
 
 echo "Deployer environment: $deployer_environment"
 echo "Terraform state storge account: $REMOTE_STATE_SA"
@@ -504,7 +504,7 @@ else
 
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="$(realpath "${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}" )"
 
 if [ ! -d "${terraform_module_directory}" ]
 then
