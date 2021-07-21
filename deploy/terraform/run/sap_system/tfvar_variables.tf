@@ -279,6 +279,9 @@ variable "database_no_ppg" {
   default = false
 }
 
+variable "database_loadbalancer_ip" {
+  default = ""
+}
 
 variable "database_vm_nodes" {
   default = [{
