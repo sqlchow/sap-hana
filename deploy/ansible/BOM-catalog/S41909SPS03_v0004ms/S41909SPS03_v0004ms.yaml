@@ -234,12 +234,12 @@ materials:
       download:     false
       url:          https://softwaredownloads.sap.com/file/0020000000410162020
 
-    - name:         "KIMMO - Patch 7 for SOFTWARE UPDATE MANAGER 2.0 SP10 ; OS: Linux on x86_64 64bit"
-      archive:      SUM20SP10_7-80002456.SAR
+    - name:         "Patch 1 for SOFTWARE UPDATE MANAGER 2.0 SP11 ; OS: Linux on x86_64 64bit"
+      archive:      SUM20SP11_1-80002456.SAR
       download:     false
-      url:          https://softwaredownloads.sap.com/file/0020000000821552021 
+      url:          https://softwaredownloads.sap.com/file/0020000000991942021 
 
-    - name:         "KIMMO - SP12 Patch4 for UMML4HANA 1"
+    - name:         "SP12 Patch4 for UMML4HANA 1"
       archive:      HANAUMML12_4-70001054.ZIP
       download:     false
       url:          https://softwaredownloads.sap.com/file/0020000000693242021
