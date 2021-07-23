@@ -208,7 +208,7 @@ resource "local_file" "ansible_inventory_new_yml" {
 
 resource "azurerm_storage_blob" "hosts_yaml" {
   provider               = azurerm.deployer
-  name                   = format("%s_hosts.yaml", length(trimspace(var.naming.prefix.SDU)) > 0 ? trimspace(var.naming.prefix.SDU) : hdb_sid)
+  name                   = format("%s_hosts.yaml", length(trimspace(var.naming.prefix.SDU)) > 0 ? trimspace(var.naming.prefix.SDU) : var.hdb_sid)
   storage_account_name   = local.tfstate_storage_account_name
   storage_container_name = local.ansible_container_name
   type                   = "Block"
@@ -217,7 +217,7 @@ resource "azurerm_storage_blob" "hosts_yaml" {
 
 resource "azurerm_storage_blob" "sap_parameters_yaml" {
   provider               = azurerm.deployer
-  name                   = format("%s_sap-parameters.yaml", length(trimspace(var.naming.prefix.SDU)) > 0 ? trimspace(var.naming.prefix.SDU) : hdb_sid)
+  name                   = format("%s_sap-parameters.yaml", length(trimspace(var.naming.prefix.SDU)) > 0 ? trimspace(var.naming.prefix.SDU) : var.hdb_sid)
   storage_account_name   = local.tfstate_storage_account_name
   storage_container_name = local.ansible_container_name
   type                   = "Block"
