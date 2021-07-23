@@ -36,15 +36,15 @@ materials:
       url:          https://softwaredownloads.sap.com/file/0020000000381822021
 
     - name:         HANA Server
-      archive:      IMDB_SERVER20_056_0-80002046.SAR
+      archive:      IMDB_SERVER20_056_0-80002031.SAR
       extract:      true
       extractDir:   CD_HDBSERVER
       creates:      SIGNATURE.SMF
-      url:          https://softwaredownloads.sap.com/file/0020000000958442021
+      url:          https://softwaredownloads.sap.com/file/0020000000958462021
       
 
     - name:         X
-      archive:      IMDB_AFL20_055_0-80001894.SAR
+      archive:      IMDB_AFL20_055_1-80001894.SAR
       extract:      true
       extractDir:   CD_HDBSERVER/COMPONENTS
       creates:      COMPONENTS/SAP_HANA_AFL/packages
