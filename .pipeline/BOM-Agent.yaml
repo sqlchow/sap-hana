@@ -20,7 +20,8 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
-- task: Validate@0
+
+- task: Ansible@0
   inputs:
     ansibleInterface: 'agentMachine'
     playbookPathOnAgentMachine:  $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_validator.yaml'
