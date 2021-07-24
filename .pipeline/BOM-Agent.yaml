@@ -19,17 +19,10 @@ pool:
 steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: |
-      # Write your commands here
-
-      
-      ls  $(Pipeline.Workspace)
-- task: Ansible@0
+  
+- task: Validate
   inputs:
     ansibleInterface: 'agentMachine'
     playbookPathOnAgentMachine:  $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_validator.yaml'
     inventoriesAgentMachine: 'noInventory'
-#    args: 'sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv)'
+    args: 'sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv)'
