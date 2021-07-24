@@ -18,10 +18,10 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+
 
 - task: Ansible@0
+  displayName: 'Run the BOM Validation for $(BOM)'
   inputs:
     ansibleInterface: 'agentMachine'
     playbookPathOnAgentMachine: $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_validator.yaml'
