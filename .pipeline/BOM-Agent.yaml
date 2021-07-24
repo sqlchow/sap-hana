@@ -1,0 +1,28 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+    - master
+    - beta/*
+  paths:
+    include:
+    - deploy/ansible/*
+
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- task: Ansible@0
+  inputs:
+    ansibleInterface: 'agentMachine'
+    playbookPathOnAgentMachine:  $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_validator.yaml'
+    inventoriesAgentMachine: 'noInventory'
+    args: 'sapbits_location_base_path=https://weeusapcontrollib.blob.core.windows.net/sapbits bom_base_name=S41909SPS03_v0004ms kv_uri=DEVWEEUSAP01user053'
