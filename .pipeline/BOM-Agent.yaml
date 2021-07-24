@@ -25,5 +25,5 @@ steps:
     ansibleInterface: 'agentMachine'
     playbookPathOnAgentMachine: '/deploy/ansible/playbook_bom_validator.yaml'
     inventoriesAgentMachine: 'noInventory'
-    args: '--extraVars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv)"'
+    args: '--extra-vars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv)"'
 
