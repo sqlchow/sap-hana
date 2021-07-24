@@ -25,4 +25,4 @@ steps:
     ansibleInterface: 'agentMachine'
     playbookPathOnAgentMachine:  $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_validator.yaml'
     inventoriesAgentMachine: 'noInventory'
-    args: 'sapbits_location_base_path=https://weeusapcontrollib.blob.core.windows.net/sapbits bom_base_name=S41909SPS03_v0004ms kv_uri=DEVWEEUSAP01user053'
+    args: 'sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv)'
