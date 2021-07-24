@@ -106,8 +106,8 @@ variable "use_local_credentials" {
 
 variable "authentication_type" {
   description = "VM Authentication type"
-  default = "key"
-  
+  default     = "key"
+
 }
 
 variable "db_ha" {
@@ -228,4 +228,7 @@ locals {
 
   secret_prefix = var.use_local_credentials ? var.naming.prefix.SDU : var.naming.prefix.VNET
   dns_label     = try(var.landscape_tfstate.dns_label, "")
+
+
+
 }
