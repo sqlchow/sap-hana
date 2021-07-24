@@ -23,7 +23,7 @@ steps:
 - task: Ansible@0
   inputs:
     ansibleInterface: 'agentMachine'
-    playbookPathOnAgentMachine: '"/home/vsts/work/1/s/deploy/ansible/playbook_bom_validator.yaml'
+    playbookPathOnAgentMachine: '/deploy/ansible/playbook_bom_validator.yaml'
     inventoriesAgentMachine: 'noInventory'
-    args: 'sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv)'
+    args: '-e sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv)'
 
