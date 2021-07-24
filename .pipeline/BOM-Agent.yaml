@@ -2,7 +2,8 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
-
+variables:
+- group: 'BOM Validation'
 trigger:
   branches:
     include:
@@ -25,5 +26,5 @@ steps:
     ansibleInterface: 'agentMachine'
     playbookPathOnAgentMachine: $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_validator.yaml'
     inventoriesAgentMachine: 'noInventory'
-    args: '--extra-vars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv)"'
+    args: '--extra-vars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv) SUser=$(S-Username) SPassword=$(S-Password) sapbits_access_key=$(sapbits-access-key) "'
 
