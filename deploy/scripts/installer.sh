@@ -534,7 +534,7 @@ fi
 allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
 echo $allParams
 
-terraform -chdir="$terraform_module_directory" plan -no-color $allParams  
+terraform -chdir="$terraform_module_directory" plan -no-color $allParams > plan_output.log
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]
 then
@@ -555,8 +555,8 @@ then
     exit 1
 fi
 
-if [ ! $new_deployment ]
-then
+if [ -f plan_output.log ]
+    then
     str1=$(grep "0 to add, 0 to change, 0 to destroy" plan_output.log)
     str2=$(grep "No changes" plan_output.log)
     if [ -n "${str1}" ] || [ -n "${str2}" ]; then

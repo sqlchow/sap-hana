@@ -133,9 +133,17 @@ if [ ! -n "${deployment_system}" ]; then
     exit 64 #script usage wrong
 fi
 
-# Read environment
-environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+ext=$(echo ${parameterfile_name} | cut -d. -f2)
+
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile_dirname}"/"${parameterfile_name}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile_dirname}"/"${parameterfile_name}")
+else
+    load_config_vars "${parameterfile_dirname}"/"${parameterfile_name}" "environment"
+    load_config_vars "${parameterfile_dirname}"/"${parameterfile_name}" "location"
+    region=$(echo "${location}" | xargs)
+fi
 
 if [ ! -n "${environment}" ]; then
     echo "#########################################################################################"

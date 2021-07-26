@@ -105,7 +105,7 @@ function missing {
     echo "#      -h or --help                          Help                                       #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-
+    
 }
 
 force=0
@@ -120,19 +120,19 @@ fi
 eval set -- "$INPUT_ARGUMENTS"
 while :
 do
-  case "$1" in
-    -d | --deployer_parameter_file)            deployer_parameter_file="$2"     ; shift 2 ;;
-    -l | --library_parameter_file)             library_parameter_file="$2"      ; shift 2 ;;
-    -s | --subscription)                       subscription="$2"                ; shift 2 ;;
-    -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
-    -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
-    -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
-    -f | --force)                              force=1                          ; shift ;;
-    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
-    -h | --help)                               showhelp 
-                                               exit 3                           ; shift ;;
-    --) shift; break ;;
-  esac
+    case "$1" in
+        -d | --deployer_parameter_file)            deployer_parameter_file="$2"     ; shift 2 ;;
+        -l | --library_parameter_file)             library_parameter_file="$2"      ; shift 2 ;;
+        -s | --subscription)                       subscription="$2"                ; shift 2 ;;
+        -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
+        -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
+        -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
+        -f | --force)                              force=1                          ; shift ;;
+        -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+        -h | --help)                               showhelp
+        exit 3                           ; shift ;;
+        --) shift; break ;;
+    esac
 done
 
 root_dirname=$(pwd)
@@ -311,13 +311,13 @@ else
     if [ -f stdout.az ]; then
         rm stdout.az
     fi
-
+    
     if [ ! -z "${subscription}" ]; then
         echo "Setting the subscription"
         az account set --sub "${subscription}"
         export ARM_SUBSCRIPTION_ID="${subscription}"
     fi
-
+    
 fi
 
 step=0
@@ -332,38 +332,38 @@ if [ 0 == $step ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-
-    if [ $force == 1 ]; then
-        rm -Rf .terraform terraform.tfstate*
-    fi
-
+    
     #Persist the parameters
     if [ ! -z "$subscription" ]; then
         save_config_var "subscription" "${deployer_config_information}"
         kvsubscription=$subscription
         save_config_var "kvsubscription" "${deployer_config_information}"
     fi
-
+    
     if [ ! -z "$client_id" ]; then
         save_config_var "client_id" "${deployer_config_information}"
     fi
-
+    
     if [ ! -z "$tenant_id" ]; then
         save_config_var "tenant_id" "${deployer_config_information}"
     fi
-
+    
     cd "${deployer_dirname}" || exit
 
-    allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
+    if [ $force == 1 ]; then
+        rm -Rf .terraform terraform.tfstate*
+    fi
 
+    allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
+    
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_deployer.sh $allParams
     if (($? > 0)); then
         exit $?
     fi
-
+    
     step=1
     save_config_var "step" "${deployer_config_information}"
-
+    
 else
     echo ""
     echo "#########################################################################################"
@@ -385,12 +385,12 @@ if [ 1 == $step ]; then
     echo "#                           Validating keyvault access                                  #"
     echo "#########################################################################################"
     echo ""
-
+    
     az keyvault secret show --name "$secretname" --vault "$keyvault" --only-show-errors 2>error.log
     if [ -s error.log ]; then
         if [ ! -z "$spn_secret" ]; then
             allParams=$(printf " -e %s -r %s -v %s --spn_secret %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}")
-
+            
             "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
             if (($? > 0)); then
                 exit $?
@@ -400,14 +400,14 @@ if [ 1 == $step ]; then
             answer=${ans^^}
             if [ "$answer" == 'Y' ]; then
                 allParams=$(printf " -e %s -r %s -v %s " "${environment}" "${region}" "${keyvault}" )
-
+                
                 "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
                 if (($? > 0)); then
                     exit $?
                 fi
             fi
         fi
-
+        
         if [ -f post_deployment.sh ]; then
             ./post_deployment.sh
             if (($? > 0)); then
@@ -417,13 +417,13 @@ if [ 1 == $step ]; then
         cd "${curdir}" || exit
         step=2
         save_config_var "step" "${deployer_config_information}"
-
+        
     fi
 fi
 unset TF_DATA_DIR
 cd $root_dirname
 if [ 2 == $step ]; then
-
+    
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -431,19 +431,19 @@ if [ 2 == $step ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-
+    
     relative_path="${root_dirname}"/"${library_dirname}"
     export TF_DATA_DIR="${relative_path}/.terraform"
     relative_path="${root_dirname}"/"${deployer_dirname}"
-
+    
     cd "${library_dirname}" || exit
-
+    
     if [ $force == 1 ]; then
         rm -Rf .terraform terraform.tfstate*
     fi
-
+    
     allParams=$(printf " -p %s -d %s %s" "${library_file_parametername}" "${relative_path}" "${approveparam}")
-
+    
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_library.sh $allParams
     if (($? > 0)); then
         exit $?
@@ -459,9 +459,7 @@ else
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    step=3
-    save_config_var "step" "${deployer_config_information}"
-
+    
 fi
 
 unset TF_DATA_DIR
@@ -475,15 +473,15 @@ if [ 3 == $step ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-
+    
     cd "${deployer_dirname}" || exit
-
+    
     # Remove the script file
     if [ -f post_deployment.sh ]; then
         rm post_deployment.sh
     fi
     allParams=$(printf " -p %s -t sap_deployer %s" "${deployer_file_parametername}" "${approveparam}")
-
+    
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/installer.sh $allParams
     if (($? > 0)); then
         exit $?
@@ -497,26 +495,87 @@ unset TF_DATA_DIR
 cd $root_dirname
 
 if [ 4 == $step ]; then
-
+    
     echo ""
-
+    
     echo "#########################################################################################"
     echo "#                                                                                       #"
     echo "#                           Migrating the library state                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-
+    
     cd "${library_dirname}" || exit
     allParams=$(printf " -p %s -t sap_library %s" "${library_file_parametername}" "${approveparam}")
-
+    
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/installer.sh $allParams
     if (($? > 0)); then
         exit $?
     fi
     cd "${curdir}" || exit
-    step=3
+    step=5
     save_config_var "step" "${deployer_config_information}"
+fi
+if [ 5 == $step ]; then
+    cd "${curdir}" || exit
+
+    cd "${library_dirname}" || exit
+    rm -Rf .terraform/modules .terraform/providers
+
+    cd "${curdir}" || exit
+    cd "${deployer_dirname}" || exit
+
+    rm -Rf .terraform/modules .terraform/providers
+    cd "${curdir}" || exit
+
+
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                           Copying the parameterfiles                                  #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+
+    ssh_timeout_s=10
+
+    load_config_vars "${deployer_config_information}" "sshsecret"    
+    load_config_vars "${deployer_config_information}" "keyvault"    
+    load_config_vars "${deployer_config_information}" "deployer_public_ip_address"
+
+    if [ ! -z ${sshsecret} ]
+    then
+        printf "%s\n" "Collecting secrets from KV"
+        temp_file=$(mktemp)
+        ppk=$(az keyvault secret show --vault-name ${keyvault} --name ${sshsecret} | jq -r .value)
+        echo "${ppk}" > "${temp_file}"
+        chmod 600 "${temp_file}"
+
+        remote_deployer_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname $deployer_parameter_file)
+        remote_library_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname $library_parameter_file)
+        remote_config_dir="~/.sap_deployment_automation"
+
+        echo "$remote_deployer_dir"
+        echo "$remote_library_dir"
+        echo "$deployer_parameter_file"
+
+        ssh -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" "[ -d $${remote_deployer_dir} ] && mkdir -p $${remote_deployer_dir}"
+        scp -i "${temp_file}" -r -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$(dirname "$deployer_parameter_file")" azureadm@"${deployer_public_ip_address}":"${remote_deployer_dir}"/
+
+        ssh -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" "[ -d $${remote_deployer_dir} ] && mkdir -p $${remote_library_dir}"
+        scp -i "${temp_file}" -r -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$(dirname "$library_parameter_file")" azureadm@"${deployer_public_ip_address}":"$remote_library_dir"/
+
+        ssh -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" "mkdir -p $remote_config_dir"
+        scp -i "${temp_file}" -r -o StrictHostKeyChecking=no -o ConnectTimeout=120 ~/.sap_deployment_automation azureadm@"${deployer_public_ip_address}":"${remote_config_dir}"/
+
+        rm "${temp_file}"
+        step=3
+        save_config_var "step" "${deployer_config_information}"
+    else
+        step=3
+        save_config_var "step" ${deployer_config_information}
+
+
+    fi
 fi
 unset TF_DATA_DIR
 
