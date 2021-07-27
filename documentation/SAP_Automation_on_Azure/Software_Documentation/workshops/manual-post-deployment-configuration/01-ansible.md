@@ -68,7 +68,7 @@ Future Steps will include:
 
     | Parameter                  | Value                                  |
     | -------------------------- | -------------------------------------- |
-    | bom_base_name              | S419009SPS03_v1                        |
+    | bom_base_name              | S41909SPS03_v0004ms                    |
     | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits |
     | password_master            | MasterPass00                           |
     | sap_fqdn                   | sap.contoso.com                        |

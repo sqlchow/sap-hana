@@ -108,5 +108,5 @@ automation_username="azureadm"
 
 #enable_purge_control_for_keyvaults=true
 
-#dns_label="sap.contoso.com"
+dns_label="sap.contoso.com"
 #dns_resource_group_name=""

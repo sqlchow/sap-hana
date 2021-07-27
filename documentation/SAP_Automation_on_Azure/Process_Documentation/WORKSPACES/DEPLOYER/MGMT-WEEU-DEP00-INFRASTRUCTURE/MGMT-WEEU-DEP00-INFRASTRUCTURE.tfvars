@@ -84,3 +84,5 @@ firewall_deployment=true
 #firewall_rule_allowed_ipaddresses=[]
 
 #assign_subscription_permissions=true
+
+
