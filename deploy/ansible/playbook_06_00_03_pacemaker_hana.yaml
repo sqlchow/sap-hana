@@ -84,6 +84,7 @@
   - block:
       - include_role:
           name:     roles-sap/5.5-hanadb-pacemaker
+        when: db_high_availability == true          
     tags:
       - 5.5-hanadb-pacemaker
 ...

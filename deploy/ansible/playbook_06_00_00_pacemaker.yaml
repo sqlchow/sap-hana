@@ -30,9 +30,8 @@
 
 
 - hosts:          "{{ sap_sid|upper }}_DB"  
-#                   {{ sap_sid|upper }}_SCS"                                           
 
-  name:           PACEMAKER - General Config
+  name:           PACEMAKER - General Config - Database
   remote_user:    "{{ orchestration_ansible_user }}"                
   become:         yes
   become_user:    root
@@ -91,31 +90,76 @@
   - block:
       - include_role:
           name:     roles-os/1.17-generic-pacemaker                         # Configures the Pacemaker cluster with Azure fence agent 
+        when: db_high_availability == true          
     tags:
       - 1.17-generic-pacemaker
 
-  
-#----------------------------------------
-# BEGIN
+- hosts:          "{{ sap_sid|upper }}_SCS"  
+- hosts:          "{{ sap_sid|upper }}_ERS"  
+
+  name:           PACEMAKER - General - Config - Central Services
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+
+# -------------------------------------+---------------------------------------8
 #
-# TODO: evaluate for inclusion and refactor.
-# SOURCE: sap-playbook
-#----------------------------------------
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
 
-# # Only SLES support SBD fencing
-# - hosts: iscsi
-#   become: true
-#   become_user: root
-#   roles:
-#    - role: iscsi-target-install
-#      when:
-#        - hana_database.size != "LargeInstance"
-#        - hana_database.high_availability
-#        - hostvars[hana_database.nodes[0].ip_admin_nic].ansible_os_family == 'Suse'
+# Specify the active tier for this playbook run
 
-#----------------------------------------
-# END
-#----------------------------------------
+  tasks:
+  - ansible.builtin.set_fact:
+      tier:     ha
+    tags:
+      - always
+
+  - ansible.builtin.set_fact:
+      primary_instance_name:                     "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
+
+  - ansible.builtin.set_fact:
+      secondary_instance_name:                   "{{ ansible_play_hosts_all[1] }}"         # Setting up Secondary Instance Name
+
+  - ansible.builtin.set_fact:
+      sap_hana_fencing_spn_client_id:            "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
+
+  - ansible.builtin.set_fact:
+      sap_hana_fencing_spn_client_pwd:           "{{ hostvars.localhost.sap_fencing_spn_pwd }}"
+
+  - ansible.builtin.set_fact:
+      sap_hana_fencing_spn_tenant_id:            "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
+
+  # - block:
+  #     - include_role:
+  #         name:     roles-os/1.3-repository                             # Repo required for JQ package 
+  #   tags:
+  #     - 1.3-repository
+
+  # - block:
+  #     - include_role:
+  #         name:     roles-os/1.4-packages                               # Install the HA packages required for pacemaker
+  #   tags:
+  #     - 1.4-packages
+      
+  # - block:
+  #     - include_role:
+  #         name:     roles-os/1.9-kernelparameters                       # Setup the kernel parameters required for pacemaker cluster VMs
+  #   tags:
+  #     - 1.9-kernelparameters
+
+  - block:
+      - include_role:
+          name:     roles-os/1.17-generic-pacemaker                         # Configures the Pacemaker cluster with Azure fence agent 
+        when: scs_high_availability == true
+    tags:
+      - 1.17-generic-pacemaker
+
 
 
 ...

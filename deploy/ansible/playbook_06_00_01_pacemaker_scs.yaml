@@ -40,7 +40,7 @@
 
    - include_role:
       name:     roles-os/6.0.0.01-HANA
-
+     when: db_high_availability == true          
 ...
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |
