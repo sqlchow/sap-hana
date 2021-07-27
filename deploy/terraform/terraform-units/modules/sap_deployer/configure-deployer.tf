@@ -29,6 +29,7 @@ resource "null_resource" "prepare-deployer" {
       "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM",
       "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE",
       "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER",
+      "mkdir $HOME/.sap_deployment_automation",
       //
       // Clones project repository
       //
