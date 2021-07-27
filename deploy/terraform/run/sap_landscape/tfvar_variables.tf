@@ -240,3 +240,13 @@ variable "witness_storage_account_arm_id" {
 variable "enable_purge_control_for_keyvaults" {
   default = true
 }
+
+variable "dns_label" {
+  description = "DNS label"
+  default = ""
+}
+
+variable "dns_resource_group_name" {
+  description = "DNS resource group name"
+  default = ""
+}

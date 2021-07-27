@@ -20,14 +20,14 @@ This block describes the variables for the VNet block in the json file
 
 sap_network_name="SAP01"
 #sap_network_arm_id=""
-sap_network_address_space="10.110.0.0/24"
+sap_network_address_space="10.110.0.0/16"
 
 
 /* admin subnet information */
 
 #sap_admin_subnet_name=""
 #sap_admin_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_admin"
-sap_admin_subnet_address_prefix="10.110.0.0/27"
+sap_admin_subnet_address_prefix="10.110.0.0/19"
 
 #sap_admin_subnet_nsg_name=""
 #sap_admin_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_adminSubnet-nsg"
@@ -36,7 +36,7 @@ sap_admin_subnet_address_prefix="10.110.0.0/27"
 
 #sap_db_subnet_name=""
 #sap_db_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_db"
-sap_db_subnet_address_prefix="10.110.0.64/27"
+sap_db_subnet_address_prefix="10.110.0.64/19"
 
 #sap_db_subnet_nsg_name=""
 #sap_db_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_dbSubnet-nsg"
@@ -45,7 +45,7 @@ sap_db_subnet_address_prefix="10.110.0.64/27"
 
 #sap_app_subnet_name=""
 #sap_app_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_app"
-sap_app_subnet_address_prefix="10.110.0.32/27"
+sap_app_subnet_address_prefix="10.110.0.32/19"
 
 #sap_app_subnet_nsg_name=""
 #sap_app_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_appSubnet-nsg"
@@ -54,7 +54,7 @@ sap_app_subnet_address_prefix="10.110.0.32/27"
 
 #sap_web_subnet_name=""
 #sap_web_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_web"
-sap_web_subnet_address_prefix="10.110.0.96/27"
+sap_web_subnet_address_prefix="10.110.0.96/19"
 
 #sap_web_subnet_nsg_name=""
 #sap_web_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_webSubnet-nsg"
@@ -105,3 +105,8 @@ automation_username="azureadm"
 
 #diagnostics_storage_account_arm_id=""
 #witness_storage_account_arm_id=""
+
+#enable_purge_control_for_keyvaults=true
+
+#dns_label=sap.contoso.com
+#dns_resource_group_name=""
