@@ -145,13 +145,13 @@ fi
 if [ -z "$deployer_parameter_file" ]; then
     missing_value='deployer parameter file'
     missing
-    exit -1
+    exit 2 #No such file or directory
 fi
 
 if [ -z "$library_parameter_file" ]; then
     missing_value='library parameter file'
     missing
-    exit -1
+    exit 2 #No such file or directory
 fi
 
 # Check terraform
@@ -164,7 +164,7 @@ if [ ! -n "$tf" ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 2 #No such file or directory
 fi
 
 az --version >stdout.az 2>&1
@@ -177,7 +177,7 @@ if [ ! -n "${az}" ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 2 #No such file or directory
 fi
 
 ext=$(echo ${deployer_parameter_file} | cut -d. -f2)
@@ -196,7 +196,7 @@ fi
 if [ ! -n "${environment}" ]; then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Incorrect parameter file.                                   #"
+    echo "#                         $boldred  Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
     echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
     echo "#                                                                                       #"
@@ -208,7 +208,7 @@ fi
 if [ ! -n "${region}" ]; then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Incorrect parameter file.                                   #"
+    echo "#                          $boldred Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
     echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
     echo "#                                                                                       #"
@@ -249,7 +249,7 @@ if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#   Missing environment variables (DEPLOYMENT_REPO_PATH)!!!                             #"
+    echo "#  $boldred Missing environment variables (DEPLOYMENT_REPO_PATH)!!! $resetformatting                            #"
     echo "#                                                                                       #"
     echo "#   Please export the folloing variables:                                               #"
     echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
@@ -269,7 +269,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#   Missing environment variables (ARM_SUBSCRIPTION_ID)!!!                              #"
+    echo "#  $boldred Missing environment variables (ARM_SUBSCRIPTION_ID)!!! $resetformatting                             #"
     echo "#                                                                                       #"
     echo "#   Please export the folloing variables:                                               #"
     echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
@@ -299,7 +299,7 @@ if [ -n "${temp}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Please login using az login                                 #"
+    echo "#                          $boldred Please login using az login! $resetformatting                               #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -328,7 +328,7 @@ if [ 0 == $step ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Bootstrapping the deployer                                  #"
+    echo "#                          $cyan Bootstrapping the deployer $resetformatting                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -349,11 +349,11 @@ if [ 0 == $step ]; then
     fi
     
     cd "${deployer_dirname}" || exit
-
+    
     if [ $force == 1 ]; then
         rm -Rf .terraform terraform.tfstate*
     fi
-
+    
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
     
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_deployer.sh $allParams
@@ -368,7 +368,7 @@ else
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Deployer is bootstrapped                                    #"
+    echo "#                          $cyan Deployer is bootstrapped $resetformatting                                   #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -382,7 +382,9 @@ if [ 1 == $step ]; then
     secretname="${environment}"-client-id
     echo ""
     echo "#########################################################################################"
-    echo "#                           Validating keyvault access                                  #"
+    echo "#                                                                                       #"
+    echo "#                          $cyan Validating keyvault access $resetformatting                                 #"
+    echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
     
@@ -421,13 +423,14 @@ if [ 1 == $step ]; then
     fi
 fi
 unset TF_DATA_DIR
-cd $root_dirname
+cd "$root_dirname" || exit
+
 if [ 2 == $step ]; then
     
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Bootstrapping the library                                   #"
+    echo "#                          $cyan Bootstrapping the library $resetformatting                                  #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -455,7 +458,7 @@ else
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                            Library is bootstrapped                                    #"
+    echo "#                           $cyan Library is bootstrapped $resetformatting                                   #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -469,7 +472,7 @@ if [ 3 == $step ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Migrating the deployer state                                #"
+    echo "#                          $cyan Migrating the deployer state $resetformatting                               #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -492,7 +495,7 @@ if [ 3 == $step ]; then
 fi
 
 unset TF_DATA_DIR
-cd $root_dirname
+cd "$root_dirname" || exit
 
 if [ 4 == $step ]; then
     
@@ -500,7 +503,7 @@ if [ 4 == $step ]; then
     
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Migrating the library state                                 #"
+    echo "#                          $cyan Migrating the library state $resetformatting                                #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -518,55 +521,55 @@ if [ 4 == $step ]; then
 fi
 if [ 5 == $step ]; then
     cd "${curdir}" || exit
-
+    
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Copying the parameterfiles                                  #"
+    echo "#                         $cyan  Copying the parameterfiles $resetformatting                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-
+    
     ssh_timeout_s=10
-
-    load_config_vars "${deployer_config_information}" "sshsecret"    
-    load_config_vars "${deployer_config_information}" "keyvault"    
+    
+    load_config_vars "${deployer_config_information}" "sshsecret"
+    load_config_vars "${deployer_config_information}" "keyvault"
     load_config_vars "${deployer_config_information}" "deployer_public_ip_address"
-
+    
     if [ ! -z ${sshsecret} ]
     then
         printf "%s\n" "Collecting secrets from KV"
         temp_file=$(mktemp)
-        ppk=$(az keyvault secret show --vault-name ${keyvault} --name ${sshsecret} | jq -r .value)
+        ppk=$(az keyvault secret show --vault-name "${keyvault}" --name "${sshsecret}" | jq -r .value)
         echo "${ppk}" > "${temp_file}"
         chmod 600 "${temp_file}"
-
-        remote_deployer_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname $deployer_parameter_file)
-        remote_library_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname $library_parameter_file)
-        remote_config_dir="~/.sap_deployment_automation"
-
+        
+        remote_deployer_dir="$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$deployer_parameter_file")
+        remote_library_dir="$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$library_parameter_file")
+        remote_config_dir="$HOME/.sap_deployment_automation"
+        
         echo "$remote_deployer_dir"
         echo "$remote_library_dir"
         echo "$deployer_parameter_file"
-
-        ssh -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" "[ -d $${remote_deployer_dir} ] && mkdir -p $${remote_deployer_dir}"
-        scp -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$deployer_parameter_file" azureadm@"${deployer_public_ip_address}":"${remote_deployer_dir}"/
-        scp -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$(dirname "$deployer_parameter_file")"/.terraform/terraform.tfstate azureadm@"${deployer_public_ip_address}":"${remote_deployer_dir}"/
-
-        ssh -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" "[ -d $${remote_deployer_dir} ] && mkdir -p $${remote_library_dir}"
-        scp -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$library_parameter_file" azureadm@"${deployer_public_ip_address}":"$remote_library_dir"/
-        scp -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$(dirname "$library_parameter_file")"/.terraform/terraform.tfstate azureadm@"${deployer_public_ip_address}":"$remote_library_dir"/
-
+        
+        ssh -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" "mkdir -p ${remote_deployer_dir}"
+        scp -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$deployer_parameter_file" azureadm@"${deployer_public_ip_address}":"${remote_deployer_dir}"/.
+        scp -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$(dirname "$deployer_parameter_file")"/.terraform/terraform.tfstate azureadm@"${deployer_public_ip_address}":"${remote_deployer_dir}"/.
+        
+        ssh -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" " mkdir -p ${remote_library_dir}"
+        scp -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$library_parameter_file" azureadm@"${deployer_public_ip_address}":"$remote_library_dir"/.
+        scp -i "${temp_file}"  -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$(dirname "$library_parameter_file")"/.terraform/terraform.tfstate azureadm@"${deployer_public_ip_address}":"$remote_library_dir"/.
+        
         scp -i "${temp_file}" -o StrictHostKeyChecking=no -o ConnectTimeout=120 "${deployer_config_information}" azureadm@"${deployer_public_ip_address}":"${remote_config_dir}"/
         scp -i "${temp_file}" -o StrictHostKeyChecking=no -o ConnectTimeout=120 "${generic_config_information}" azureadm@"${deployer_public_ip_address}":"${remote_config_dir}"/
-
+        
         rm "${temp_file}"
         step=3
         save_config_var "step" "${deployer_config_information}"
     else
         step=3
         save_config_var "step" ${deployer_config_information}
-
-
+        
+        
     fi
 fi
 unset TF_DATA_DIR
