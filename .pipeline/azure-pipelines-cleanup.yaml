@@ -73,7 +73,7 @@ jobs:
           for subnet in ${subnet_list}
           do
             echo ${subnet}
-            az network vnet subnet delete --resource-group ${sap_landscape_rg} --vnet-name ${sap_vnet} --name ${subnet} || :
+            az network vnet subnet delete --resource-group $rg --vnet-name ${sap_vnet} --name ${subnet} || :
           done
         fi
       done
