@@ -18,6 +18,14 @@ resource "azurerm_resource_group" "resource_group" {
 
 }
 
+resource "azurerm_role_assignment" "resource_group" {
+  provider = azurerm.main
+  count                = local.rg_exists || length(trimspace(try(var.deployer_tfstate.deployer_uai.principal_id, ""))) == 0 ? 0 : 1
+  scope                = azurerm_resource_group.resource_group[0].id
+  role_definition_name = "Contributor"
+  principal_id         = var.deployer_tfstate.deployer_uai.principal_id
+}
+
 // Imports data of existing resource group
 data "azurerm_resource_group" "resource_group" {
   provider = azurerm.main

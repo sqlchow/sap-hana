@@ -18,55 +18,55 @@ This block describes the variables for the VNet block in the json file
 
 */
 
-sap_network_name="SAP01"
-#sap_network_arm_id=""
-sap_network_address_space="10.110.0.0/16"
+network_name="SAP01"
+#network_arm_id=""
+network_address_space="10.110.0.0/16"
 
 
 /* admin subnet information */
 
-#sap_admin_subnet_name=""
-#sap_admin_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_admin"
-sap_admin_subnet_address_prefix="10.110.0.0/19"
+#admin_subnet_name=""
+#admin_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_admin"
+admin_subnet_address_prefix="10.110.0.0/19"
 
-#sap_admin_subnet_nsg_name=""
-#sap_admin_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_adminSubnet-nsg"
+#admin_subnet_nsg_name=""
+#admin_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_adminSubnet-nsg"
 
 /* db subnet information */
 
-#sap_db_subnet_name=""
-#sap_db_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_db"
-sap_db_subnet_address_prefix="10.110.0.64/19"
+#db_subnet_name=""
+#db_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_db"
+db_subnet_address_prefix="10.110.32.0/19"
 
-#sap_db_subnet_nsg_name=""
-#sap_db_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_dbSubnet-nsg"
+#db_subnet_nsg_name=""
+#db_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_dbSubnet-nsg"
 
 /* app subnet information */
 
-#sap_app_subnet_name=""
-#sap_app_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_app"
-sap_app_subnet_address_prefix="10.110.0.32/19"
+#app_subnet_name=""
+#app_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_app"
+app_subnet_address_prefix="10.110.96.0/18"
 
-#sap_app_subnet_nsg_name=""
-#sap_app_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_appSubnet-nsg"
+#app_subnet_nsg_name=""
+#app_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_appSubnet-nsg"
 
 /* web subnet information */
 
-#sap_web_subnet_name=""
-#sap_web_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_web"
-sap_web_subnet_address_prefix="10.110.0.96/19"
+#web_subnet_name=""
+#web_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_web"
+web_subnet_address_prefix="10.110.128.0/19"
 
-#sap_web_subnet_nsg_name=""
-#sap_web_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_webSubnet-nsg"
+#web_subnet_nsg_name=""
+#web_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_webSubnet-nsg"
 
 /* iscsi subnet information */
 
-#sap_iscsi_subnet_name=""
-#sap_iscsi_subnet_arm_id=""
-#sap_iscsi_subnet_address_prefix=""
+#iscsi_subnet_name=""
+#iscsi_subnet_arm_id=""
+#iscsi_subnet_address_prefix=""
 
-#sap_iscsi_subnet_nsg_name=""
-#sap_iscsi_subnet_nsg_arm_id=""
+#iscsi_subnet_nsg_name=""
+#iscsi_subnet_nsg_arm_id=""
 
 #iscsi_count=0
 #iscsi_size=""
@@ -108,5 +108,5 @@ automation_username="azureadm"
 
 #enable_purge_control_for_keyvaults=true
 
-#dns_label=sap.contoso.com
+#dns_label="sap.contoso.com"
 #dns_resource_group_name=""
