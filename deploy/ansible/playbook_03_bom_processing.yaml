@@ -38,11 +38,6 @@
         name:     roles-os/1.5-disk-setup
     tags:
       - 1.5-disk-setup 
-  - block:
-    - include_role:
-        name:     roles-os/1.16-services
-    tags:
-      - 1.16-services
 
   - block:
     - include_role:
@@ -55,6 +50,12 @@
         name:     roles-sap-os/2.6-sap-exports
     tags:
       - 2.6-sap-exports
+
+  - block:
+      - include_role:
+          name:     roles-os/1.16-services
+    tags:
+      - 1.16-services
 
   - block:
     - include_role:
