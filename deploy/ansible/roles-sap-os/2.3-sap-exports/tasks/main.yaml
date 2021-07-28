@@ -43,6 +43,7 @@
     - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/install',            line: '/usr/sap/install *(rw,sync,no_wdelay,no_root_squash)'            }
     - { tier: 'preparation', path: '/etc/nfs.conf',      regexp: '^# vers3=',                    line: 'vers3=n'                                                         }
     - { tier: 'preparation', path: '/etc/nfs.conf',      regexp: '^# vers4.1=',                  line: 'vers4.1=y'                                                       }
+    - { tier: 'preparation', path: '/etc/nfs.conf',      regexp: '^# vers4.2=',                  line: 'vers4.2=y'                                                       }
   when:     (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat8" and (item.tier == "all" or item.tier == tier)
  
 
