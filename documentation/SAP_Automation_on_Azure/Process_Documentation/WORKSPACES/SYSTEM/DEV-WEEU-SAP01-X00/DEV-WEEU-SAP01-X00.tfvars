@@ -91,7 +91,7 @@ database_vm_image={
 #database_high_availability=true
 
 database_platform="HANA"
-database_size="S4Demo"
+database_size="Default"
 
 #database_vm_zones=["1"]
 #database_vm_use_DHCP=true

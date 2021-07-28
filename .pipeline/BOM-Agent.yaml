@@ -11,9 +11,7 @@ trigger:
     - beta/*
   paths:
     include:
-    - deploy/ansible/BOM-catalog/*
-    exclude:
-    - deploy/ansible/BOM-catalog/a*
+    - deploy/ansible/*
 
 
 pool:

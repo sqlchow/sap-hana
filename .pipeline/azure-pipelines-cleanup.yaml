@@ -63,21 +63,6 @@ jobs:
         echo ${subnet}
         az network vnet subnet delete --resource-group ${sap_landscape_rg} --vnet-name ${sap_vnet} --name ${subnet} || :
       done
-
-      groups=$(az group list --tag Delete=True --query [].name --output tsv)
-      for rg in $groups
-      do
-        if $(az group exists -n $rg); then
-          sap_vnet=$(az network vnet list --resource-group $rg | jq -r '.[].name')
-          subnet_list=$(az network vnet subnet list --resource-group $rg --vnet-name ${sap_vnet} | jq -c '.[] | select(.name | contains("RHEL") | not) | select(.name | contains("SLES") | not)' | jq -r .name)
-          for subnet in ${subnet_list}
-          do
-            echo ${subnet}
-            az network vnet subnet delete --resource-group $rg --vnet-name ${sap_vnet} --name ${subnet} || :
-          done
-        fi
-      done
-
     displayName: 'Clean up subnet'
 - job: scheduled_RG_Cleanup
   pool:

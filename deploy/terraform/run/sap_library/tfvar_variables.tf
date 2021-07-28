@@ -154,8 +154,3 @@ variable "library_ansible_blob_container_is_existing" {
 variable "library_ansible_blob_container_name" {
   default = "ansible"
 }
-
-variable "dns_label" {
-  description = "DNS label"
-  default = ""
-}

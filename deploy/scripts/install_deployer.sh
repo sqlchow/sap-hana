@@ -326,57 +326,5 @@ then
         return_value=-1
     fi
 fi
-
-sshsecret=$(terraform -chdir="${terraform_module_directory}"  output deployer_private_key_secret_name | tr -d \")
-
-return_value=-1
-temp=$(echo "${sshsecret}" | grep "Warning")
-if [ -z "${temp}" ]
-then
-    temp=$(echo "${sshsecret}" | grep "Backend reinitialization required")
-    if [ -z "${temp}" ]
-    then
-        touch "${deployer_config_information}"
-        echo ""
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo "#                  Secret to use for SSH key: $sshsecret                     #
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-        echo ""
-
-        save_config_var "sshsecret" "${deployer_config_information}"
-        return_value=0
-    else
-        return_value=-1
-    fi
-fi
-
-deployer_public_ip_address=$(terraform -chdir="${terraform_module_directory}"  output deployer_public_ip_address | tr -d \")
-
-return_value=-1
-temp=$(echo "${deployer_public_ip_address}" | grep "Warning")
-if [ -z "${temp}" ]
-then
-    temp=$(echo "${deployer_public_ip_address}" | grep "Backend reinitialization required")
-    if [ -z "${temp}" ]
-    then
-        touch "${deployer_config_information}"
-        echo ""
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo "#                  Deployer public IP: $deployer_public_ip_address                     #
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-        echo ""
-
-        save_config_var "deployer_public_ip_address" "${deployer_config_information}"
-        return_value=0
-    else
-        return_value=-1
-    fi
-fi
-
-
 unset TF_DATA_DIR
 exit $return_value

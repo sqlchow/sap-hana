@@ -137,7 +137,7 @@ then
     printf -v val %-40.40s "$deployment_system"
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#  $boldred Incorrect system deployment type specified: ${val}$resetformatting#"
+    echo "#   Incorrect system deployment type specified: ${val}#"
     echo "#                                                                                       #"
     echo "#     Valid options are:                                                                #"
     echo "#       sap_deployer                                                                    #"
@@ -172,7 +172,7 @@ if [ ! -n "${environment}" ]
 then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                         $boldred  Incorrect parameter file. $resetformatting                                  #"
+    echo "#                           Incorrect parameter file.                                   #"
     echo "#                                                                                       #"
     echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
     echo "#                                                                                       #"
@@ -185,7 +185,7 @@ if [ ! -n "${region}" ]
 then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                          $boldred Incorrect parameter file. $resetformatting                                  #"
+    echo "#                           Incorrect parameter file.                                   #"
     echo "#                                                                                       #"
     echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
     echo "#                                                                                       #"
@@ -256,7 +256,7 @@ if [ -n "${temp}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                          $boldred Please login using az login $resetformatting                                 #"
+    echo "#                           Please login using az login                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -372,7 +372,7 @@ then
     printf -v val %-40.40s "$deployment_system"
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#   $boldred Incorrect system deployment type specified: ${val}$resetformatting#"
+    echo "#   Incorrect system deployment type specified: ${val}#"
     echo "#                                                                                       #"
     echo "#     Valid options are:                                                                #"
     echo "#       sap_deployer                                                                    #"
@@ -426,7 +426,7 @@ else
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#            $cyan The system has already been deployed and the statefile is in Azure $resetformatting       #"
+        echo "#             The system has already been deployed and the statefile is in Azure        #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
@@ -464,7 +464,7 @@ then
         new_deployment=true
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                                 $cyan  New deployment $resetformatting                                      #"
+        echo "#                                   New deployment                                      #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         
@@ -474,7 +474,7 @@ then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                          $cyan Existing deployment was detected$resetformatting                            #"
+        echo "#                           Existing deployment was detected                            #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
@@ -487,7 +487,7 @@ then
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
-            echo -e "#   $boldred The environment was deployed using an older version of the Terrafrom templates$resetformatting     #"
+            echo "#    The environment was deployed using an older version of the Terrafrom templates     #"
             echo "#                                                                                       #"
             echo "#                               !!! Risk for Data loss !!!                              #"
             echo "#                                                                                       #"
@@ -509,7 +509,7 @@ then
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
-            echo -e "# $cyanTerraform templates version:" $deployed_using_version "were used in the deployment$resetformatting "
+            echo "# Terraform templates version:" $deployed_using_version "were used in the deployment "
             echo "#                                                                                       #"
             echo "#########################################################################################"
             echo ""
@@ -521,7 +521,7 @@ fi
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
-echo -e "#                            $cyan Running Terraform plan $resetformatting                                    #"
+echo "#                             Running Terraform plan                                    #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
 echo ""
@@ -534,14 +534,14 @@ fi
 allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
 echo $allParams
 
-terraform -chdir="$terraform_module_directory" plan -no-color $allParams > plan_output.log
+terraform -chdir="$terraform_module_directory" plan -no-color $allParams  
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]
 then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                             $boldreduscoreErrors during the plan phase$resetformatting                              #"
+    echo -e "#                            $boldreduscore Errors during the plan phase $resetformatting                             #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -555,15 +555,15 @@ then
     exit 1
 fi
 
-if [ -f plan_output.log ]
-    then
+if [ ! $new_deployment ]
+then
     str1=$(grep "0 to add, 0 to change, 0 to destroy" plan_output.log)
     str2=$(grep "No changes" plan_output.log)
     if [ -n "${str1}" ] || [ -n "${str2}" ]; then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                          $cyan Infrastructure is up to date $resetformatting                               #"
+        echo "#                           Infrastructure is up to date                                #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
@@ -584,7 +584,7 @@ if [ -f plan_output.log ]
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                               $boldreduscore!!! Risk for Data loss !!!$resetformatting                               #"
+        echo -e "#                              $boldreduscore !!! Risk for Data loss !!!  $resetformatting                             #"
         echo "#                                                                                       #"
         echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
         echo "#                                                                                       #"
@@ -620,7 +620,7 @@ if [ $ok_to_proceed ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                            $cyan Running Terraform apply$resetformatting                                   #"
+    echo "#                             Running Terraform apply                                   #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -635,7 +635,7 @@ if [ $ok_to_proceed ]; then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                          $boldreduscore!Errors during the apply phase!$resetformatting                              #"
+        echo -e "#                          $boldreduscore Errors during the apply phase $resetformatting                              #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""

@@ -33,5 +33,3 @@ deployer_vnet="DEP00"
 #library_ansible_blob_container_is_existing=false
 #library_ansible_blob_container_name="ansible"
 
-dns_label="sap.contoso.com"
-

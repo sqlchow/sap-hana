@@ -158,7 +158,7 @@ fi
 
 echo "#########################################################################################"
 echo "#                                                                                       #"
-echo -e "#                            $cyan  Setting the secrets $resetformatting                                     #"
+echo "#                              Setting the secrets                                      #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
 echo ""
@@ -188,7 +188,7 @@ result=$(grep "ERROR: The user, group or application" stdout.az)
 if [ -n "${result}" ]; then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#        $boldred  No access to add the secrets in the" "${keyvault}" "keyvault $resetformatting            #"
+    echo "#          No access to add the secrets in the" "${keyvault}" "keyvault             #"
     echo "#            Please add an access policy for the account you use                        #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
@@ -202,7 +202,7 @@ if [ -n "${result}" ]; then
     printf -v val "%-20.20s could not be found!" "$keyvault"
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                $cyan      Keyvault" "${val}" " $resetformatting              #"
+    echo "#                      Keyvault" "${val}" "               #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""

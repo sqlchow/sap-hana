@@ -263,15 +263,6 @@ variable "database_size" {
   default = ""
 }
 
-variable "database_sid" {
-  default = ""
-}
-
-variable "database_instance_number" {
-  default = "01"
-}
-
-
 variable "database_vm_zones" {
   default = []
 }

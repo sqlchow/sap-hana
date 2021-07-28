@@ -148,7 +148,7 @@ if [ $param_dirname != '.' ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#  $boldred Please run this command from the folder containing the parameter file$resetformatting               #"
+    echo "#   Please run this command from the folder containing the parameter file               #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     exit 3
@@ -163,7 +163,7 @@ then
     echo -e "#                 $boldreduscore Parameter file does not exist: ${val}$resetformatting #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit 3
+    exit
 fi
 
 ext=$(echo ${workload_file_parametername} | cut -d. -f2)
@@ -190,7 +190,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit 65 #data format error
+    exit -1
 fi
 
 if [ ! -n "${region}" ]
@@ -203,7 +203,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit 65 #data format error
+    exit -1
 fi
 
 #Persisting the parameters across executions
@@ -222,7 +222,10 @@ then
 fi
 
 #Plugins
-mkdir -p "$HOME/.terraform.d/plugin-cache"
+if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
+then
+    mkdir "$HOME/.terraform.d/plugin-cache"
+fi
 
 init "${automation_config_directory}" "${generic_config_information}" "${workload_config_information}"
 
@@ -284,7 +287,7 @@ if [ -n "${temp}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                          $boldred Please login using az login $resetformatting                                #"
+    echo "#                           Please login using az login                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -306,7 +309,7 @@ then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "# $cyan Changing the subscription to: $STATE_SUBSCRIPTION             $resetformatting      #"
+    echo "#                   Changing the subscription to: $STATE_SUBSCRIPTION                   #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -508,7 +511,7 @@ then
     printf -v val %-40.40s "$deployment_system"
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#  $boldred Incorrect system deployment type specified: ${val}$resetformatting#"
+    echo "#   Incorrect system deployment type specified: ${val}#"
     echo "#                                                                                       #"
     echo "#     Valid options are:                                                                #"
     echo "#       sap_landscape                                                                   #"
@@ -573,14 +576,14 @@ then
         new_deployment=true
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                                  $cyan New deployment $resetformatting                                     #"
+        echo "#                                   New deployment                                      #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
     else
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                          $cyan Existing deployment was detected $resetformatting                           #"
+        echo "#                           Existing deployment was detected                            #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
@@ -590,7 +593,7 @@ then
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
-            echo -e "#   $boldred The environment was deployed using an older version of the Terrafrom templates $resetformatting    #"
+            echo "#    The environment was deployed using an older version of the Terrafrom templates     #"
             echo "#                                                                                       #"
             echo "#                               !!! Risk for Data loss !!!                              #"
             echo "#                                                                                       #"
@@ -624,7 +627,7 @@ fi
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
-echo -e "#                           $cyan  Running Terraform plan $resetformatting                                   #"
+echo "#                             Running Terraform plan                                    #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
 echo ""
@@ -638,7 +641,7 @@ then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                          $cyan Infrastructure is up to date $resetformatting                               #"
+        echo "#                           Infrastructure is up to date                                #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
@@ -652,7 +655,7 @@ then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                              $boldred !!! Risk for Data loss !!! $resetformatting                             #"
+        echo "#                               !!! Risk for Data loss !!!                              #"
         echo "#                                                                                       #"
         echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
         echo "#                                                                                       #"
@@ -682,7 +685,7 @@ if [ $ok_to_proceed ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo  -e "#                            $cyan Running Terraform apply $resetformatting                                  #"
+    echo "#                             Running Terraform apply                                   #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""

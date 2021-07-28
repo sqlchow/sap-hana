@@ -15,12 +15,8 @@ variable "loadbalancers" {
   description = "List of LoadBalancers created for HANA Databases"
 }
 
-variable "sap_sid" {
-  description = "SAP SID"
-}
-
-variable "db_sid" {
-  description = "Database SID"
+variable "hdb_sid" {
+  description = "List of SIDs used when generating Load Balancers"
 }
 
 variable "hana_database_info" {

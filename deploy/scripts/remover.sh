@@ -133,22 +133,14 @@ if [ ! -n "${deployment_system}" ]; then
     exit 64 #script usage wrong
 fi
 
-ext=$(echo ${parameterfile_name} | cut -d. -f2)
-
-# Helper variables
-if [ "${ext}" == json ]; then
-    environment=$(jq --raw-output .infrastructure.environment "${parameterfile_dirname}"/"${parameterfile_name}")
-    region=$(jq --raw-output .infrastructure.region "${parameterfile_dirname}"/"${parameterfile_name}")
-else
-    load_config_vars "${parameterfile_dirname}"/"${parameterfile_name}" "environment"
-    load_config_vars "${parameterfile_dirname}"/"${parameterfile_name}" "location"
-    region=$(echo "${location}" | xargs)
-fi
+# Read environment
+environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+region=$(jq --raw-output .infrastructure.region "${parameterfile}")
 
 if [ ! -n "${environment}" ]; then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                          $boldred Incorrect parameter file. $resetformatting                                  #"
+    echo "#                           Incorrect parameter file.                                   #"
     echo "#                                                                                       #"
     echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
     echo "#                                                                                       #"
@@ -160,7 +152,7 @@ fi
 if [ ! -n "${region}" ]; then
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                          $boldred Incorrect parameter file. $resetformatting                                  #"
+    echo "#                           Incorrect parameter file.                                   #"
     echo "#                                                                                       #"
     echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
     echo "#                                                                                       #"
@@ -175,7 +167,7 @@ if [ ! -f "${parameterfile}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#              $boldred Parameter file does not exist: ${val} $resetformatting#"
+    echo "#               Parameter file does not exist: ${val} #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     exit 2 #No such file or directory
@@ -234,7 +226,7 @@ if [ -n "${temp}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                          $boldred Please login using az login $resetformatting                                #"
+    echo "#                           Please login using az login                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -264,7 +256,7 @@ if [ ! -d "${terraform_module_directory}" ]; then
     printf -v val %-40.40s "$deployment_system"
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#  $boldred Incorrect system deployment type specified: ${val} $resetformatting#"
+    echo "#   Incorrect system deployment type specified: ${val}#"
     echo "#                                                                                       #"
     echo "#     Valid options are:                                                                #"
     echo "#       sap_deployer                                                                    #"
@@ -289,7 +281,7 @@ fi
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
-echo -e "#                            $cyan Running Terraform init $resetformatting                                   #"
+echo "#                             Running Terraform init                                    #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
 echo ""
@@ -306,7 +298,7 @@ terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
-echo -e "#                            $cyan Running Terraform destroy$resetformatting                                 #"
+echo "#                             Running Terraform destroy                                 #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
 echo ""
@@ -328,7 +320,7 @@ elif [ "$deployment_system" == "sap_library" ]; then
         printf -v val %-40.40s "$terraform_bootstrap_directory"
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#  $boldred Unable to find bootstrap directory: ${val}$resetformatting#"
+        echo "#   Unable to find bootstrap directory: ${val}#"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
