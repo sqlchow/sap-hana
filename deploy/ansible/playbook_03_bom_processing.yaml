@@ -41,12 +41,6 @@
 
   - block:
     - include_role:
-        name:     roles-sap-os/2.3-sap-mounts
-    tags:
-      - 2.3-sap-mounts
-
-  - block:
-    - include_role:
         name:     roles-sap-os/2.6-sap-exports
     tags:
       - 2.6-sap-exports
@@ -56,6 +50,12 @@
           name:     roles-os/1.16-services
     tags:
       - 1.16-services
+
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.3-sap-mounts
+    tags:
+      - 2.3-sap-mounts
 
   - block:
     - include_role:
