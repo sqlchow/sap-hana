@@ -186,9 +186,9 @@ locals {
     if database != {}
   ])
 
-  ips_primary_scs = length(var.nics_scs_admin) > 0 ? var.nics_scs_admin : var.nics_scs
-  ips_primary_app = length(var.nics_app_admin) > 0 ? var.nics_app_admin : var.nics_app
-  ips_primary_web = length(var.nics_web_admin) > 0 ? var.nics_web_admin : var.nics_web
+  ips_primary_scs = var.nics_scs
+  ips_primary_app = var.nics_app
+  ips_primary_web = var.nics_web
 
   ips_scs = [for key, value in local.ips_primary_scs : value.private_ip_address]
   ips_app = [for key, value in local.ips_primary_app : value.private_ip_address]
