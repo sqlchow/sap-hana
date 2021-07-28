@@ -35,7 +35,7 @@ services:
         - { tier: 'preparation', service: 'nfs-server',   node_tier: 'scs',     state: 'restarted' }
 
     suse12:
-        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'started'  }
+        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'restarted'  }
 
     suse15:
-        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'started'  }
+        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'restarted'  }
