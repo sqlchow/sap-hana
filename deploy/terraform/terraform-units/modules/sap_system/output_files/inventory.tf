@@ -146,28 +146,28 @@ resource "local_file" "ansible_inventory_new_yml" {
     ips_web = length(local.ips_web) > 0 ? local.ips_web : [],
     sid     = var.hdb_sid,
     passervers = length(local.ips_app) > 0 ? (
-      slice(var.naming.virtualmachine_names.APP_VMNAME, 0, 1)) : (
+      slice(var.naming.virtualmachine_names.APP_COMPUTERNAME, 0, 1)) : (
       []
     ),
     appservers = length(local.ips_app) > 1 ? (
-      slice(var.naming.virtualmachine_names.APP_VMNAME, 1, length(local.ips_app))) : (
+      slice(var.naming.virtualmachine_names.APP_COMPUTERNAME, 1, length(local.ips_app))) : (
       []
     ),
     scsservers = length(local.ips_scs) > 0 ? (
       length(local.ips_scs) > 1 ? (
-        slice(var.naming.virtualmachine_names.SCS_VMNAME, 0, 1)) : (
-        var.naming.virtualmachine_names.SCS_VMNAME
+        slice(var.naming.virtualmachine_names.SCS_COMPUTERNAME, 0, 1)) : (
+        var.naming.virtualmachine_names.SCS_COMPUTERNAME
       )) : (
       []
     ),
     ersservers = length(local.ips_scs) > 0 ? (
       length(local.ips_scs) > 1 ? (
-        slice(var.naming.virtualmachine_names.SCS_VMNAME, 1, length(local.ips_scs))) : (
+        slice(var.naming.virtualmachine_names.SCS_COMPUTERNAME, 1, length(local.ips_scs))) : (
         []
       )) : (
       []
     ),
-    webservers        = length(local.ips_web) > 0 ? var.naming.virtualmachine_names.WEB_VMNAME : [],
+    webservers        = length(local.ips_web) > 0 ? var.naming.virtualmachine_names.WEB_COMPUTERNAME : [],
     prefix            = var.naming.prefix.SDU,
     separator         = var.naming.separator,
     platform          = lower(length(local.hdb_vms) > 0 ? "HANA" : local.anydb_vms[0].platform)
