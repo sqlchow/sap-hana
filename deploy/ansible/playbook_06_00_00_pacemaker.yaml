@@ -24,6 +24,7 @@
 
   - include_role:
       name:     roles-misc/0.2-kv-secrets
+      public:   yes      
     tags:
        - kv-secrets
 
@@ -56,12 +57,12 @@
 
   tasks:
   - set_fact:
-      tier:    ha
-      primary_instance_name : "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
-      secondary_instance_name: "{{ ansible_play_hosts_all[1] }}"        # Setting up Secondary Instance Name
-      sap_hana_fencing_spn_client_id: "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
-      sap_hana_fencing_spn_client_pwd: "{{ hostvars.localhost.sap_fencing_spn_pwd }}"
-      sap_hana_fencing_spn_tenant_id: "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
+      tier:    [ ha , fencing ]
+      primary_instance_name:                     "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
+      secondary_instance_name:                   "{{ ansible_play_hosts_all[1] }}"         # Setting up Secondary Instance Name
+      sap_hana_fencing_spn_client_id:            "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
+      sap_hana_fencing_spn_client_pwd:           "{{ hostvars.localhost.sap_fencing_spn_pwd }}"
+      sap_hana_fencing_spn_tenant_id:            "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
 
   - block:
       - include_role:
@@ -77,7 +78,7 @@
 
 
   - include_role:
-      name:     roles-os/6.0.0.0-Generic                                # Configures the Pacemaker cluster with Azure fence agent 
+      name:     roles-os/1.17-generic-pacemaker                         # Configures the Pacemaker cluster with Azure fence agent 
 
   
 #----------------------------------------
