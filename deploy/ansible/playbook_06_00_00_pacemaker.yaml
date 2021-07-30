@@ -40,7 +40,7 @@
     - vars/ansible-input-api.yaml                               # API Input template with defaults
 
 
-  tasks:
+  #tasks:
 
   # - name: Test Connection                                     # Simple connection test for troubleshooting
   #   ping:
