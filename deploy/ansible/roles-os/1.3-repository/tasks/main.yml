@@ -133,7 +133,7 @@
 - name:             "Determine repos appropriate for tier"
   set_fact:
     repos_for_tier: "{{ repos[distro_full_id] |
-                          selectattr('tier', 'in', ['all', tier]) |
+                          selectattr('tier', 'in', ['all', tier] | flatten) | 
                           list }}"
 
 - name: Print list of matching repos if verbosity it 1 or greater
