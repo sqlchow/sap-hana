@@ -13,7 +13,7 @@
 - name: " Retrieve Subscription ID and Resource Group Name"
   shell: curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01" | jq
   register: hanavmmetadata
-  no_log: true
+  no_log: false
   changed_when: false
    
 - name: save the Json data to a Variable as a Fact
