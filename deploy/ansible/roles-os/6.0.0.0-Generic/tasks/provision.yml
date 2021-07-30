@@ -10,15 +10,6 @@
   loop: "{{ ha_packages[ansible_os_family] | flatten(levels=1) }}"
   when: hdb_size != "LargeInstance"
 
-# Pacemaker can create a large number of processes
-- name: Ensure Process limit is raised
-  lineinfile:
-    path: /etc/systemd/system.conf
-    state: present
-    regexp: "^#?\\s*DefaultTasksMax="
-    line: "DefaultTasksMax=4096"
-  register: raise_process_limit
-  
 - name: Ensure systemctl daemon is reloaded
   systemd:
     daemon_reload: True
