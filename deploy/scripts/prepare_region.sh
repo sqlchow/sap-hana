@@ -402,6 +402,7 @@ if [ 1 == $step ]; then
             answer=${ans^^}
             if [ "$answer" == 'Y' ]; then
                 allParams=$(printf " -e %s -r %s -v %s " "${environment}" "${region}" "${keyvault}" )
+                
                 "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
                 if (($? > 0)); then
                     exit $?

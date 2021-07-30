@@ -406,7 +406,6 @@ Licensed under the MIT license.
             $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
         }
     }
-
     $Command = " init -upgrade=true -backend-config ""subscription_id=$state_subscription_id"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" "
     if (Test-Path ".terraform" -PathType Container) {
         if (Test-Path ".\.terraform\terraform.tfstate" -PathType Leaf) {
@@ -446,7 +445,7 @@ Licensed under the MIT license.
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
     Write-Verbose $Cmd
-
+    
     $Command = " output automation_version"
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
