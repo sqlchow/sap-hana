@@ -24,7 +24,7 @@
 
   tasks:
     - include_role:
-      name:     roles-os/6.0.0.01-HANA
+        name:     roles-os/6.0.0.01-HANA
   # - name: Test Connection                                     # Simple connection test for troubleshooting
   #   ping:
 
