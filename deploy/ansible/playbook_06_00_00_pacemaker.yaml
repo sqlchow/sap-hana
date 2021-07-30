@@ -28,8 +28,8 @@
        - kv-secrets
 
 
-- hosts:          "{{ sap_sid|upper }}_DB  :
-                   {{ sap_sid|upper }}_SCS"                                           
+- hosts:          "{{ sap_sid|upper }}_DB"  
+#                   {{ sap_sid|upper }}_SCS"                                           
 
   name:           PACEMAKER - General Config
   remote_user:    "{{ orchestration_ansible_user }}"                
