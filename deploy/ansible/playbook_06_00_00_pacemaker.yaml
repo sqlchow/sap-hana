@@ -13,9 +13,9 @@
 - hosts: localhost
   name: Get SPN from KeyVault
   remote_user:    "{{ orchestration_ansible_user }}"
-  become:         yes
+  become:         no
   become_user:    root
-  gather_facts:   no
+  gather_facts:   yes
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
   tasks:
