@@ -52,16 +52,16 @@ The helper script below can be used to copy the pertinent folders.
 ```bash
     cd ~/Azure_SAP_Automated_Deployment
     mkdir -p WORKSPACES/DEPLOYER
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
+    cp sap-hana/deploy/samples/WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
 
     mkdir -p WORKSPACES/LIBRARY
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/LIBRARY/MGMT-WEEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
+    cp sap-hana/deploy/samples/WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
 
     mkdir -p WORKSPACES/LANDSCAPE
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
+    cp sap-hana/deploy/samples/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
 
     mkdir -p WORKSPACES/SYSTEM
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/SYSTEM/DEV-WEEU-SAP01-X00 WORKSPACES/SYSTEM/. -r
+    cp sap-hana/deploy/samples/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00 WORKSPACES/SYSTEM/. -r
     cd WORKSPACES
 
 ```
@@ -189,13 +189,13 @@ The helper script below can be used to copy the folders.
 cd ~/Azure_SAP_Automated_Deployment
 
 mkdir -p WORKSPACES/LIBRARY
-cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/LIBRARY/MGMT-NOEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
+cp sap-hana/deploy/samples/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
 
 mkdir -p WORKSPACES/LANDSCAPE
-cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
+cp sap-hana/deploy/samples/WORKSPACES/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
 
 mkdir -p WORKSPACES/SYSTEM
-cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/SYSTEM/DEV-NOEU-SAP02-X02 WORKSPACES/SYSTEM/. -r
+cp sap-hana/deploy/samples/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02 WORKSPACES/SYSTEM/. -r
 cd WORKSPACES
 ```
 
@@ -348,16 +348,16 @@ The helper script below can be used to copy the pertinent folders.
 ```bash
     cd ~/Azure_SAP_Automated_Deployment
     mkdir -p WORKSPACES/DEPLOYER
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
+    cp sap-hana/deploy/samples/WORKSPACES/DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
 
     mkdir -p WORKSPACES/LIBRARY
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/LIBRARY/MGMT-EUS2-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
+    cp sap-hana/deploy/samples/WORKSPACES/LIBRARY/MGMT-EUS2-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
 
     mkdir -p WORKSPACES/LANDSCAPE
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
+    cp sap-hana/deploy/samples/WORKSPACES/LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
 
     mkdir -p WORKSPACES/SYSTEM
-    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/SYSTEM/QA-EUS2-SAP03-X01 WORKSPACES/SYSTEM/. -r
+    cp sap-hana/deploy/samples/WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01 WORKSPACES/SYSTEM/. -r
     cd WORKSPACES
 
 ```
