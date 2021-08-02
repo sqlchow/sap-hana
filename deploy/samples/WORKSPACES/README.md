@@ -33,14 +33,14 @@ A sample configuration for this is available here:
 
 | Component                | Template |
 | :------------------------| :----------------------------------------------------------------------- |
-| Deployer                 | [DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json](../../../deploy/samples/WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
-| Library                  | [LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json](../../../DEPLOY/SAMPLES/WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
-| Workload                 | [LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES//LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
-| System                   | [SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json)
+| Deployer                 | [DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json](./DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
+| Library                  | [LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json](./LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
+| Workload                 | [LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json](.//LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
+| System                   | [SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json](./SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json)
 
 <br>
 
-From the cloned repository copy the following folders from the *deploy/samples/WORKSPACES* to your root folder (*Azure_SAP_Automated_Deployment/WORKSPACES*) for parameter files
+From the cloned repository copy the following folders to your root folder (*Azure_SAP_Automated_Deployment*) for parameter files
 
 - DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE
 - LIBRARY/MGMT-WEEU-SAP_LIBRARY
@@ -74,7 +74,7 @@ For Service Principal creation see [Service Principal Creation](./spn.md).
 Substitute the Service Principal values in the script below before running the script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
+    cd ~/Azure_SAP_Automated_Deployment
 
     $DEPLOYMENT_REPO_PATH/scripts/prepare_region.sh
         --deployer_parameter_file DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json \
@@ -108,7 +108,7 @@ For Service Principal creation see [Service Principal Creation](./spn.md).
 Substitute your Service Principal values in the script below before running the script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
+    cd ~/Azure_SAP_Automated_Deployment/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
 
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json \
     --deployer_environment MGMT
@@ -138,7 +138,7 @@ When using PowerShell the same can be achieved with the ***New-SAPWorkloadZone**
 For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containing the DEV-WEEU-SAP01-X00.json parameter file and use the ***installer.sh*** script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00
+    cd ~/Azure_SAP_Automated_Deployment/SYSTEM/DEV-WEEU-SAP01-X00
 
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile DEV-WEEU-SAP01-X00.json --type sap_system --auto-approve
 ```
@@ -171,13 +171,13 @@ A sample configuration for this is available here:
 
 | Component                | Template |
 | :------------------------| :----------------------------------------------------------------------- |
-| Library                  | [LIBRARY/MGMT-NOEU-SAP_LIBRARY/MGMT-NOEU-SAP_LIBRARY.json](../../../DEPLOY/SAMPLES/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY/MGMT-NOEU-SAP_LIBRARY.json) |
-| Workload                 | [DEV-NOEU-SAP02-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES//LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE/DEV-NOEU-SAP02-INFRASTRUCTURE.json) |
-| System                   | [DEV-NOEU-SAP02-X02/DEV-NOEU-SAP02-X02.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02/DEV-NOEU-SAP02-X02.json) |
+| Library                  | [LIBRARY/MGMT-NOEU-SAP_LIBRARY/MGMT-NOEU-SAP_LIBRARY.json](./LIBRARY/MGMT-NOEU-SAP_LIBRARY/MGMT-NOEU-SAP_LIBRARY.json) |
+| Workload                 | [DEV-NOEU-SAP02-INFRASTRUCTURE.json](.//LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE/DEV-NOEU-SAP02-INFRASTRUCTURE.json) |
+| System                   | [DEV-NOEU-SAP02-X02/DEV-NOEU-SAP02-X02.json](./SYSTEM/DEV-NOEU-SAP02-X02/DEV-NOEU-SAP02-X02.json) |
 
 <br>
 
-From the cloned repository copy the following folders to your root folder (*Azure_SAP_Automated_Deployment/WORKSPACES*) for parameter files
+From the cloned repository copy the following folders to your root folder (*Azure_SAP_Automated_Deployment*) for parameter files
 
 - LIBRARY/MGMT-NOEU-SAP_LIBRARY
 - LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE
@@ -221,7 +221,7 @@ The deployer and library can be deployed using the ***install_library.sh*** and 
 
 ```bash
 
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY
+    cd ~/Azure_SAP_Automated_Deployment/LIBRARY/MGMT-NOEU-SAP_LIBRARY
 
     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_library.sh --parameterfile MGMT-NOEU-SAP_LIBRARY.json 
 ```
@@ -230,7 +230,7 @@ Capture the value for the remote_state_storage_account_name from the output of t
 
 ```bash
 
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY
+    cd ~/Azure_SAP_Automated_Deployment/LIBRARY/MGMT-NOEU-SAP_LIBRARY
 
     $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh --parameterfile MGMT-NOEU-SAP_LIBRARY.json --type sap_library
 ```
@@ -259,7 +259,7 @@ Capture the value for the remote_state_storage_account_name from the output of t
 The workload deployed using the ***install_workloadzone.sh*** command. Update the MGMT-NOEU-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE
+    cd ~/Azure_SAP_Automated_Deployment/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE
 
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameterfile DEV-NOEU-SAP02-INFRASTRUCTURE.json \
      --state_subscription wwwwwwww-wwww-wwww-wwww-wwwwwwwwwwww \
@@ -293,7 +293,7 @@ When using PowerShell the same can be achieved with the ***New-SAPWorkloadZone**
 For deploying the SAP system navigate to the folder(DEV-NOEU-SAP02-X02) containing the DEV-NOEU-SAP02-X02.json parameter file and use the ***installer.sh*** script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02
+    cd ~/Azure_SAP_Automated_Deployment/SYSTEM/DEV-NOEU-SAP02-X02
 
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile DEV-NOEU-SAP02-X02.json --type sap_system --auto-approve
 ```
@@ -329,14 +329,14 @@ A sample configuration for this is available here:
 
 | Component                | Template |
 | :------------------------| :----------------------------------------------------------------------- |
-| Deployer                 | [DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES/DEPLOYER/MGMT-EUS2-DEP00-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json)
-| Library                  | [LIBRARY/MGMT-EUS2-SAP_LIBRARY/MGMT-EUS2-SAP_LIBRARY.json](../../../DEPLOY/SAMPLES/WORKSPACES/LIBRARY/MGMT-EUS2-SAP_LIBRARY/MGMT-EUS2-SAP_LIBRARY.json)
-| Workload                 | [LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE/QA-EUS2-SAP03-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES//LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE/QA-EUS2-SAP03-INFRASTRUCTURE.json)
-| System                   | [SYSTEM/QA-EUS2-SAP03-X01/QA-EUS2-SAP03-X01.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01/QA-EUS2-SAP03-X01.json)
+| Deployer                 | [DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json](./DEPLOYER/MGMT-EUS2-DEP00-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json)
+| Library                  | [LIBRARY/MGMT-EUS2-SAP_LIBRARY/MGMT-EUS2-SAP_LIBRARY.json](./LIBRARY/MGMT-EUS2-SAP_LIBRARY/MGMT-EUS2-SAP_LIBRARY.json)
+| Workload                 | [LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE/QA-EUS2-SAP03-INFRASTRUCTURE.json](.//LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE/QA-EUS2-SAP03-INFRASTRUCTURE.json)
+| System                   | [SYSTEM/QA-EUS2-SAP03-X01/QA-EUS2-SAP03-X01.json](./SYSTEM/QA-EUS2-SAP03-X01/QA-EUS2-SAP03-X01.json)
 
 <br>
 
-From the cloned repository copy the following folders to your root folder (*Azure_SAP_Automated_Deployment/WORKSPACES*) for parameter files
+From the cloned repository copy the following folders to your root folder (*Azure_SAP_Automated_Deployment*) for parameter files
 
 - DEPLOYER/MGMT-EUS2-DEP00-INFRASTRUCTURE
 - LIBRARY/MGMT-EUS2-SAP_LIBRARY
@@ -370,7 +370,7 @@ For Service Principal creation see [Service Principal Creation](./spn.md).
 Substitute you Service Principal values in the script below before running the script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
+    cd ~/Azure_SAP_Automated_Deployment
 
     $DEPLOYMENT_REPO_PATH/scripts/prepare_region.sh
         --deployer_parameter_file DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json \
@@ -404,7 +404,7 @@ For Service Principal creation see [Service Principal Creation](./spn.md).
 Substitute you Service Principal values in the script below before running the script.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE
+    cd ~/Azure_SAP_Automated_Deployment/LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE
 
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh --parameterfile QA-EUS2-SAP03-INFRASTRUCTURE.json \
     --deployer_environment MGMT
@@ -436,7 +436,7 @@ For deploying the SAP system navigate to the folder(QA-EUS2-SAP03-X01) containin
 
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01
+    cd ~/Azure_SAP_Automated_Deployment/SYSTEM/QA-EUS2-SAP03-X01
 
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile QA-EUS2-SAP03-X01.json --type sap_system --auto-approve
 ```
@@ -468,11 +468,11 @@ A sample configuration for this is available here
 
 | Component                  | Template |
 | :--------------------------|  :----------------------------------------------------------------------- |
-| Library                    | [MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json](../../../DEPLOY/SAMPLES/WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json) |
-| Workload                   | [PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES/LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json) |
-| System                     | [PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json) |
-| System (custom disk sizes) | [PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json) |
-| Custom disk size file      | [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json) |
+| Library                    | [MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json](./LIBRARY/MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json) |
+| Workload                   | [PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json](./LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json) |
+| System                     | [PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json](./SYSTEM/PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json) |
+| System (custom disk sizes) | [PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json](./SYSTEM/PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json) |
+| Custom disk size file      | [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](./SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json) |
 
 <br>
 
@@ -496,7 +496,7 @@ By providing false in the "use" attribute in the deployer section, the automatio
 The deployer and library can be deployed using the ***install_library.sh*** command. Update the MGMT-WUS2-SAP_LIBRARY.json file and add the resource id for the keyvault containing the service principal details.
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY
+    cd ~/Azure_SAP_Automated_Deployment/LIBRARY/MGMT-WUS2-SAP_LIBRARY
 
     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_library.sh --parameterfile MGMT-WUS2-SAP_LIBRARY.json 
 
@@ -505,7 +505,7 @@ The deployer and library can be deployed using the ***install_library.sh*** comm
 Capture the value for the remote_state_storage_account_name from the output of the previous command and migrate the terraform state to Azure using:
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY
+    cd ~/Azure_SAP_Automated_Deployment/LIBRARY/MGMT-WUS2-SAP_LIBRARY
 
     $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh --parameterfile MGMT-WUS2-SAP_LIBRARY.json --type sap_library
 
@@ -532,7 +532,7 @@ Capture the value for the remote_state_storage_account_name from the output of t
 Update the PROD-WUS2-SAP04-INFRASTRUCTURE.json file and add the resource id for the keyvault containing the service principal details. Deploy the system with the ***install_workloadzone.sh*** bash script:
 
 ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE
+    cd ~/Azure_SAP_Automated_Deployment/LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE
 
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh --parameterfile PROD-WUS2-SAP04-INFRASTRUCTURE.json \
      --state_subscription wwwwwwww-wwww-wwww-wwww-wwwwwwwwwwww \
@@ -566,7 +566,7 @@ For deploying the SAP system navigate to the folder(PROD-WUS2-SAP04-X03) contain
 
 ```bash
 
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X03
+    cd ~/Azure_SAP_Automated_Deployment/SYSTEM/PROD-WUS2-SAP04-X03
 
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile PROD-WUS2-SAP04-X03.json --type sap_system --auto-approve
 
@@ -584,7 +584,7 @@ When using PowerShell the same can be achieved with the ***New-SAPSystem*** Powe
 
 ## **Scenario 4: Brownfield without deployer using a custom disk configuration** ##
 
-This deployment has a custom disk configuration for the HANA deployment.The custom disk sizing for the system is defined here: [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json)
+This deployment has a custom disk configuration for the HANA deployment.The custom disk sizing for the system is defined here: [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](./SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json)
 
 **Note** To match the disk sizes with the deployment the node beneath the "db" node needs to be the same as the database.size attribute in the configuration json
 
@@ -611,7 +611,7 @@ For deploying the SAP system navigate to the folder(PROD-WUS2-SAP04-X04) contain
 
 ```bash
 
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04
+    cd ~/Azure_SAP_Automated_Deployment/SYSTEM/PROD-WUS2-SAP04-X04
 
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile PROD-WUS2-SAP04-X04.json --type sap_system --auto-approve
 

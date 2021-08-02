@@ -586,17 +586,17 @@ locals {
   //Disks for Ansible
   // host: xxx, LUN: #, type: sapusr, size: #
 
-  app_disks_ansible = distinct(flatten([for vm in local.app_virtualmachine_names : [
+  app_disks_ansible = distinct(flatten([for vm in local.app_computer_names : [
     for idx, datadisk in local.app_data_disk_per_dbnode :
     format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, local.custom_sizing ? datadisk.type : "sap")
   ]]))
 
-  scs_disks_ansible = distinct(flatten([for vm in local.scs_virtualmachine_names : [
+  scs_disks_ansible = distinct(flatten([for vm in local.scs_computer_names : [
     for idx, datadisk in local.scs_data_disk_per_dbnode :
     format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, local.custom_sizing ? datadisk.type : "sap")
   ]]))
 
-  web_disks_ansible = distinct(flatten([for vm in local.web_virtualmachine_names : [
+  web_disks_ansible = distinct(flatten([for vm in local.web_computer_names : [
     for idx, datadisk in local.web_data_disk_per_dbnode :
     format("{ host: '%s', LUN: %d, type: '%s' }", vm, idx, local.custom_sizing ? datadisk.type : "sap")
   ]]))
