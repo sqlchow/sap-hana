@@ -270,7 +270,7 @@ For more details on the configuration of the SAP Library see [Workload Zone Conf
 
 The SAP System is the actual SAP Application, it contains all the Azure artifacts required to host the SAP Application.
 
-A sample SAP System configuration is specified in [SAP System](../../../deploy/samples/WORKSPACES/SYSTEM/DEV-WEEU-SAP00-X00/DEV-WEEU-SAP01-X00.json)
+A sample SAP System configuration is specified in [SAP System](../../../deploy/samples/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json)
 
 The deployment will create a SAP system that has an Hana database server, 2 application servers, 1 central services server and a web dispatcher and two key vaults (which can be ignored for now).
 
@@ -308,7 +308,7 @@ This step deploys the actual infrastructure for the SAP System (SID)
 
 ## Sample files ##
 
-The repository contains a folder [WORKSPACES](WORKSPACES) that has a set of sample parameter files that can be used to deploy the supporting components and the SAP System. The folder structure is documented here: [Deployment folder structure](Deployment_folder_structure.md)
+The repository contains a folder [WORKSPACES](../../../deploy/samples/WORKSPACES) that has a set of sample parameter files that can be used to deploy the supporting components and the SAP System. The folder structure is documented here: [Deployment folder structure](Deployment_folder_structure.md)
 
 The name of the environment is **DEV** and it is deployed to West Europe. The SID of the application is X00.
 
@@ -333,10 +333,10 @@ The links below explain how to deploy using the different deployment environment
 
 ## Changing the naming convention ##
 
-The automation uses a default naming convention which is defined in the Standard naming convention document [standards-naming](.//Software_Documentation/standards-naming.md)
+The automation uses a default naming convention which is defined in the Standard naming convention document [standards-naming](./Software_Documentation/standards-naming.md)
 
 <!-- TODO: Why is the following link a full URL? Shouldn't it be a relative path like all the others? -->
-[naming conventions for the deployment](https://github.com/Azure/sap-hana/blob/documentation-updates/documentation/SAP_Automation_on_Azure/Process_Documentation/Changing_the_naming_convention.md) should be defined upfront and can be customized according the needs.
+[naming conventions for the deployment](./Changing_the_naming_convention.md) should be defined upfront and can be customized according the needs.
 
 ## Changing disk sizing ##
 
