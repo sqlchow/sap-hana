@@ -257,7 +257,7 @@ The Workload Zone configuration file defines the region and the environment name
     }
 ```
 
-A sample workload zone configuration is specified in [Workload Zone Environment](../../../deploy/samples/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP00-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
+A sample workload zone configuration is specified in [Workload Zone Environment](../../../deploy/samples/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
 
 The deployment will create a Virtual network and a storage account for boot diagnostics and a storage account which can be used as the witness disk for Windows High Availability Architectures and two key vaults. The deployment will populate the keyvault with the default credentials for the Virtual Machines.
 
