@@ -272,6 +272,7 @@ The SAP System is the actual SAP Application, it contains all the Azure artifact
 
 A sample SAP System configuration is specified in [SAP System](../../../deploy/samples/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json)
 
+
 The deployment will create a SAP system that has an Hana database server, 2 application servers, 1 central services server and a web dispatcher and two key vaults (which can be ignored for now).
 
 ### Design questions - SAP System ###
