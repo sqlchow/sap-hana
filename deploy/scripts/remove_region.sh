@@ -147,8 +147,19 @@ if [ ! -n "${az}" ]; then
 fi
 
 # Helper variables
-environment=$(jq --raw-output .infrastructure.environment "${deployer_parameter_file}")
-region=$(jq --raw-output .infrastructure.region "${deployer_parameter_file}")
+ext=$(echo ${deployer_parameter_file} | cut -d. -f2)
+
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${deployer_parameter_file}")
+    region=$(jq --raw-output .infrastructure.region "${deployer_parameter_file}")
+else
+
+    load_config_vars "${root_dirname}"/"${deployer_parameter_file}" "environment"
+    load_config_vars "${root_dirname}"/"${deployer_parameter_file}" "location"
+    region=$(echo ${location} | xargs)
+fi
+
 key=$(echo "${deployer_parameter_file}" | cut -d. -f1)
 
 if [ ! -n "${environment}" ]
@@ -279,29 +290,33 @@ param_dirname=$(pwd)
 
 relative_path="${curdir}"/"${deployer_dirname}"
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/sap_deployer/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/sap_deployer/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
-#Reinitialize
+temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
+if [ -z "${temp}" ]
+then
+    #Reinitialize
 
-echo ""
-echo "#########################################################################################"
-echo "#                                                                                       #"
-echo "#                          Running Terraform init (deployer)                            #"
-echo "#                                                                                       #"
-echo "#########################################################################################"
-echo ""
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                          Running Terraform init (deployer)                            #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
 
-terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
---backend-config "subscription_id=${subscription}" \
---backend-config "resource_group_name=${resource_group}" \
---backend-config "storage_account_name=${storage_account}" \
---backend-config "container_name=tfstate" \
---backend-config "key=${key}.terraform.tfstate"
+    terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
+    --backend-config "subscription_id=${subscription}" \
+    --backend-config "resource_group_name=${resource_group}" \
+    --backend-config "storage_account_name=${storage_account}" \
+    --backend-config "container_name=tfstate" \
+    --backend-config "key=${key}.terraform.tfstate"
 
+fi
 
 #Initialize the statefile and copy to local
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/sap_deployer/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/sap_deployer/
 
 echo ""
 echo "#########################################################################################"
@@ -323,28 +338,33 @@ param_dirname=$(pwd)
 
 #Library
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/sap_library/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/sap_library/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 #Reinitialize
 
 key=$(echo "${library_file_parametername}" | cut -d. -f1)
 
-echo ""
-echo "#########################################################################################"
-echo "#                                                                                       #"
-echo "#                             Running Terraform init (library)                          #"
-echo "#                                                                                       #"
-echo "#########################################################################################"
-echo ""
+temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
+if [ -z "${temp}" ]
+then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                             Running Terraform init (library)                          #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
 
 
-terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
---backend-config "subscription_id=${subscription}" \
---backend-config "resource_group_name=${resource_group}" \
---backend-config "storage_account_name=${storage_account}" \
---backend-config "container_name=tfstate" \
---backend-config "key=${key}.terraform.tfstate"
+    terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
+    --backend-config "subscription_id=${subscription}" \
+    --backend-config "resource_group_name=${resource_group}" \
+    --backend-config "storage_account_name=${storage_account}" \
+    --backend-config "container_name=tfstate" \
+    --backend-config "key=${key}.terraform.tfstate"
+
+fi
 
 echo ""
 echo "#########################################################################################"
@@ -355,7 +375,7 @@ echo "##########################################################################
 echo ""
 
 #Initialize the statefile and copy to local
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/sap_library/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/sap_library/
 terraform -chdir="${terraform_module_directory}" init -force-copy -reconfigure --backend-config "path=${param_dirname}/terraform.tfstate"
 
 extra_vars=""
@@ -386,7 +406,7 @@ cd "${deployer_dirname}" || exit
 
 param_dirname=$(pwd)
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/sap_deployer/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/sap_deployer/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 extra_vars=""
@@ -412,5 +432,8 @@ cd "${curdir}" || exit
 
 
 unset TF_DATA_DIR
+
+step=0
+save_config_var "step" "${deployer_config_information}"
 
 exit 0
