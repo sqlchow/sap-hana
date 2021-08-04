@@ -311,7 +311,19 @@ else
     if [ -f stdout.az ]; then
         rm stdout.az
     fi
-    
+    cloudIDUsed=$(az account show | grep "cloudShellID")
+    if [ ! -z $cloudIDUsed ];
+    then 
+        echo ""
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo -e "#                          $boldred Please login using az login! $resetformatting                               #"
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        echo ""
+    fi
+
+
     if [ ! -z "${subscription}" ]; then
         echo "Setting the subscription"
         az account set --sub "${subscription}"
