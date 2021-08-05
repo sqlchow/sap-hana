@@ -97,7 +97,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id
   # If running as a normal user use the object ID of the user otherwise use the object_id from AAD
-  object_id = data.azurerm_client_config.deployer.object_id != "" ? data.azurerm_client_config.deployer.object_id : data.azuread_service_principal.deployer[0].object_id
+  object_id = data.azurerm_client_config.deployer.object_id != "" ? try(data.azurerm_client_config.deployer.object_id, "00000000-0000-0000-0000-000000000000") : try(data.azurerm_client_config.deployer.client_id, "00000000-0000-0000-0000-000000000000")
 
   secret_permissions = [
     "Get",
@@ -111,8 +111,11 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
   ]
 
   lifecycle {
-    create_before_destroy = true
+    ignore_changes = [
+      object_id
+    ]
   }
+
 }
 
 // Comment out code with users.object_id for the time being.
