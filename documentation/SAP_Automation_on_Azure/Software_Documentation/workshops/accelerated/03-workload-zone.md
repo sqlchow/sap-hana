@@ -99,10 +99,7 @@ Logon to the deployer using the ssh key downloaded in the previous step.
      ```bash
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
      --parameterfile DEMO-SCUS-SAP00-INFRASTRUCTURE.json                     \
-     --deployer_tfstate_key DEMO-SCUS-DEP00-INFRASTRUCTURE.terraform.tfstate \
-     --storageaccountname demoscustfstate###                                 \
-     --deployer_environment DEMO                                             \
-     --vault DEMOSCUSDEP00user###                                            \
+     --auto-approve
      ```
 
 
