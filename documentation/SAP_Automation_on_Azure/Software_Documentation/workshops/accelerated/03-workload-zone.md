@@ -59,7 +59,7 @@ Logon to the deployer using the ssh key downloaded in the previous step.
 1. Create Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/NP-EUS2-SAP00-INFRASTRUCTURE; cd $_
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEMO-SCUS-SAP00-INFRASTRUCTURE; cd $_
     ```
     <br/>
 
