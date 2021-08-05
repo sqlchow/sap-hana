@@ -47,6 +47,7 @@ Future Steps will include:
 
 ## Notes
 
+In order to perform the SAP installation the software **must** be downloaded first, this can be done following the steps defined here [Software download](../software-download)
 
 <br/><br/>
 
@@ -55,9 +56,14 @@ Future Steps will include:
 ### Post Deployment Configuration - Ansible
 <br/>
 
-1. From the SAP Deployment Workspace directory, change to the `DEMO-EUS2-SAP00-X00` directory.
+1. From the SAP Deployment Workspace directory, change to the appropriate directory `DEMO-EUS2-SAP00-X00` or `DEMO-SCUS-SAP00-X00` directory.
     ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-EUS2-SAP00-X00
+    
+    or 
+
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-SCUS-SAP00-X00
+    
     ```
     <br/><br/>
 
@@ -68,7 +74,7 @@ Future Steps will include:
 
     | Parameter                  | Value                                  |
     | -------------------------- | -------------------------------------- |
-    | bom_base_name              | S419009SPS03_v1                        |
+    | bom_base_name              | S41909SPS03_v0004ms                    |
     | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits |
     | password_master            | MasterPass00                           |
     | sap_fqdn                   | sap.contoso.com                        |
@@ -80,11 +86,11 @@ Future Steps will include:
     ```
     <br/>
 
-    File: `sap-parameters.yaml`
+    Sample File: `sap-parameters.yaml`
     ```bash
     ---
 
-    bom_base_name:                 S41909SPS03_v1
+    bom_base_name:                 S41909SPS03_v0004ms
     sapbits_location_base_path:    https://<storage_account_FQDN>/sapbits
     password_master:               MasterPass00
     sap_fqdn:                      sap.contoso.com

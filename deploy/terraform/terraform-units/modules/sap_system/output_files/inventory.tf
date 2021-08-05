@@ -255,8 +255,8 @@ locals {
     trimspace(split(":", strValue)[0]) => trimspace(substr(strValue, length(split(":", strValue)[0]) + 1, -1))
   })
 
-  bom     = lookup(local.itemvalues, "bom_base_name", "12")
-  sapbits = lookup(local.itemvalues, "sapbits_location_base_path", "22")
-  pass    = lookup(local.itemvalues, "password_master", "32")
+  bom     = lookup(local.itemvalues, "bom_base_name", "")
+  sapbits = lookup(local.itemvalues, "sapbits_location_base_path", "https://?????????.blob.core.windows.net/sapbits")
+  pass    = lookup(local.itemvalues, "password_master", "")
 }
 

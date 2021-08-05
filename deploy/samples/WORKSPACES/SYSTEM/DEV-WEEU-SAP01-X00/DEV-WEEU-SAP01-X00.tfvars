@@ -1,15 +1,136 @@
-# Infrastructure block
+# Deployment information
+# - tfstate_resource_id is the Azure resource identifier for the Storage account in the SAP Library
+#   that will contain the Terraform state files
+# - deployer_tfstate_key is the state file name for the deployer
+# - landscape_tfstate_key is the state file name for the workload deployment
+# These are required parameters, if using the deployment scripts they will be auto populated otherwise they need to be entered
 
-environment="DEV"
-location="westeurope"
+
+tfstate_resource_id   = null
+deployer_tfstate_key  = null
+landscape_tfstate_key = null
+
+# Infrastructure block
+# The environment value is a mandatory field, it is used for partitioning the environments, for example (PROD and NP)
+environment = "DEV"
+
+# The region valus is a mandatory field, it is used to control where the resources are deployed
+region      = "westeurope"
+
+# RESOURCEGROUP
+# The two resource group name and arm_id can be used to control the naming and the creation of the resource group
+# The resource_group_name value is optional, it can be used to override the name of the resource group that will be provisioned
+# The resource_group_name arm_id is optional, it can be used to provide an existing resource group for the deployment
 #resource_group_name=""
 #resource_group_arm_id=""
+
+# PPG
+# The proximity placement group names and arm_ids are optional can be used to control the naming and the creation of the proximity placement groups
+# The proximityplacementgroup_names list value is optional, it can be used to override the name of the proximity placement groups that will be provisioned
+# The proximityplacementgroup_arm_ids list value is optional, it can be used to provide an existing proximity placement groups for the deployment
 #proximityplacementgroup_names=[]
 #proximityplacementgroup_arm_ids=[]
+
+# NETWORKING
+# The deployment automation supports two ways of providing subnet information.
+# 1. Subnets are defined as part of the workload virtual network deployment
+#    In this model multiple SAP System share the subnets
+# 2. Subnets are deployed as part of the SAP system
+#    In this model each system has its own sets of subnets
+#
+# The automation supports both creating the subnets (greenfield) or using existing subnets (brownfield)
+# For the greenfield scenario the subnet address prefix must be specified whereas
+# for the brownfield scenario the Azure resource identifier for the subnet must be specified
+
+# The network logical name is mandatory - it is used in the naming convention and should map to the workload virtual network logical name 
+network_name="SAP01"
+
+# ADMIN subnet
+# If defined these parameters control the subnet name and the subnet prefix
+# admin_subnet_name is an optional parameter and should only be used if the default naming is not acceptable 
+#admin_subnet_name=""
+
+# admin_subnet_prefix is a mandatory parameter if the subnets are not defined in the workload or if existing subnets are not used
+#admin_subnet_prefix="10.1.1.0/24"
+# admin_subnet_arm_id is an optional parameter that if provided specifies Azure resource identifier for the existing subnet to use
+#admin_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_admin"
+
+# admin_subnet_nsg_name is an optional parameter and should only be used if the default naming is not acceptable for the network security group name 
+#admin_subnet_nsg_name=""
+# admin_subnet_nsg_arm_id is an optional parameter that if provided specifies Azure resource identifier for the existing network security group to use
+#admin_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_adminSubnet-nsg"
+
+# DB subnet
+# If defined these parameters control the subnet name and the subnet prefix
+# db_subnet_name is an optional parameter and should only be used if the default naming is not acceptable 
+#db_subnet_name=""
+
+# db_subnet_prefix is a mandatory parameter if the subnets are not defined in the workload or if existing subnets are not used
+#db_subnet_prefix="10.1.2.0/24"
+
+# db_subnet_arm_id is an optional parameter that if provided specifies Azure resource identifier for the existing subnet to use
+#db_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_db"
+
+# db_subnet_nsg_name is an optional parameter and should only be used if the default naming is not acceptable for the network security group name 
+#db_subnet_nsg_name=""
+
+# db_subnet_nsg_arm_id is an optional parameter that if provided specifies Azure resource identifier for the existing network security group to use
+#db_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_dbSubnet-nsg"
+
+
+# APP subnet
+# If defined these parameters control the subnet name and the subnet prefix
+# app_subnet_name is an optional parameter and should only be used if the default naming is not acceptable 
+#app_subnet_name=""
+
+# app_subnet_prefix is an optional parameter that if provided specifies Azure resource identifier for the existing subnet to use
+#app_subnet_prefix="10.1.3.0/24"
+
+# app_subnet_arm_id is an optional parameter that if provided specifies Azure resource identifier for the existing subnet to use
+#app_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_app"
+
+# app_subnet_nsg_name is an optional parameter and should only be used if the default naming is not acceptable for the network security group name 
+#app_subnet_nsg_name=""
+
+# app_subnet_nsg_arm_id is an optional parameter that if provided specifies Azure resource identifier for the existing network security group to use
+#app_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_appSubnet-nsg"
+
+# WEB subnet
+# If defined these parameters control the subnet name and the subnet prefix
+# web_subnet_name is an optional parameter and should only be used if the default naming is not acceptable 
+#web_subnet_name=""
+
+# web_subnet_prefix is an optional parameter that if provided specifies Azure resource identifier for the existing subnet to use
+#web_subnet_prefix="10.1.4.0/24"
+
+# web_subnet_arm_id is an optional parameter that if provided specifies Azure resource identifier for the existing subnet to use
+#web_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_web"
+
+# web_subnet_nsg_name is an optional parameter and should only be used if the default naming is not acceptable for the network security group name 
+#web_subnet_nsg_name=""
+
+# web_subnet_nsg_arm_id is an optional parameter that if provided specifies Azure resource identifier for the existing network security group to use
+#web_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_webSubnet-nsg"
+
 #Anchor VM
+# The Anchor VM can be used as the first Virtual Machine deployed by the deployment, this Virtual Machine will anchor the proximity placement group and all the 
+# subsequent virtual machines will be deployed in the same group. It is recommended to use the same SKU for the Anchor VM as for the database VM
+
+# the deploy_anchor_vm flag controls if an anchor VM should be deployed
+#deploy_anchor_vm=false
+
+
+# anchor_vm_sku if used is mandatory and defines the virtual machine SKU
 #anchor_vm_sku="Standard_D4s_v4"
+
+# Defines the default authentication model (key/password)
 #anchor_vm_authentication_type="key"
+
+# Defines if the anchor VM should use accelerated networking
 #anchor_vm_accelerated_networking=true
+
+# The anchor_vm_image defines the Virtual machine image to use, if source_image_id is specified the deployment will use the custom image provided, in this case os_type must also be specified
+
 #anchor_vm_image={
 #os_type=""
 #source_image_id=""
@@ -18,38 +139,12 @@ location="westeurope"
 #sku="gen1"
 #version="latest"
 #}
+
+# anchor_vm_nic_ips if defined will provide the IP addresses for the network interface cards 
 #anchor_vm_nic_ips=["","",""]
-#deploy_anchor_vm=true
+# anchor_vm_use_DHCP is a boolean flag controlling if Azure subnet provided IP addresses should be used (true)
 #anchor_vm_use_DHCP=true
 
-#Networking 
-#network_arm_id=""
-network_name="SAP01"
-#network_address_space="10.1.0.0/16"
-
-#admin_subnet_name=""
-#admin_subnet_prefix="10.1.1.0/24"
-#admin_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_admin"
-#admin_subnet_nsg_name=""
-#admin_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_adminSubnet-nsg"
-
-#db_subnet_name=""
-#db_subnet_prefix="10.1.2.0/24"
-#db_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_db"
-#db_subnet_nsg_name="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_dbSubnet-nsg"
-#db_subnet_nsg_arm_id=""
-
-#app_subnet_name=""
-#app_subnet_prefix="10.1.3.0/24"
-#app_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_app"
-#app_subnet_nsg_name=""
-#app_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_appSubnet-nsg"
-
-#web_subnet_name=""
-#web_subnet_prefix="10.1.4.0/24"
-#web_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_web"
-#web_subnet_nsg_name=""
-#web_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_webSubnet-nsg"
 
 #Database VM
 
