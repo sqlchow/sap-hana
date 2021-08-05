@@ -1,7 +1,7 @@
 ### <img src="../../../assets/images/UnicornSAPBlack256x256.png" width="64px"> SAP Deployment Automation Framework <!-- omit in toc -->
 <br/><br/>
 
-# Bootstrapping the Deployer <!-- omit in toc -->
+# Prepare the region <!-- omit in toc -->
 
 <br/>
 
@@ -34,11 +34,11 @@
 
     | Field             | Legnth   | Value  |
     | ----------------- | -------- | ------ |
-    | `<ENV>`           | [5 CHAR] | NP     |
+    | `<ENV>`           | [5 CHAR] | DEMO     |
     | `<REGION>`        | [4 CHAR] | EUS2   |
     | `<DEPLOYER_VNET>` | [7 CHAR] | DEP00  |
   
-    Which becomes this: **NP-EUS2-DEP00-INFRASTRUCTURE**
+    Which becomes this: **DEMO-EUS2-DEP00-INFRASTRUCTURE**
     
     This is used in several places:
     - The path of the Workspace Directory.
@@ -51,7 +51,7 @@
 
 ## Procedure
 
-### Bootstrap - Deployer
+### Prepare - region
 
 <br/>
 
@@ -61,7 +61,7 @@
       <br/>![Cloud Shell](assets/CloudShell1.png)
       <br/><br/>
 
-2. Ensure that you are authenticated with the correct subscription.
+2. Ensure that you are authenticated with the correct subscription. 
     ```bash
     az login
     az account list --output=table | grep -i true
@@ -81,16 +81,7 @@
     export ARM_SUBSCRIPTION_ID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
     ```
 
-
-2. Terraform
-     ```bash
-     mkdir -p ~/bin; cd $_
-     wget  https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
-     unzip terraform_0.14.7_linux_amd64.zip
-     alias terraform=~/bin/terraform
-     ```
-
-3. Repository
+2. Repository
    1. Clone the Repository and Checkout the branch.
         ```bash
         mkdir -p ~/Azure_SAP_Automated_Deployment; cd $_
@@ -98,7 +89,7 @@
         cd  ~/Azure_SAP_Automated_Deployment/sap-hana
         ```
 
-    1. (*Optional*) Checkout Branch
+    1. (*Optional*) Checkout Branch (beta branch is recommended)
         ```bash
         git checkout <branch_name>
         ```
@@ -116,7 +107,7 @@
         <br/>
 
 4. DEPLOYER - Create Working Directory and prepare JSON.
-    <br/>*`Observe Naming Convention`*<br/>
+    <br/>*`Observe Naming Convention` Choose a suitable location*<br/>
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER/DEMO-SCUS-DEP00-INFRASTRUCTURE; cd $_
 
@@ -148,7 +139,7 @@
     <br/>
 
 5. SAP_LIBRARY - Create Working Directory and prepare JSON.
-    <br/>*`Observe Naming Convention`*<br/>
+    <br/>*`Observe Naming Convention` Use same location as for the deployer*<br/>
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/DEMO-SCUS-SAP_LIBRARY; cd $_
 
@@ -170,13 +161,13 @@
 
 
 6.  Prepare the environment
-    1. Change to Working 
+    1. Change to the WORKSPACES directory
     ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
     ```
     <br/>
 
-    2. Validate
+    2. Validate (optional)
     ```bash
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh --parameterfile DEPLOYER/DEMO-SCUS-DEP00-INFRASTRUCTURE/DEMO-SCUS-DEP00-INFRASTRUCTURE.json \
                                                        --type sap_deployer
@@ -203,17 +194,6 @@
           - SPN App Password:
           - SPN Tenant ID:
           - SPN Subscription:
-
-
-
-
-
-
-
-
-
-
-
 
 
 7.  Post Processing
@@ -246,4 +226,4 @@
        <br/><br/><br/><br/>
 
 
-# Next: [Bootstrap - SPN](03-workload-zone.md) <!-- omit in toc -->
+# Next: [Install workload zone](03-workload-zone.md) <!-- omit in toc -->

@@ -94,12 +94,27 @@ if [ $param_dirname != '.' ]; then
     exit 3
 fi
 
-# Read environment
-environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+ext=$(echo ${parameterfile} | cut -d. -f2)
+
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+    use_deployer=$(jq --raw-output .deployer.use "${parameterfile}")
+else
+    
+    load_config_vars "${param_dirname}"/"${parameterfile}" "library_environment"
+    environment=$(echo ${library_environment} | xargs)
+    load_config_vars "${param_dirname}"/"${parameterfile}" "library_location"
+    region=$(echo ${library_location} | xargs)
+
+    load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_use"
+    use_deployer=$deployer_use
+fi
+
 key=$(echo "${parameterfile}" | cut -d. -f1)
 
-use_deployer=$(jq --raw-output .deployer.use "${parameterfile}")
+
 if [ "${use_deployer}" == "null" ]; then
     use_deployer=false
 fi
@@ -343,7 +358,6 @@ then
     exit -1
 fi
 return_value=-1
-
 REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
 temp=$(echo "${REMOTE_STATE_SA}" | grep -m1 "Warning")
 if [ -z "${temp}" ]
@@ -351,9 +365,36 @@ then
     temp=$(echo "${REMOTE_STATE_SA}" | grep "Backend reinitialization required")
     if [ -z "${temp}" ]
     then
-        get_and_store_sa_details ${REMOTE_STATE_SA} "${library_config_information}"
+        echo "save"
+        save_config_var "REMOTE_STATE_SA" "${library_config_information}"
         return_value=0
     fi
 fi
+
+tfstate_resource_id=$(terraform -chdir="${terraform_module_directory}" output tfstate_resource_id| tr -d \")
+temp=$(echo $tfstate_resource_id | grep -m1 "Warning")
+if [ -z "${temp}" ]
+then
+    temp=$(echo "${tfstate_resource_id}" | grep "Backend reinitialization required")
+    if [ -z "${temp}" ]
+    then
+        save_config_var "tfstate_resource_id" "${library_config_information}"
+        return_value=0
+    fi
+fi
+
+REMOTE_STATE_RG=$(terraform -chdir="${terraform_module_directory}" output remote_state_resource_group_name| tr -d \")
+temp=$(echo "${REMOTE_STATE_RG}" | grep -m1 "Warning")
+if [ -z "${temp}" ]
+then
+    temp=$(echo "${REMOTE_STATE_RG}" | grep "Backend reinitialization required")
+    if [ -z "${temp}" ]
+    then
+        echo "save"
+        save_config_var "REMOTE_STATE_RG" "${library_config_information}"
+        return_value=0
+    fi
+fi
+
 
 exit $return_value

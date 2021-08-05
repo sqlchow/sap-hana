@@ -83,10 +83,6 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     storage_account_uri = azurerm_storage_account.deployer[0].primary_blob_endpoint
   }
 
-  tags = {
-    JumpboxName = "Deployer"
-  }
-
   connection {
     type        = "ssh"
     host        = azurerm_public_ip.deployer[count.index].ip_address
@@ -95,4 +91,6 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     password    = lookup(local.deployers[count.index].authentication, "password", null)
     timeout     = var.ssh-timeout
   }
+
+   tags = local.tags
 }

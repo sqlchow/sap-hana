@@ -78,6 +78,11 @@ variable "cloudinit_growpart_config" {
   description = "A cloud-init config that configures automatic growpart expansion of root partition"
 }
 
+variable "license_type" {
+  description = "Specifies the license type for the OS"
+  default     = ""
+
+}
 
 locals {
   // Resources naming
@@ -87,25 +92,28 @@ locals {
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
 
+  default_filepath = format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")
+  custom_sizing    = length(var.custom_disk_sizes_filename) > 0
+
   // Imports database sizing information
-  file_name = length(var.custom_disk_sizes_filename) > 0 ? (
-    format("%s/%s", path.cwd, var.custom_disk_sizes_filename)) : (
-    format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")
+  file_name = local.custom_sizing ? (
+    fileexists(var.custom_disk_sizes_filename) ? (
+      var.custom_disk_sizes_filename) : (
+      format("%s/%s", path.cwd, var.custom_disk_sizes_filename)
+    )) : (
+    local.default_filepath
+
   )
 
-  sizes         = jsondecode(file(local.file_name))
-  custom_sizing = length(var.custom_disk_sizes_filename) > 0
+  sizes = jsondecode(file(local.file_name))
 
   faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))
 
-  region = try(var.infrastructure.region, "")
-  sid    = upper(var.sap_sid)
-  prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
-
+  region  = var.infrastructure.region
+  sid     = upper(var.sap_sid)
+  prefix  = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
   rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
-  //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
-  offset = try(var.options.resource_offset, 0)
 
   hdb_list = [
     for db in var.databases : db
@@ -115,7 +123,7 @@ locals {
   enable_deployment = (length(local.hdb_list) > 0) ? true : false
 
   // Filter the list of databases to only HANA platform entries
-  hdb = try(local.hdb_list[0], {})
+  hdb = var.databases[0]
 
   //ANF support
   use_ANF = try(local.hdb.use_ANF, false)
@@ -144,21 +152,21 @@ locals {
   // If custom image is used, we do not overwrite os reference with default value
   hdb_custom_image = length(try(local.hdb.os.source_image_id, "")) > 0
   hdb_os = {
-    "source_image_id" = local.hdb_custom_image ? local.hdb.os.source_image_id : ""
-    "publisher"       = try(local.hdb.os.publisher, local.hdb_custom_image ? "" : "suse")
-    "offer"           = try(local.hdb.os.offer, local.hdb_custom_image ? "" : "sles-sap-12-sp5")
-    "sku"             = try(local.hdb.os.sku, local.hdb_custom_image ? "" : "gen1")
-    "version"         = try(local.hdb.os.version, local.hdb_custom_image ? "" : "latest")
+    os_type         = "LINUX"
+    source_image_id = local.hdb_custom_image ? local.hdb.os.source_image_id : ""
+    publisher       = local.hdb_custom_image ? "" : length(try(local.hdb.os.publisher, "")) > 0 ? local.hdb.os.publisher : "SUSE"
+    offer           = local.hdb_custom_image ? "" : length(try(local.hdb.os.offer, "")) > 0 ? local.hdb.os.offer : "sles-sap-12-sp5"
+    sku             = local.hdb_custom_image ? "" : length(try(local.hdb.os.sku, "")) > 0 ? local.hdb.os.sku : "gen1"
+    version         = local.hdb_custom_image ? "" : length(try(local.hdb.os.version, "")) > 0 ? local.hdb.os.version : "latest"
   }
 
   hdb_size = try(local.hdb.size, "Default")
 
   db_sizing = local.enable_deployment ? lookup(local.sizes.db, local.hdb_size).storage : []
-  db_size   = local.enable_deployment ? lookup(local.sizes.db, local.hdb_size).compute : {}
+  db_size   = local.enable_deployment ? lookup(local.sizes.db, local.hdb_size).compute.vm_size : ""
 
-  hdb_vm_sku = try(local.db_size.vm_size, "Standard_E4s_v3")
+  hdb_vm_sku = length(local.db_size) > 0 ? local.db_size : "Standard_E4s_v3"
 
-  hdb_fs = try(local.hdb.filesystem, "xfs")
   hdb_ha = try(local.hdb.high_availability, false)
 
   sid_auth_type        = try(local.hdb.authentication.type, "key")
@@ -174,12 +182,9 @@ locals {
   node_count      = try(length(local.hdb.dbnodes), 1)
   db_server_count = local.hdb_ha ? local.node_count * 2 : local.node_count
 
-  hdb_ins    = try(local.hdb.instance, {})
-  hdb_sid    = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
-  hdb_nr     = try(local.hdb_ins.instance_number, "01")
-  components = merge({ hana_database = [] }, try(local.hdb.components, {}))
-  xsa        = try(local.hdb.xsa, { routing = "ports" })
-  shine      = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
+  hdb_ins = try(local.hdb.instance, {})
+  hdb_sid = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
+  hdb_nr  = try(local.hdb_ins.instance_number, "01")
 
   dbnodes = local.hdb_ha ? (
     flatten([for idx, dbnode in try(local.hdb.dbnodes, [{}]) :
@@ -289,7 +294,7 @@ locals {
     [
       for storage_type in local.db_sizing : [
         for idx, disk_count in range(storage_type.count) : {
-          suffix                    = format("%s%02d", storage_type.name, disk_count + local.offset)
+          suffix                    = format("%s%02d", storage_type.name, disk_count + var.options.resource_offset)
           storage_account_type      = storage_type.disk_type,
           disk_size_gb              = storage_type.size_gb,
           disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
@@ -329,7 +334,7 @@ locals {
     [
       for storage_type in local.db_sizing : [
         for idx, disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, storage_type.lun_start + disk_count + local.offset)
+          suffix               = format("%s%02d", storage_type.name, storage_type.lun_start + disk_count + var.options.resource_offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -390,6 +395,10 @@ locals {
   zonal_deployment = local.db_zone_count > 0 || local.enable_ultradisk ? true : false
 
   //If we deploy more than one server in zone put them in an availability set
-  use_avset = !local.zonal_deployment || local.db_server_count != local.db_zone_count
+  use_avset = local.db_server_count > 0 && !try(local.hdb.no_avset, false) ? !local.zonal_deployment || (local.db_server_count != local.db_zone_count) : false
+
+  //PPG control flag
+  no_ppg = var.databases[0].no_ppg
+
 
 }
