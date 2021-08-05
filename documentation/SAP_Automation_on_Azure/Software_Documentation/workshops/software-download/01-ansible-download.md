@@ -31,7 +31,7 @@ This step will leverage an Ansible playbool to download software from SAP, the d
 
 <br>
 
-1. Store the required secrets in deployer Key Vault.
+1. Store the required secrets in deployer Key Vault. (resource group: DEMO-EUS2-DEP00-INFRASTRUCTURE or DEMO-SCUS-DEP00-INFRASTRUCTURE)
 
     Secrets to be created/updated:
 
@@ -48,8 +48,7 @@ This step will leverage an Ansible playbool to download software from SAP, the d
 1. From the SAP Deployment Workspace directory, create a new directory 'BOMS'.
 
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/BOMS
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/BOMS
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/BOMS; cd $_
     ```
 
 2. Create the `sap-parameters.yaml` parameter file.
@@ -60,11 +59,11 @@ This step will leverage an Ansible playbool to download software from SAP, the d
 
     Values to be updated:
 
-    | Parameter                  | Value                                     |
-    | -------------------------- | ----------------------------------------- |
-    | bom_base_name              | S41909SPS03_v0004ms                       |
-    | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits    |
-    | kv_uri                     | Name of Key Vault containing the secrets  |
+    | Parameter                  | Value                                                                                                 |
+    | -------------------------- | ----------------------------------------------------------------------------------------------------- |
+    | bom_base_name              | S41909SPS03_v0004ms                                                                                   |
+    | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits (This is the "sapbits" storage account in the SAP Library)     |
+    | kv_uri                     | Name of Key Vault containing the secrets (Deployer keyvault)                                          |
 
 3. Execute the Ansible Playbook.
 

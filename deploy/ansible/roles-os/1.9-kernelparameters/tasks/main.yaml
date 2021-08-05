@@ -70,6 +70,8 @@
     reload:                                    yes
     ignoreerrors:                              yes
   loop:                                        "{{ getparamlistforapply }}"
+  when:
+          - item.tier in ["all", tier]
 
 # ----------------------------------------
 # END
