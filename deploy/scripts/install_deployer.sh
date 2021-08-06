@@ -335,7 +335,8 @@ then
     temp=$(echo "${sshsecret}" | grep "Backend reinitialization required")
     if [ -z "${temp}" ]
     then
-        save_config_var "sshsecret "${deployer_config_information}"
+        save_config_var "sshsecret" "${deployer_config_information}"
+    fi
 fi
 
 deployer_public_ip_address=$(terraform -chdir="${terraform_module_directory}"  output deployer_public_ip_address | tr -d \")
@@ -346,7 +347,8 @@ then
     temp=$(echo "${deployer_public_ip_address}" | grep "Backend reinitialization required")
     if [ -z "${temp}" ]
     then
-        save_config_var "deployer_public_ip_address "${deployer_config_information}"
+        save_config_var "deployer_public_ip_address" "${deployer_config_information}"
+    fi
 fi
 
 unset TF_DATA_DIR
