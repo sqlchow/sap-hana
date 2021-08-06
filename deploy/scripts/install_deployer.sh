@@ -326,5 +326,28 @@ then
         return_value=-1
     fi
 fi
+
+sshsecret=$(terraform -chdir="${terraform_module_directory}"  output deployer_private_key_secret_name | tr -d \")
+
+temp=$(echo "${sshsecret}" | grep "Warning")
+if [ -z "${temp}" ]
+then
+    temp=$(echo "${sshsecret}" | grep "Backend reinitialization required")
+    if [ -z "${temp}" ]
+    then
+        save_config_var "sshsecret "${deployer_config_information}"
+fi
+
+deployer_public_ip_address=$(terraform -chdir="${terraform_module_directory}"  output deployer_public_ip_address | tr -d \")
+
+temp=$(echo "${deployer_public_ip_address}" | grep "Warning")
+if [ -z "${temp}" ]
+then
+    temp=$(echo "${deployer_public_ip_address}" | grep "Backend reinitialization required")
+    if [ -z "${temp}" ]
+    then
+        save_config_var "deployer_public_ip_address "${deployer_config_information}"
+fi
+
 unset TF_DATA_DIR
 exit $return_value
