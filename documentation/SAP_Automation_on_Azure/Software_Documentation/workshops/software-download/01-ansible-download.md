@@ -58,30 +58,25 @@ This step will leverage an Ansible playbool to download software from SAP, the d
 
 <br>
 
-1. From the SAP Deployment Workspace directory, create a new directory 'BOMS'.
+1. From the SAP Deployment Workspace directory, create a new directory 'BOMS' and the sap-parameter.yaml file.
 
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/BOMS; cd $_
-    ```
-
-2. Create the `sap-parameters.yaml` parameter file.
-
-    ```bash
-
- ```bash
     cat <<EOF > sap-parameters.yaml
     ---
-
     bom_base_name:               S41909SPS03_v0004ms
     sapbits_location_base_path:  https://<storage_account_FQDN>/sapbits
     kv_uri:                      
-    
     ...
     EOF
-    ```
+    
+ ```
+    
+2. Update the `sap-parameters.yaml` parameter file.
 
+ ```bash
     vi sap-parameters.yaml
-    ```
+ ```
 
     Values to be updated:
 
@@ -91,7 +86,7 @@ This step will leverage an Ansible playbool to download software from SAP, the d
     | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits (This is the "sapbits" storage account in the SAP Library)     |
     | kv_uri                     | Name of Key Vault containing the secrets (Deployer keyvault)                                          |
 
-3. Execute the Ansible Playbook.
+4. Execute the Ansible Playbook.
 
     There are three ways to do this.
 
