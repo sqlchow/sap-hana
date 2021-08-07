@@ -20,7 +20,7 @@
 # If Microsoft supplied BOM found
 - name:             Register Microsoft Supplied BOM {{ bom_name }}
   include_vars:
-    ansible.builtin.file:           "{{ microsoft_supplied_bom.stat.path }}"
+    file:           "{{ microsoft_supplied_bom.stat.path }}"
     name:           bom
   when:             microsoft_supplied_bom.stat.exists == true
 
@@ -52,7 +52,7 @@
 
     - name:             Register downloaded BOM ({{ bom_name }})
       include_vars:
-        ansible.builtin.file:           "{{ inventory_dir }}/{{ bom_name }}.yaml"
+        file:           "{{ inventory_dir }}/{{ bom_name }}.yaml"
         name:           bom
 
   when:             microsoft_supplied_bom.stat.exists != true
