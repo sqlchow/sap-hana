@@ -41,6 +41,19 @@ This step will leverage an Ansible playbool to download software from SAP, the d
     | S-Password                 | Password of S User Account                             |
     | sapbits-access-key         | Access key for the SAP Library sapbits storage account |
 
+2. Add secrets to KeyVault.
+   - Where `<Deployer-User_KV_name>` is the keyvault name.
+   - Where `<S-Username>` is the S user account name
+   - Where `<S-Password>` is the S user account's password
+   - Where `<access-key>` is the access key for the storage account
+
+```bash
+    az keyvault secret set --name "S-Username" --vault-name "<Deployer-User_KV_name>" --value "<S-Username>";
+    az keyvault secret set --name "S-Password" --vault-name "<Deployer-User_KV_name>" --value "<S-Password>";
+    # If not populated
+    az keyvault secret set --name "sapbits-access-key" --vault-name "<Deployer-User_KV_name>" --value "<access-key>";
+```
+
 ### SAP Software Download - Ansible ###
 
 <br>
@@ -54,6 +67,19 @@ This step will leverage an Ansible playbool to download software from SAP, the d
 2. Create the `sap-parameters.yaml` parameter file.
 
     ```bash
+
+ ```bash
+    cat <<EOF > sap-parameters.yaml
+    ---
+
+    bom_base_name:               S41909SPS03_v0004ms
+    sapbits_location_base_path:  https://<storage_account_FQDN>/sapbits
+    kv_uri:                      
+    
+    ...
+    EOF
+    ```
+
     vi sap-parameters.yaml
     ```
 
