@@ -53,6 +53,7 @@ In order to perform the SAP installation the software **must** be downloaded fir
 
 ## Procedure
 
+Runtime environment: Deployer
 ### Post Deployment Configuration - Ansible
 <br/>
 
@@ -76,6 +77,7 @@ In order to perform the SAP installation the software **must** be downloaded fir
     | -------------------------- | -------------------------------------- |
     | bom_base_name              | S41909SPS03_v0004ms                    |
     | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits |
+    | sapbits_sas_token          | SAS token for storage account (if required) |
     | password_master            | MasterPass00                           |
     | sap_fqdn                   | sap.contoso.com                        |
     
@@ -92,6 +94,7 @@ In order to perform the SAP installation the software **must** be downloaded fir
 
     bom_base_name:                 S41909SPS03_v0004ms
     sapbits_location_base_path:    https://<storage_account_FQDN>/sapbits
+    sapbits_sas_token:             <SAS-Token>
     password_master:               MasterPass00
     sap_fqdn:                      sap.contoso.com
 
