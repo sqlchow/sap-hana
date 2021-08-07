@@ -28,7 +28,7 @@
 #
 # -------------------------------------+---------------------------------------8
 
-  - set_fact:
+  - ansible.builtin.set_fact:
       tier:     preparation
 
   - include_role:

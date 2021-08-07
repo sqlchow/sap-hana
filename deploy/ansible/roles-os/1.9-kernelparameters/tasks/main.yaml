@@ -43,7 +43,7 @@
 # ----------------------------------------
 
 - name:                                        Gather list of parameters which need to be applied
-  set_fact:
+  ansible.builtin.set_fact:
     getparamlistforapply:                      '{{ 
                                                   (
                                                     parameters["common"] 
