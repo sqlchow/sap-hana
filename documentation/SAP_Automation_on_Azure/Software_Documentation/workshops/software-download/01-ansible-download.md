@@ -66,8 +66,6 @@ This step will leverage an Ansible playbool to download software from SAP, the d
 
 2. Create the `sap-parameters.yaml` parameter file.
 
-    ```bash
-
  ```bash
     cat <<EOF > sap-parameters.yaml
     ---
@@ -78,10 +76,13 @@ This step will leverage an Ansible playbool to download software from SAP, the d
     
     ...
     EOF
-    ```
+ ```
+    
+2. Update the `sap-parameters.yaml` parameter file.
 
+ ```bash
     vi sap-parameters.yaml
-    ```
+ ```
 
     Values to be updated:
 
@@ -91,7 +92,7 @@ This step will leverage an Ansible playbool to download software from SAP, the d
     | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits (This is the "sapbits" storage account in the SAP Library)     |
     | kv_uri                     | Name of Key Vault containing the secrets (Deployer keyvault)                                          |
 
-3. Execute the Ansible Playbook.
+4. Execute the Ansible Playbook.
 
     There are three ways to do this.
 
