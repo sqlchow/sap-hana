@@ -15,7 +15,7 @@ trigger:
 
 
 pool:
-  vmImage: ubuntu-latest
+  name: PERM-WEEU
 
 steps:
 
