@@ -58,24 +58,18 @@ This step will leverage an Ansible playbool to download software from SAP, the d
 
 <br>
 
-1. From the SAP Deployment Workspace directory, create a new directory 'BOMS'.
+1. From the SAP Deployment Workspace directory, create a new directory 'BOMS' and the sap-parameter.yaml file.
 
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/BOMS; cd $_
-    ```
-
-2. Create the `sap-parameters.yaml` parameter file.
-
- ```bash
     cat <<EOF > sap-parameters.yaml
     ---
-
     bom_base_name:               S41909SPS03_v0004ms
     sapbits_location_base_path:  https://<storage_account_FQDN>/sapbits
     kv_uri:                      
-    
     ...
     EOF
+    
  ```
     
 2. Update the `sap-parameters.yaml` parameter file.
