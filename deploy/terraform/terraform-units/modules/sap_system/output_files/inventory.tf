@@ -203,6 +203,7 @@ resource "local_file" "sap-parameters_yml" {
     bom           = local.bom
     sapbits       = local.sapbits
     pass          = local.pass
+    token         = local.token
     }
   )
   filename             = format("%s/sap-parameters.yaml", path.cwd)
@@ -258,5 +259,7 @@ locals {
   bom     = lookup(local.itemvalues, "bom_base_name", "")
   sapbits = lookup(local.itemvalues, "sapbits_location_base_path", "https://?????????.blob.core.windows.net/sapbits")
   pass    = lookup(local.itemvalues, "password_master", "")
+
+  token    = lookup(local.itemvalues, "sapbits_sas_token", "")
 }
 
