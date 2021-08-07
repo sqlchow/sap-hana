@@ -11,7 +11,7 @@ product_ids:
   dbl:    NW_ABAP_DB:S4HANA1909.CORE.HDB.ABAP
   pas:    NW_ABAP_CI:S4HANA1909.CORE.HDB.ABAP
   app:    NW_DI:S4HANA1909.CORE.HDB.PD
-  web:
+  web:    NW_Webdispatcher:NW750.IND.PD
 
 materials:
   dependencies:
@@ -234,10 +234,10 @@ materials:
       download:     false
       url:          https://softwaredownloads.sap.com/file/0020000000410162020
 
-    - name:         "Patch 3 for SOFTWARE UPDATE MANAGER 2.0 SP11 ; OS: Linux on x86_64 64bit"
-      archive:      SUM20SP11_3-80002456.SAR
+    - name:         "Patch 2 for SOFTWARE UPDATE MANAGER 2.0 SP11 ; OS: Linux on x86_64 64bit"
+      archive:      SUM20SP11_2-80002456.SAR
       download:     false
-      url:          https://softwaredownloads.sap.com/file/0020000001125852021
+      url:          https://softwaredownloads.sap.com/file/0020000001083682021 
 
     - name:         "SP12 Patch4 for UMML4HANA 1"
       archive:      HANAUMML12_4-70001054.ZIP
