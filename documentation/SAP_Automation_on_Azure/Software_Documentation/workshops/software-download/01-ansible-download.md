@@ -97,8 +97,8 @@ This step will leverage an Ansible playbool to download software from SAP, the d
         ```
 
         ```bash
-        1) BOM Validator
-        2) BOM Downloader
+        1) BOM Downloader
+        2) BOM Uploader
         3) Quit
         Please select playbook: 
         ```
@@ -114,8 +114,8 @@ This step will leverage an Ansible playbool to download software from SAP, the d
         ```
 
         Use the following playbooks in the command, as shown in the order below.
-        - `playbook_bom_validator.yaml`
         - `playbook_bom_downloader.yaml`
+        - `playbook_bom_uploader.yaml`
 
     3. (*Optional*) Execute the Ansible playbooks sequentially via a single `ansible-playbook` command.
 
@@ -124,6 +124,6 @@ This step will leverage an Ansible playbool to download software from SAP, the d
           --user        azureadm                                                                           \
           --private-key sshkey                                                                             \
           --extra-vars="@sap-parameters.yaml"                                                              \
-          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_bom_validator.yaml             \
           ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_bom_downloader.yaml            \
+          ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_bom_uploader.yaml              
         ```
