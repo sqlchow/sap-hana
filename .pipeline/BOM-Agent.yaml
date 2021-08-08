@@ -1,7 +1,5 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+
+name: BOM Download
 variables:
 - group: 'BOM Validation'
 trigger:
@@ -21,10 +19,10 @@ steps:
 
 
 - task: Ansible@0
-  displayName: 'Run the BOM Validation for $(BOM)'
+  displayName: 'Run the BOM downloader for $(BOM)'
   inputs:
     ansibleInterface: 'agentMachine'
-    playbookPathOnAgentMachine: $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_validator.yaml'
+    playbookPathOnAgentMachine: $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_downloader.yaml'
     inventoriesAgentMachine: 'noInventory'
     args: '--extra-vars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv) SUser=$(S-Username) SPassword=$(S-Password) sapbits_access_key=$(sapbits-access-key) "'
 
