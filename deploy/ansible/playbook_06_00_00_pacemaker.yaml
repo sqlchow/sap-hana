@@ -75,7 +75,12 @@
           name:     roles-os/1.4-packages                               # Install the HA packages required for pacemaker
     tags:
       - 1.4-packages
-
+      
+  - block:
+      - include_role:
+          name:     roles-os/1.9-kernelparameters                       # Setup the kernel parameters required for pacemaker cluster VMs
+    tags:
+      - 1.9-kernelparameters
 
   - include_role:
       name:     roles-os/1.17-generic-pacemaker                         # Configures the Pacemaker cluster with Azure fence agent 
