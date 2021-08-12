@@ -50,6 +50,14 @@ packages:
       - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
       - { tier: 'sapos', package: 'csh',                                                      state: 'present' }     
       - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
+    #------------------------- Begin - Packages required for Clustering ---------------------------------------8
+      - { tier: 'ha',    package: 'pcs',                                node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'pcs',                                node_tier: 'scs',     state: 'present' }
+      - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'scs',     state: 'present' }
+      - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'scs',     state: 'present' }
+    #------------------------- End - Packages required for Clustering -----------------------------------------8
 
     redhat8:
       - { tier: 'os',    package: '@base',                                                    state: 'present' }
@@ -89,6 +97,16 @@ packages:
       - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
       - { tier: 'sapos', package: 'csh',                                                      state: 'present' }     
       - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
+     #------------------------- Begin - Packages required for Clustering ---------------------------------------8
+      - { tier: 'ha',    package: 'pcs',                                node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'fence-agents-azure-arm',             node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'pcs',                                node_tier: 'scs',     state: 'present' }
+      - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'scs',     state: 'present' }
+      - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'scs',     state: 'present' }
+      - { tier: 'ha',    package: 'fence-agents-azure-arm',             node_tier: 'scs',     state: 'present' }
+    #------------------------- End - Packages required for Clustering -----------------------------------------8
 
     suse12:
       - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
