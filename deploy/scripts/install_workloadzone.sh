@@ -555,14 +555,17 @@ else
         --backend-config "container_name=tfstate" \
         --backend-config "key=${key}.terraform.tfstate"
     else
+        check_output=1
         terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
         --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
         --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
         --backend-config "container_name=tfstate" \
         --backend-config "key=${key}.terraform.tfstate"
-        check_output=1
     fi
-    
+    if [ 0 != $? ]    
+    then
+      exit $?
+    fi
 fi
 
 if [ 1 == $check_output ]
@@ -629,11 +632,24 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform -chdir="${terraform_module_directory}" plan -var-file=${var_file} $tfstate_parameter $deployer_tfstate_key_parameter > plan_output.log
+terraform -chdir="${terraform_module_directory}" plan -no-color -detailed-exitcode  -var-file=${var_file} $tfstate_parameter $deployer_tfstate_key_parameter > plan_output.log
+return_value=$?
+if [ 1 == $return_value ]    
+then
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#                           $boldreduscore  Errors running plan $resetformatting                                   #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    cat plan_output.log
+    exit $?
+fi
+
 
 if [ ! $new_deployment ]
 then
-    if [ grep "No changes" plan_output.log ]
+    if [ 0 == $return_value ]    
     then
         echo ""
         echo "#########################################################################################"
@@ -690,7 +706,7 @@ if [ $ok_to_proceed ]; then
     terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file=${var_file} $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter
 fi
 
-return_value=0
+return_value=$?
 landscape_tfstate_key=${key}.terraform.tfstate
 save_config_var "landscape_tfstate_key" "${workload_config_information}"
 
