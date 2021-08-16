@@ -74,7 +74,7 @@ function missing {
 
 force=0
 
-INPUT_ARGUMENTS=$(getopt -n installer -o p:t:o:hif --longoptions type:,parameterfile:,storageaccountname:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n installer -o p:t:o:d:l:s:hif --longoptions type:,parameterfile:,storageaccountname:,deployer_tfstate_key:,landscape_tfstate_key:,state_subscription:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -88,6 +88,9 @@ do
         -t | --type)                               deployment_system="$2"           ; shift 2 ;;
         -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
         -o | --storageaccountname)                 REMOTE_STATE_SA="$2"             ; shift 2 ;;
+        -s | --state_subscription)                 STATE_SUBSCRIPTION="$2"          ; shift 2 ;;
+        -d | --deployer_tfstate_key)               deployer_tfstate_key="$2"        ; shift 2 ;;
+        -l | --landscape_tfstate_key)              landscape_tfstate_key="$2"       ; shift 2 ;;
         -f | --force)                              force=1                          ; shift ;;
         -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
         -h | --help)                               showhelp
@@ -100,15 +103,18 @@ done
 tfstate_resource_id=""
 tfstate_parameter=""
 
-deployer_tfstate_key=""
 deployer_tfstate_key_parameter=""
 deployer_tfstate_key_exists=false
-landscape_tfstate_key=""
 landscape_tfstate_key_parameter=""
 landscape_tfstate_key_exists=false
 
 parameterfile_name=$(basename "${parameterfile}")
 param_dirname=$(dirname "${parameterfile}")
+
+echo $STATE_SUBSCRIPTION
+echo $deployer_tfstate_key
+echo $landscape_tfstate_key
+
 
 if [ "${param_dirname}" != '.' ]; then
     echo ""
@@ -233,13 +239,33 @@ fi
 if [ -z "$REMOTE_STATE_SA" ];
 then
     load_config_vars "${system_config_information}" "REMOTE_STATE_SA"
+else
+    save_config_vars "${system_config_information}" REMOTE_STATE_SA
 fi
 
 load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
 load_config_vars "${system_config_information}" "tfstate_resource_id"
-load_config_vars "${system_config_information}" "deployer_tfstate_key"
-load_config_vars "${system_config_information}" "landscape_tfstate_key"
-load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+
+if [ -z "$deployer_tfstate_key" ];
+then
+  load_config_vars "${system_config_information}" "deployer_tfstate_key"
+else
+  save_config_vars "${system_config_information}" deployer_tfstate_key
+fi
+
+if [ -z "$landscape_tfstate_key" ];
+then
+  load_config_vars "${system_config_information}" "landscape_tfstate_key"
+else
+  save_config_vars "${system_config_information}" landscape_tfstate_key
+fi
+
+if [ -z "$STATE_SUBSCRIPTION" ];
+then
+  load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+else
+  save_config_vars "${system_config_information}" STATE_SUBSCRIPTION
+fi
 
 echo "Terraform storage " "${REMOTE_STATE_SA}"
 
