@@ -489,13 +489,12 @@ then
     echo "#                                                                                       #"
     echo -e "#                            $boldreduscore!!! Error when Initializing !!!$resetformatting                            #"
     echo "#                                                                                       #"
-    echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
     exit $return_value        
 fi
 
-
+echo "here?"
 if [ 1 == $check_output ]
 then
     terraform -chdir=$terraform_module_directory refresh -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars}
