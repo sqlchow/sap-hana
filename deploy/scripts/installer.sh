@@ -428,15 +428,16 @@ deployment_parameter=""
 version_parameter=""
 if [ ! -d ./.terraform/ ];
 then
+    deployment_parameter=" -var deployment=new "
+
     terraform -chdir="${terraform_module_directory}" init -upgrade=true -force-copy \
     --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
     --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
     --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
     --backend-config "container_name=tfstate" \
     --backend-config "key=${key}.terraform.tfstate"
-    
-    deployment_parameter=" -var deployment=new "
-    
+    return_value=$?
+
 else
     temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
     if [ ! -z "${temp}" ]
@@ -447,6 +448,7 @@ else
         --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
         --backend-config "container_name=tfstate" \
         --backend-config "key=${key}.terraform.tfstate"
+        return_value=$?
         
     else
         echo ""
@@ -469,16 +471,30 @@ else
             ok_to_proceed=true
         fi
         
+        check_output=1
         terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure  \
         --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
         --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
         --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
         --backend-config "container_name=tfstate" \
         --backend-config "key=${key}.terraform.tfstate"
-        check_output=1
+        return_value=$?
         
     fi
 fi
+
+if [ 0 != $return_value ]
+then
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#                            $boldreduscore!!! Error when Initializing !!!$resetformatting                            #"
+    echo "#                                                                                       #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit $return_value        
+fi
+
 
 if [ 1 == $check_output ]
 then
