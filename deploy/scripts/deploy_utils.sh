@@ -116,3 +116,104 @@ function get_and_store_sa_details {
         STATE_SUBSCRIPTION
 
 }
+
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |            Discover the executing user and client                          |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+function set_azure_cloud_environment_variables() {
+    #Description
+    # Find the cloud environment where we are executing.
+    # This is included for future use.
+    
+    echo "[set_azure_cloud_environment_variables]: Identifying the executing cloud environment"    
+    
+    # set the azure cloud environment variables
+    local azure_cloud_environment=''
+
+    unset AZURE_ENVIRONMENT
+
+    # check the azure environment in which we are running
+    AZURE_ENVIRONMENT=$(az cloud show --query name --output tsv)
+
+    if [ -n "${AZURE_ENVIRONMENT}" ]; then
+
+        case $AZURE_ENVIRONMENT in
+            AzureCloud)
+                azure_cloud_environment='public'
+                ;;
+            AzureUSGovernment)
+                azure_cloud_environment='usgov'
+                ;;
+            AzureChinaCloud)
+                azure_cloud_environment='china'
+                ;;
+            AzureGermanCloud)
+                azure_cloud_environment='german'
+                ;;
+            esac
+
+            export AZURE_ENVIRONMENT=${azure_cloud_environment}
+    else
+        echo "[set_azure_cloud_environment_variables]: Unable to determine the Azure cloud environment"
+    fi
+}
+
+function set_executing_user_environment_variables() {
+    
+    local exec_user_type
+    local az_user_name
+    local az_user_obj_id
+    local az_tenant_id
+    
+    echo "[get_executing_user_and_client]: Identifying the executing user and client"
+    
+    set_azure_cloud_environment_variables
+
+    
+    exec_user_type=$(az account show | jq -r .user.type)
+    
+    if [ "${exec_user_type}" == "user" ]; then
+        
+        echo "[get_executing_user_and_client]: Identified login type as 'user'"
+
+        unset ARM_TENANT_ID
+        unset ARM_SUBSCRIPTION_ID
+        unset ARM_CLIENT_ID
+        unset ARM_CLIENT_SECRET
+        unset SCRIPT_TF_aad_app_object_id
+
+        az_tenant_id=$(az account show -o json | jq -r .tenantId)
+        az_user_obj_id=$(az ad signed-in-user show --query objectId -o tsv)
+        az_user_name=$(az ad signed-in-user show --query userPrincipalName -o tsv)
+
+        echo "[get_executing_user_and_client]: logged in user objectID: ${az_user_obj_id} (${az_user_name})"
+        echo "[get_executing_user_and_client]: Initializing state with user: ${az_user_name}"
+    else
+        
+        unset az_user_obj_id
+        
+        #when logged in as a service principal or MSI, username is clientID
+        export clientID=$(az account show --query user.name -o tsv)
+
+        #do we need to get details of the service principal?
+        if [ "${clientID}" == "null" ]; then
+            echo "[get_executing_user_and_client]: unable to identify the executing user and client"
+            return 65      #/* data format error */
+        fi
+
+        case "${clientID}" in
+            "systemAssignedIdentity")
+                echo "[get_executing_user_and_client]: logged in using System Assigned Identity"
+                ;;
+            "userAssignedIdentity")
+                echo "[get_executing_user_and_client]: logged in using User Assigned Identity: ($(az account))"
+                ;;
+            *)
+                echo "[get_executing_user_and_client]: unable to identify the executing user and client"
+                ;;
+        esac
+
+    fi
+}
