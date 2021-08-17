@@ -188,6 +188,7 @@ function set_executing_user_environment_variables() {
         # if you are executing as user, we do not want to set any exports for terraform
         echo -e "\t[set_executing_user_environment_variables]: Identified login type as 'user'"
 
+        echo -e "\t[set_executing_user_environment_variables]: unsetting ARM_* environment variables"
         unset ARM_TENANT_ID
         unset ARM_SUBSCRIPTION_ID
         unset ARM_CLIENT_ID
