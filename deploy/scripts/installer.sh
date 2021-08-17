@@ -91,7 +91,7 @@ do
         -s | --state_subscription)                 STATE_SUBSCRIPTION="$2"          ; shift 2 ;;
         -d | --deployer_tfstate_key)               deployer_tfstate_key="$2"        ; shift 2 ;;
         -l | --landscape_tfstate_key)              landscape_tfstate_key="$2"       ; shift 2 ;;
-        -a | --ado)                                ado=1                            ; shift 2 ;;
+        -a | --ado)                                ado=1                            ; shift ;;
         -f | --force)                              force=1                          ; shift ;;
         -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
         -h | --help)                               showhelp
@@ -551,10 +551,11 @@ then
         else
             version_parameter=" -var terraform_template_version=${deployed_using_version} "
             
+            printf -v val %-.20s "$deployed_using_version"            
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
-            echo -e "# $cyanTerraform templates version:" $deployed_using_version "were used in the deployment$resetformatting "
+            echo -e "#              $cyan Deployed using the Terraform templates version: $val $resetformatting                #"
             echo "#                                                                                       #"
             echo "#########################################################################################"
             echo ""
@@ -566,7 +567,7 @@ fi
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
-echo -e "#                            $cyan Running Terraform plan $resetformatting                                    #"
+echo -e "#                            $cyan Running Terraform plan $resetformatting                                   #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
 echo ""
@@ -590,13 +591,9 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    if [ -f error.log ]
-    then
-        cat error.log
-        rm error.log
-    fi
     if [ -f plan_output.log ]
     then
+        cat plan_output.log
         rm plan_output.log
     fi
     unset TF_DATA_DIR

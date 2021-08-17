@@ -96,7 +96,7 @@ function missing {
 
 show_help=false
 force=0
-INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:k:o:s:c:p:t:av:ifh --longoptions parameterfile:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,vault:,storageaccountname:,ado,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:k:o:s:c:p:t:v:aifh --longoptions parameterfile:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,vault:,storageaccountname:,ado,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   showhelp
@@ -115,7 +115,7 @@ do
     -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
     -v | --vault)                              keyvault="$2"                    ; shift 2 ;;
     -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
-    -a | --ado)                                ado=1                            ; shift 2 ;;
+    -a | --ado)                                called_from_ado=1                ; shift ;;
     -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
     -f | --force)                              force=1                          ; shift ;;
     -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
@@ -307,7 +307,7 @@ then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "# $cyan Changing the subscription to: $STATE_SUBSCRIPTION             $resetformatting      #"
+    echo -e "#       $cyan Changing the subscription to: $STATE_SUBSCRIPTION $resetformatting            #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -613,7 +613,7 @@ then
             echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
             echo "#                                                                                       #"
             echo "#########################################################################################"
-            if [ 1 == $ado ] ; then
+            if [ 1 == $called_from_ado ] ; then
               unset TF_DATA_DIR
               exit 1
             fi
@@ -627,11 +627,11 @@ then
                 exit 1
             fi
         else
-            
+            printf -v val %-.20s "$deployed_using_version"            
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
-            echo "# Terraform templates version:" $deployed_using_version "were used in the deployment "
+            echo -e "#             $cyan Deployed using the Terraform templates version: $val $resetformatting               #"
             echo "#                                                                                       #"
             echo "#########################################################################################"
             echo ""
@@ -696,7 +696,7 @@ then
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
-        if [ 1 == $ado ] ; then
+        if [ 1 == $called_from_ado ] ; then
             unset TF_DATA_DIR
             exit 1
         fi
