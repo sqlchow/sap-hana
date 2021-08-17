@@ -311,7 +311,7 @@ if [ 1 == $return_value ] ; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                          $boldreduscore Errors during the plan phase $resetformatting                                #"    
+    echo -e "#                          $boldreduscore Errors during the plan phase $resetformatting                               #"    
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
