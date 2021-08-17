@@ -74,7 +74,7 @@ function missing {
 
 force=0
 
-INPUT_ARGUMENTS=$(getopt -n installer -o p:t:o:d:l:s:hif --longoptions type:,parameterfile:,storageaccountname:,deployer_tfstate_key:,landscape_tfstate_key:,state_subscription:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n installer -o p:t:o:d:l:s:ahif --longoptions type:,parameterfile:,storageaccountname:,deployer_tfstate_key:,landscape_tfstate_key:,state_subscription:,ado,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -91,6 +91,7 @@ do
         -s | --state_subscription)                 STATE_SUBSCRIPTION="$2"          ; shift 2 ;;
         -d | --deployer_tfstate_key)               deployer_tfstate_key="$2"        ; shift 2 ;;
         -l | --landscape_tfstate_key)              landscape_tfstate_key="$2"       ; shift 2 ;;
+        -a | --ado)                                ado=1                            ; shift 2 ;;
         -f | --force)                              force=1                          ; shift ;;
         -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
         -h | --help)                               showhelp
@@ -386,9 +387,7 @@ then
     fi
 else
     landscape_tfstate_key_parameter=""
-    
 fi
-
 
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 export TF_DATA_DIR="${param_dirname}/.terraform"
@@ -430,11 +429,11 @@ if [ ! -d ./.terraform/ ];
 then
     deployment_parameter=" -var deployment=new "
 
-    terraform -chdir="${terraform_module_directory}" init -upgrade=true -force-copy \
-    --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
-    --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
+    terraform -chdir="${terraform_module_directory}" init      \
+    --backend-config "subscription_id=${STATE_SUBSCRIPTION}"   \
+    --backend-config "resource_group_name=${REMOTE_STATE_RG}"  \
     --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
-    --backend-config "container_name=tfstate" \
+    --backend-config "container_name=tfstate"                  \
     --backend-config "key=${key}.terraform.tfstate"
     return_value=$?
 
@@ -443,10 +442,10 @@ else
     if [ ! -z "${temp}" ]
     then
         terraform -chdir="${terraform_module_directory}" init -upgrade=true -force-copy \
-        --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
-        --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
-        --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
-        --backend-config "container_name=tfstate" \
+        --backend-config "subscription_id=${STATE_SUBSCRIPTION}"                        \
+        --backend-config "resource_group_name=${REMOTE_STATE_RG}"                       \
+        --backend-config "storage_account_name=${REMOTE_STATE_SA}"                      \
+        --backend-config "container_name=tfstate"                                       \
         --backend-config "key=${key}.terraform.tfstate"
         return_value=$?
         
@@ -535,6 +534,11 @@ then
             echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
             echo "#                                                                                       #"
             echo "#########################################################################################"
+
+            if [ 1 == $ado ] ; then
+              unset TF_DATA_DIR
+              exit 1
+            fi
             
             read -p "Do you want to continue Y/N?"  ans
             answer=${ans^^}
@@ -586,8 +590,11 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    cat error.log
-    rm error.log
+    if [ -f error.log ]
+    then
+        cat error.log
+        rm error.log
+    fi
     if [ -f plan_output.log ]
     then
         rm plan_output.log
@@ -631,6 +638,10 @@ if [ 2 == $return_value ] ; then
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
+        if [ 1 == $ado ] ; then
+            unset TF_DATA_DIR
+            exit 1
+        fi
         read -n 1 -r -s -p $'Press enter to continue...\n'
         
         cat plan_output.log
