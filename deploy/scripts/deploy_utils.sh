@@ -122,12 +122,12 @@ function get_and_store_sa_details {
 # |            Discover the executing user and client                          |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
-function set_azure_cloud_environment_variables() {
+function set_azure_cloud_environment() {
     #Description
     # Find the cloud environment where we are executing.
     # This is included for future use.
     
-    echo "[set_azure_cloud_environment_variables]: Identifying the executing cloud environment"    
+    echo -e "\t\t[set_azure_cloud_environment]: Identifying the executing cloud environment"
     
     # set the azure cloud environment variables
     local azure_cloud_environment=''
@@ -156,7 +156,7 @@ function set_azure_cloud_environment_variables() {
 
             export AZURE_ENVIRONMENT=${azure_cloud_environment}
     else
-        echo "[set_azure_cloud_environment_variables]: Unable to determine the Azure cloud environment"
+        echo -e "\t\t[set_azure_cloud_environment]: Unable to determine the Azure cloud environment"
     fi
 }
 
@@ -166,52 +166,53 @@ function set_executing_user_environment_variables() {
     local az_user_name
     local az_user_obj_id
     local az_tenant_id
+    local az_client_id
     
-    echo "[get_executing_user_and_client]: Identifying the executing user and client"
+    echo -e "\t[set_executing_user_environment_variables]: Identifying the executing user and client"
     
-    set_azure_cloud_environment_variables
+    set_azure_cloud_environment
 
-    
     exec_user_type=$(az account show | jq -r .user.type)
+    az_tenant_id=$(az account show -o json | jq -r .tenantId)
     
+    # if you are executing as user, we do not want to set any exports to run Terraform
+    # else, if you are executing as service principal, we need to export the ARM variables
     if [ "${exec_user_type}" == "user" ]; then
-        
-        echo "[get_executing_user_and_client]: Identified login type as 'user'"
+        # if you are executing as user, we do not want to set any exports for terraform
+        echo -e "\t[set_executing_user_environment_variables]: Identified login type as 'user'"
 
         unset ARM_TENANT_ID
         unset ARM_SUBSCRIPTION_ID
         unset ARM_CLIENT_ID
         unset ARM_CLIENT_SECRET
-        unset SCRIPT_TF_aad_app_object_id
 
-        az_tenant_id=$(az account show -o json | jq -r .tenantId)
         az_user_obj_id=$(az ad signed-in-user show --query objectId -o tsv)
         az_user_name=$(az ad signed-in-user show --query userPrincipalName -o tsv)
 
-        echo "[get_executing_user_and_client]: logged in user objectID: ${az_user_obj_id} (${az_user_name})"
-        echo "[get_executing_user_and_client]: Initializing state with user: ${az_user_name}"
+        echo -e "\t[set_executing_user_environment_variables]: logged in user objectID: ${az_user_obj_id} (${az_user_name})"
+        echo -e "\t[set_executing_user_environment_variables]: Initializing state with user: ${az_user_name}"
     else
-        
+        # else, if you are executing as service principal, we need to export the ARM variables
         unset az_user_obj_id
         
         #when logged in as a service principal or MSI, username is clientID
-        export clientID=$(az account show --query user.name -o tsv)
+        az_client_id=$(az account show --query user.name -o tsv)
 
         #do we need to get details of the service principal?
-        if [ "${clientID}" == "null" ]; then
-            echo "[get_executing_user_and_client]: unable to identify the executing user and client"
+        if [ "${az_client_id}" == "null" ]; then
+            echo -e "\t[set_executing_user_environment_variables]: unable to identify the executing user and client"
             return 65      #/* data format error */
         fi
 
-        case "${clientID}" in
+        case "${az_client_id}" in
             "systemAssignedIdentity")
-                echo "[get_executing_user_and_client]: logged in using System Assigned Identity"
+                echo -e "\t[set_executing_user_environment_variables]: logged in using System Assigned Identity"
                 ;;
             "userAssignedIdentity")
-                echo "[get_executing_user_and_client]: logged in using User Assigned Identity: ($(az account))"
+                echo -e "\t[set_executing_user_environment_variables]: logged in using User Assigned Identity: ($(az account))"
                 ;;
             *)
-                echo "[get_executing_user_and_client]: unable to identify the executing user and client"
+                echo -e "\t[set_executing_user_environment_variables]: unable to identify the executing user and client"
                 ;;
         esac
 
