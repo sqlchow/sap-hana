@@ -326,12 +326,15 @@ then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#             $boldred Please login using the service principal credentials! $resetformatting                   #"
+    echo -e "#            $boldred Please login with 'az login' either as yourself or SPN $resetformatting            #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
     exit 67                                                                                             #addressee unknown
 fi
+
+#setting the user environment variables
+set_executing_user_environment_variables
 
 step=0
 load_config_vars "${deployer_config_information}" "step"
