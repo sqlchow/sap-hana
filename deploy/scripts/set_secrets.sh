@@ -240,17 +240,16 @@ if [ -n "${result}" ]; then
     exit 68	#/* name unknown */
 fi
 
-#turn off echo, we do not want to show the details being uploaded to keyvault
-stty -echo
+#turn off output, we do not want to show the details being uploaded to keyvault
 secretname="${environment}"-client-id
 echo -e "\t $cyan Setting secret ${secretname} in keyvault ${keyvault} $resetformatting \n"
-az keyvault secret set --name "${secretname}" --vault-name "${keyvault}" --value "${client_id}"
+az keyvault secret set --name "${secretname}" --vault-name "${keyvault}" --value "${client_id}" --only-show-errors --output none
 
 secretname="${environment}"-tenant-id
 echo -e "\t $cyan Setting secret ${secretname} in keyvault ${keyvault} $resetformatting \n"
-az keyvault secret set --name "${secretname}" --vault-name "${keyvault}" --value "${tenant_id}"
+az keyvault secret set --name "${secretname}" --vault-name "${keyvault}" --value "${tenant_id}" --only-show-errors --output none
 
 secretname="${environment}"-client-secret
 echo -e "\t $cyan Setting secret ${secretname} in keyvault ${keyvault} $resetformatting \n"
-az keyvault secret set --name "${secretname}" --vault-name "${keyvault}" --value "${client_secret}"
-stty echo
+az keyvault secret set --name "${secretname}" --vault-name "${keyvault}" --value "${client_secret}" --only-show-errors --output none
+
