@@ -9,7 +9,7 @@ trigger:
     - beta/*
   paths:
     include:
-    - deploy/ansible/BOM-catalog*
+    - deploy/ansible/BOM-catalog/*.yaml
 
 
 pool:
