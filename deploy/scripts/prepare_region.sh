@@ -326,7 +326,7 @@ then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#            $boldred Please login with 'az login' either as yourself or SPN $resetformatting            #"
+    echo -e "#            $boldred Please login using the service principal credentials! $resetformatting            #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
