@@ -228,7 +228,10 @@ function set_executing_user_environment_variables() {
                 echo -e "\t[set_executing_user_environment_variables]: Initializing state with SPN named: ${az_user_name}"
 
                 if [ -z "$az_client_secret" ]; then
-                    read -r -p "SPN App Password: " az_client_secret
+                    #do not output the secret to screen
+                    stty -echo
+                    read -ers -p "        -> Kindly provide SPN Password: " az_client_secret; echo "********"
+                    stty echo
                 fi
 
                 #export the environment variables
@@ -251,3 +254,14 @@ function set_executing_user_environment_variables() {
 
     fi
 }
+
+function unset_executing_user_environment_variables() {
+    echo -e "\t[unset_executing_user_environment_variables]: unsetting ARM_* environment variables"
+    
+    unset ARM_SUBSCRIPTION_ID
+    unset ARM_TENANT_ID
+    unset ARM_CLIENT_ID
+    unset ARM_CLIENT_SECRET
+
+}
+
