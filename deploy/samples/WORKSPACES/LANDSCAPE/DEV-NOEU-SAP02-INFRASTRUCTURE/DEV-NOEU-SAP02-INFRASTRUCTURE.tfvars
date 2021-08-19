@@ -25,8 +25,8 @@ deployer_tfstate_key  = null
 # The environment value is a mandatory field, it is used for partitioning the environments, for example (PROD and NP)
 environment = "DEV"
 
-# The region valus is a mandatory field, it is used to control where the resources are deployed
-region      = "northeurope"
+# The location valus is a mandatory field, it is used to control where the resources are deployed
+location      = "northeurope"
 
 # RESOURCEGROUP
 # The two resource group name and arm_id can be used to control the naming and the creation of the resource group
