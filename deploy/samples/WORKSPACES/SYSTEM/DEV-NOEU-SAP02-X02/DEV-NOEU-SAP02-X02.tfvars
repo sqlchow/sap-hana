@@ -28,7 +28,7 @@ landscape_tfstate_key = null
 environment = "DEV"
 
 # The region valus is a mandatory field, it is used to control where the resources are deployed
-region      = "westeurope"
+region      = "northeurope"
 
 # RESOURCEGROUP
 # The two resource group name and arm_id can be used to control the naming and the creation of the resource group
@@ -60,7 +60,7 @@ region      = "westeurope"
 # for the brownfield scenario the Azure resource identifier for the subnet must be specified
 
 # The network logical name is mandatory - it is used in the naming convention and should map to the workload virtual network logical name 
-network_name="SAP01"
+network_name="SAP02"
 
 # ADMIN subnet
 # If defined these parameters control the subnet name and the subnet prefix
@@ -224,7 +224,7 @@ database_vm_use_DHCP=true
 #                                                                                       #
 #########################################################################################
 # sid is a mandatory field that defines the SAP Application SID
-sid="X00"
+sid="X02"
 
 #app_tier_vm_sizing="New"
 
@@ -249,7 +249,7 @@ app_tier_use_DHCP=true
 # Application Servers
 
 # application_server_count defines how many application servers to deploy
-application_server_count=3
+application_server_count=2
 
 # application_server_zones is an optional list defining the availability zones to which deploy the application servers
 #application_server_zones=["1","2","3"]
@@ -385,7 +385,7 @@ webdispatcher_server_count=0
 
 # resource_offset can be used to provide an offset for resource naming
 # server#, disk# 
-#resource_offset=1
+resource_offset=1
 
 # vm_disk_encryption_set_id if defined defines the custom encryption key 
 #vm_disk_encryption_set_id=""

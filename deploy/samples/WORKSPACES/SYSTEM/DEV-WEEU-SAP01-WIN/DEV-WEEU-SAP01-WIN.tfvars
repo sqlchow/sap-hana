@@ -224,7 +224,7 @@ database_vm_use_DHCP=true
 #                                                                                       #
 #########################################################################################
 # sid is a mandatory field that defines the SAP Application SID
-sid="X00"
+sid="WIN"
 
 #app_tier_vm_sizing="New"
 
@@ -249,7 +249,7 @@ app_tier_use_DHCP=true
 # Application Servers
 
 # application_server_count defines how many application servers to deploy
-application_server_count=3
+application_server_count=2
 
 # application_server_zones is an optional list defining the availability zones to which deploy the application servers
 #application_server_zones=["1","2","3"]
@@ -274,9 +274,10 @@ application_server_count=3
 application_server_image= {
   os_type=""
   source_image_id=""
-  publisher="SUSE"
-  offer="sles-sap-12-sp5"
-  sku="gen1"
+  offer="windowsserver"
+  publisher= "MicrosoftWindowsServer"
+  sku= "2016-Datacenter-smalldisk"
+  version= "latest"
 }
 
 # SCS Servers
@@ -317,13 +318,14 @@ ers_instance_number="02"
 # The vm_image defines the Virtual machine image to use for the application servers, 
 # if source_image_id is specified the deployment will use the custom image provided, 
 # in this case os_type must also be specified
-#scs_server_image= {
-# os_type=""
-# source_image_id=""
-# publisher="SUSE"
-# offer="sles-sap-12-sp5"
-# sku="gen1"
-#}
+scs_server_image= {
+  os_type=""
+  source_image_id=""
+  offer="windowsserver"
+  publisher= "MicrosoftWindowsServer"
+  sku= "2016-Datacenter-smalldisk"
+  version= "latest"
+}
 
 # Web Dispatchers
 
@@ -385,7 +387,7 @@ webdispatcher_server_count=0
 
 # resource_offset can be used to provide an offset for resource naming
 # server#, disk# 
-#resource_offset=1
+resource_offset=1
 
 # vm_disk_encryption_set_id if defined defines the custom encryption key 
 #vm_disk_encryption_set_id=""
