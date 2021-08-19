@@ -313,8 +313,8 @@ locals {
     local.db_avset_arm_ids_defined ? { avset_arm_ids = local.avset_arm_ids } : null), (
     length(local.dbnodes) > 0 ? { dbnodes = local.dbnodes } : null), (
     length(local.db_zones_temp) > 0 ? { zones = local.db_zones_temp } : null), (
-    length(local.frontend_ip) > 0 ? { loadbalancer = { frontend_ip = local.frontend_ip } } : { loadbalancer = {} })
-    length(local.db_tags) > 0 ? { tags = local.db_tags } : null), (
+    length(local.frontend_ip) > 0 ? { loadbalancer = { frontend_ip = local.frontend_ip } } : { loadbalancer = {} }), (
+    length(local.db_tags) > 0 ? { tags = local.db_tags } : null)
     )
   ]
 
