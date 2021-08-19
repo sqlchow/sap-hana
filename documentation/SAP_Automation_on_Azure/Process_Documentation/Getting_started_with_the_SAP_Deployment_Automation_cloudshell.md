@@ -21,7 +21,9 @@ For the purpose of this document we will talk about two ways of authenticating t
   3. ~~Authenticate to Azure using the Terraform provider block~~ (not recommended, see below)
 
   ``` 
-  🚨❗ The ability to specify your Azure subscription credentials in a Terraform configuration file can be convenient - especially when testing. However, it is not advisable to store credentials in a clear-text file that can be viewed by non-trusted individuals.
+  🚨❗ 
+  The ability to specify your Azure subscription credentials in a Terraform configuration file can be convenient - especially when testing.
+  However, it is not advisable to store credentials in a clear-text file that can be viewed by non-trusted individuals.
   ```
   
   ```
