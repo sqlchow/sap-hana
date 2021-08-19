@@ -281,6 +281,8 @@ fi
 
 curdir=$(pwd)
 
+#we know that we have a valid az session so let us set the environment variables
+set_executing_user_environment_variables
 
 # Deployer
 
