@@ -121,7 +121,7 @@
   block:
     # If there are no repos configured zypper lr will fail with rc == 6
     - name:     Check that zypper repos are registered
-      command:    zypper lr
+      ansible.builtin.command:    zypper lr
       # command/shell actions always report changed even if they are
       # not making any changes; we know this command action doesn't
       # change anything so ensure it doesn't report as changed.

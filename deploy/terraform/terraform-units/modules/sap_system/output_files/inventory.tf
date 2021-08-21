@@ -204,6 +204,7 @@ resource "local_file" "sap-parameters_yml" {
     sapbits       = local.sapbits
     pass          = local.pass
     token         = local.token
+    clst_pass     = local.clst_pass
     }
   )
   filename             = format("%s/sap-parameters.yaml", path.cwd)
@@ -256,9 +257,10 @@ locals {
     trimspace(split(":", strValue)[0]) => trimspace(substr(strValue, length(split(":", strValue)[0]) + 1, -1))
   })
 
-  bom     = lookup(local.itemvalues, "bom_base_name", "")
-  sapbits = lookup(local.itemvalues, "sapbits_location_base_path", "https://?????????.blob.core.windows.net/sapbits")
-  pass    = lookup(local.itemvalues, "password_master", "")
+  bom       = lookup(local.itemvalues, "bom_base_name", "")
+  sapbits   = lookup(local.itemvalues, "sapbits_location_base_path", "https://?????????.blob.core.windows.net/sapbits")
+  pass      = lookup(local.itemvalues, "password_master", "")
+  clst_pass = lookup(local.itemvalues, "password_ha_db_cluster", "")
 
   token    = lookup(local.itemvalues, "sapbits_sas_token", "")
 }

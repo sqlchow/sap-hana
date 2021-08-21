@@ -121,20 +121,32 @@
     az keyvault secret show
       --vault-name {{ kv_uri }}
       --name {{ fencing_spn_client_id }}
-      --debug
   changed_when: false
   register: keyvault_secret_show_fencing_spn_client_id
   no_log: false
   when:
     - tier == "fencing"
 
+- name: "SPN Secrets:  Fencing agent SPN Client ID"
+  ansible.builtin.debug:
+    var:                          keyvault_secret_show_fencing_spn_client_id
+    verbosity:                    1
+  when:
+    - tier == "fencing"
+
+
 - name: "SPN Secrets: Extract Fencing agent SPN Client ID"
   ansible.builtin.set_fact:
     sap_fencing_spn_client_id: >-
       {{ (keyvault_secret_show_fencing_spn_client_id.stdout | from_json).value }}
-  no_log: true
+  no_log: false
   when:
     - tier == "fencing"
+
+- name: "SPN Secrets: Fencing agent SPN Client ID"
+  ansible.builtin.debug:
+    var: sap_fencing_spn_client_id
+    verbosity: 2
 
 - name: Construct SPN Client ID Password name
   ansible.builtin.set_fact:

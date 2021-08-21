@@ -19,7 +19,6 @@
       - "password_ha_db_cluster | trim | length > 0"
 
 - name: Check the required Clustering scripts are available
-  when: ansible_os_family == 'Suse'
   stat:
     path: "{{ item }}"
   loop:
@@ -27,9 +26,10 @@
     - "/usr/sbin/ha-cluster-join"
   register: cluster_scripts_status_results
   failed_when: not cluster_scripts_status_results.stat.exists
+  when: ansible_os_family == 'Suse'
 
 - name: Check if a cluster has already been prepared
-  ansible.builtin.shell "{{ cluster_status_cmd[ansible_os_family] }}"
+  ansible.builtin.shell: "{{ cluster_status_cmd[ansible_os_family] }}"
   register: cluster_existence_check_result
   changed_when: false
   failed_when: false

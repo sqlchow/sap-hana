@@ -4,29 +4,29 @@
 # This file runs common pre-provisioning tasks before the OS specific clustering is performed
 #############################################################################################
 - name: Ensure clustering software is installed
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: present
   loop: "{{ ha_packages[ansible_os_family] | flatten(levels=1) }}"
   when: hdb_size != "LargeInstance"
 
 - name: Ensure systemctl daemon is reloaded
-  ansible.builtin.systemd
+  ansible.builtin.systemd:
     daemon_reload: True
 
 # Configure SSH Keys for inter-node communication as root
 - name: Ensure there are SSH keys for the root user to communicate between nodes
-  ansible.builtin.shell ssh-keygen -b 4096 -t rsa -f /root/.ssh/id_rsa -q -N ""
+  ansible.builtin.shell: ssh-keygen -b 4096 -t rsa -f /root/.ssh/id_rsa -q -N ""
   args:
     creates: /root/.ssh/id_rsa
 
 - name: Ensure there is a public key for the root user SSH key
-  ansible.builtin.shell ssh-keygen -f /root/.ssh/id_rsa -y > /root/.ssh/id_rsa.pub
+  ansible.builtin.shell: ssh-keygen -f /root/.ssh/id_rsa -y > /root/.ssh/id_rsa.pub
   args:
     creates: /root/.ssh/id_rsa.pub
 
 - name: Ensure the Public SSH keys are available for exchanging SSH key trust between nodes
-  ansible.builtin.shell cat /root/.ssh/id_rsa.pub
+  ansible.builtin.shell: cat /root/.ssh/id_rsa.pub
   register: cluster_public_ssh_key
   changed_when: False
 

@@ -49,8 +49,8 @@ packages:
       - { tier: 'sapos', package: 'libatomic',                                                state: 'present' }
       - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
       - { tier: 'sapos', package: 'csh',                                                      state: 'present' }     
-      - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
     #------------------------- Begin - Packages required for Clustering ---------------------------------------8
+      - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
       - { tier: 'ha',    package: 'pcs',                                       node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'pacemaker',                                 node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                                 node_tier: 'hana',    state: 'present' }
@@ -118,9 +118,9 @@ packages:
       - { tier: 'sapos', package: 'compat-sap-c++-*',                                         state: 'present' }
       - { tier: 'sapos', package: 'libatomic',                                                state: 'present' }
       - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
-      - { tier: 'sapos', package: 'csh',                                                      state: 'present' }     
-      - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
+      - { tier: 'sapos', package: 'csh',                                                      state: 'present' }
      #------------------------- Begin - Packages required for Clustering ---------------------------------------8
+      - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
       - { tier: 'ha',    package: 'pcs',                                node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'hana',    state: 'present' }
