@@ -23,7 +23,7 @@
 # Build the list of tasks to be executed in order here. 
 #
 # -------------------------------------+---------------------------------------8
-  - ansible.builtin.set_fact:
+  - set_fact:
       tier:     web                                                             # SAP Install phase: Web Dispatcher
 
   - include_role:

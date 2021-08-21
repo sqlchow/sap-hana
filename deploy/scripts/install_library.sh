@@ -303,13 +303,13 @@ echo ""
 
 if [ -n "${deployer_statefile_foldername}" ]; then
     echo "Deployer folder specified:" "${deployer_statefile_foldername}"
-    terraform -chdir="${terraform_module_directory}" plan -no-color -detailed-exitcode -var-file="${var_file}" -var deployer_statefile_foldername="${deployer_statefile_foldername}" > plan_output.log 2>&1
+    terraform -chdir="${terraform_module_directory}" plan -no-color -var-file="${var_file}" -var deployer_statefile_foldername="${deployer_statefile_foldername}" > plan_output.log 2>&1
 else
-    terraform -chdir="${terraform_module_directory}" plan -no-color -detailed-exitcode -var-file="${var_file}"  > plan_output.log 2>&1
+    terraform -chdir="${terraform_module_directory}" plan -no-color -var-file="${var_file}"  > plan_output.log 2>&1
 fi
+str1=$(grep "Error: KeyVault " plan_output.log)
 
-return_value=$?
-if [ 1 == $return_value ] ; then
+if [ -n "${str1}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -319,7 +319,7 @@ if [ 1 == $return_value ] ; then
     echo ""
     echo $str1
     rm plan_output.log
-    exit $return_value
+    exit -1
 fi
 
 if [ -f plan_output.log ]; then
@@ -342,7 +342,9 @@ else
     terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" 2>error.log
 fi
  
-if [ 0 != $return_value ] ; then
+str1=$(grep "Error: " error.log)
+if [ -n "${str1}" ]
+then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -353,8 +355,9 @@ if [ 0 != $return_value ] ; then
     cat error.log
     rm error.log
     unset TF_DATA_DIR
-    exit $return_value
+    exit -1
 fi
+return_value=-1
 REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
 temp=$(echo "${REMOTE_STATE_SA}" | grep -m1 "Warning")
 if [ -z "${temp}" ]

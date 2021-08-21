@@ -35,7 +35,7 @@
 # -------------------------------------+---------------------------------------8
 
   # Specify the active tier for this playbook run
-  - ansible.builtin.set_fact:
+  - set_fact:
       tier:     os
     tags:
       - always
@@ -104,6 +104,9 @@
       name:     roles-os/1.16-services
 
   - include_role:
+      name:     roles-os/1.16-services
+
+  - include_role:
       name:     roles-os/1.20-prometheus
     tags:
       - 1.20-prometheus
@@ -138,7 +141,7 @@
 # √  pre_tasks:
 # √    - name: Include SAP HANA DB sizes
 # √      include_vars:
-# √        ansible.builtin.file: "{{ configs_path }}/hdb_sizes.json"
+# √        file: "{{ configs_path }}/hdb_sizes.json"
 # √        name: hdb_sizes
 
 #----------------------------------------
@@ -147,6 +150,6 @@
 
 
 
-# # ansible.builtin.debug: Example of listing hostvars for a specific server.
-  # - ansible.builtin.debug:
+# # DEBUG: Example of listing hostvars for a specific server.
+  # - debug:
   #     var: hostvars['x00scs00l373']

@@ -27,7 +27,7 @@
 #
 # -------------------------------------+---------------------------------------8
 
-  - ansible.builtin.set_fact:
+  - set_fact:
       tier:     hdb                                                             # Actions for HANA DB Servers
     tags:
       - always
@@ -77,7 +77,7 @@
 #   pre_tasks:
 #     - name: Include SAP HANA DB sizes
 #       include_vars:
-#         ansible.builtin.file: "{{ configs_path }}/hdb_sizes.json"
+#         file: "{{ configs_path }}/hdb_sizes.json"
 #         name: hdb_sizes
 #   roles:
 #     - role: hdb-server-install

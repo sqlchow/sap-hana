@@ -58,7 +58,7 @@
 #   webadm - SAP admin user for web dispatcher. same as <sid>adm. 
 # 
 - name:       "SAP: Create SAP Users"
-  ansible.builtin.user:
+  user:
     name:         "{{ item.user }}"
     comment:      "{{ item.comment }}"
     uid:          "{{ item.uid }}"

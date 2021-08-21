@@ -31,11 +31,11 @@
 #   pre_tasks:
 #     - name: Include output JSON
 #       include_vars:
-#         ansible.builtin.file: "{{ inventory_dir }}/output.json"
+#         file: "{{ inventory_dir }}/output.json"
 #         name: output
 
 #     - name: Create dictionary with HANA database inforamtion from output.JSON
-#       ansible.builtin.set_fact:
+#       set_fact:
 #         hana_database: "{{ item }}"
 #       loop: "{{ output.databases|flatten(levels=1) }}"
 #       when: item.platform == 'HANA'
@@ -90,7 +90,7 @@
 #   pre_tasks:
 #     - name: Include SAP HANA DB sizes
 #       include_vars:
-#         ansible.builtin.file: "{{ configs_path }}/hdb_sizes.json"
+#         file: "{{ configs_path }}/hdb_sizes.json"
 #         name: hdb_sizes
 #   max_fail_percentage: 0
 #   roles:
@@ -202,7 +202,7 @@
 #   pre_tasks:
 #     - name: Include SAP HANA DB sizes
 #       include_vars:
-#         ansible.builtin.file: "{{ configs_path }}/hdb_sizes.json"
+#         file: "{{ configs_path }}/hdb_sizes.json"
 #         name: hdb_sizes
 #   roles:
 #     - role: hdb-server-install

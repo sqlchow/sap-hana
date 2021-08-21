@@ -405,7 +405,6 @@ variable "webdispatcher_server_no_ppg" {
   default = false
 }
 
-
 variable "webdispatcher_server_image" {
   default = {
     "os_type"         = ""
