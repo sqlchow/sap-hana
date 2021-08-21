@@ -31,7 +31,7 @@
 
 
 - name: "BoM Secrets: Retrieve S User details"
-  command: >-
+  ansible.builtin.command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
       --name "S-Username"
@@ -43,7 +43,7 @@
 
 
 - name: "BoM Secrets: Extract S User secret details"
-  set_fact:
+  ansible.builtin.set_fact:
     SUser: >-
       {{ (keyvault_secret_show_SUser.stdout | from_json).value }}
   no_log: true
@@ -51,7 +51,7 @@
     - tier == "bom"
 
 - name: Show S User
-  debug:
+  ansible.builtin.debug:
     var:                          SUser
     verbosity:                    2  
   when:
@@ -59,7 +59,7 @@
 
 
 - name: "BoM Secrets: Retrieve S Password details"
-  command: >-
+  ansible.builtin.command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
       --name "S-Password"
@@ -70,7 +70,7 @@
     - tier == "bom"
 
 - name: "BoM Secrets: Extract S User Password secret details"
-  set_fact:
+  ansible.builtin.set_fact:
     SPassword: >-
       {{ (keyvault_secret_show_SPassword.stdout | from_json).value }}
   no_log: true
@@ -78,7 +78,7 @@
     - tier == "bom"
 
 - name: "BoM Secrets: Retrieve Access Key details"
-  command: >-
+  ansible.builtin.command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
       --name "sapbits-access-key"
@@ -89,7 +89,7 @@
     - tier == "bom"
 
 - name: "BoM Secrets: Extract S User Password details"
-  set_fact:
+  ansible.builtin.set_fact:
     sapbits_access_key: >-
       {{ (keyvault_secret_show_AccessKey.stdout | from_json).value }}
   no_log: true
@@ -97,7 +97,7 @@
     - tier == "bom"
 
 - name: "BoM Secrets: Retrieve Access Key details"
-  command: >-
+  ansible.builtin.command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
       --name "sapbits-access-key"
@@ -141,7 +141,7 @@
     fencing_spn_pwd: "{{ secret_prefix }}-fencing-spn-pwd"
 
 - name: "BoM Secrets: Retrieve Fencing agent SPN PWD details"
-  command: >-
+  ansible.builtin.command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
       --name {{ fencing_spn_pwd }}
@@ -164,7 +164,7 @@
     fencing_spn_tenant_id: "{{ secret_prefix }}-fencing-spn-tenant"
 
 - name: "BoM Secrets: Retrieve Fencing agent SPN Tenant details"
-  command: >-
+  ansible.builtin.command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
       --name {{ fencing_spn_tenant_id }}
