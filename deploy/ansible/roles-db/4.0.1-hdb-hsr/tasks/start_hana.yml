@@ -12,7 +12,7 @@
 
 - name: Determine if HANA is running
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function GetProcessList
   failed_when: false
@@ -21,14 +21,14 @@
 
 - name: Ensure HANA is running
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function StartWait {{ hana_stop_start_timeout_in_seconds }} {{ hana_stop_start_delay_in_seconds }}
   when: hana_running.rc != 3
 
 - name: Check HANA is running
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function GetProcessList
   changed_when: false

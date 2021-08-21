@@ -45,7 +45,7 @@
     uid:           "{{ item.uid }}"
     group:         "{{ item.group | default(item.name) }}"
     groups:        "{{ item.groups }}"
-    shell:         "{{ item.shell | default('/bin/bash') }}"
+    ansible.builtin.shell         "{{ item.shell | default('/bin/bash') }}"
     password:      "{{ item.password |
                        password_hash('sha512', 'azure/sap-hana',
                                      rounds=10000) }}"

@@ -11,22 +11,22 @@
   when: hdb_size != "LargeInstance"
 
 - name: Ensure systemctl daemon is reloaded
-  systemd:
+  ansible.builtin.systemd
     daemon_reload: True
 
 # Configure SSH Keys for inter-node communication as root
 - name: Ensure there are SSH keys for the root user to communicate between nodes
-  shell: ssh-keygen -b 4096 -t rsa -f /root/.ssh/id_rsa -q -N ""
+  ansible.builtin.shell ssh-keygen -b 4096 -t rsa -f /root/.ssh/id_rsa -q -N ""
   args:
     creates: /root/.ssh/id_rsa
 
 - name: Ensure there is a public key for the root user SSH key
-  shell: ssh-keygen -f /root/.ssh/id_rsa -y > /root/.ssh/id_rsa.pub
+  ansible.builtin.shell ssh-keygen -f /root/.ssh/id_rsa -y > /root/.ssh/id_rsa.pub
   args:
     creates: /root/.ssh/id_rsa.pub
 
 - name: Ensure the Public SSH keys are available for exchanging SSH key trust between nodes
-  shell: cat /root/.ssh/id_rsa.pub
+  ansible.builtin.shell cat /root/.ssh/id_rsa.pub
   register: cluster_public_ssh_key
   changed_when: False
 
@@ -44,7 +44,7 @@
 
 # Set up Hosts entries for the cluster nodes
 - name: Ensure the Primary node hosts entry exists
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/hosts
     state: present
     insertafter: EOF
@@ -52,7 +52,7 @@
     line: "{{ primary_instance.ip_db }} {{ primary_instance.name }}"
 
 - name: Ensure the Secondary node hosts entry exists
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/hosts
     state: present
     insertafter: EOF

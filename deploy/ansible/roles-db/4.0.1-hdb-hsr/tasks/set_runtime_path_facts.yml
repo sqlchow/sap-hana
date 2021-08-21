@@ -2,7 +2,7 @@
 
 - name: Determine runtime value of SAP global path
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     set -o pipefail && grep '^alias cdglo=' ~/.sapenv.sh | sed -e 's/^.* //' -e 's/$SAPSYSTEMNAME/{{ hdb_sid | upper }}/' -e "s/'//"
   register: global_path_status
   changed_when: false
@@ -33,7 +33,7 @@
 
 - name: Ensure the Primary node SSFS files are present on the primary node
   when: ansible_hostname == primary_instance_name
-  block:
+  ansible.builtin.block:
 
     - name: Ensure the Primary node SSFS_{{ hdb_sid | upper }}.DAT file exists
       stat:
@@ -49,11 +49,11 @@
 
 - name: Ensure HANA DB version is checked and captured
   when: ansible_hostname == primary_instance_name
-  block:
+  ansible.builtin.block:
 
     - name: Check HANA DB Version and register
       become_user: "{{ hdb_sid_admin_user }}"
-      shell: /hana/shared/HDB/HDB00/HDB version
+      ansible.builtin.shell /hana/shared/HDB/HDB00/HDB version
       register: hdbversion
       changed_when: false
     - debug:

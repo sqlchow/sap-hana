@@ -31,7 +31,7 @@ admin_users:
     group:        example
     groups:       ["users", "adm"]
     sudoers_role: "admin_no_password"
-    shell:        /bin/bash
+    ansible.builtin.shell        /bin/bash
     password:     "some_password_string"
     state:        present
     tier:         example

@@ -113,7 +113,7 @@
     fencing_spn_client_id: "{{ secret_prefix }}-fencing-spn-id"
 
 - name: "SPN Secrets:  Fencing agent SPN Client ID"
-  debug:
+  ansible.builtin.debug:
     var:                          sap_fencing_spn_client_id
     verbosity:                    1
 

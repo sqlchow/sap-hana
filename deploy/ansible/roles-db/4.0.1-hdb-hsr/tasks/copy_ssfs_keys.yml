@@ -2,7 +2,7 @@
 
 - name: Ensure the Primary node SSFS files are present on the primary node
   when: ansible_hostname == primary_instance_name
-  block:
+  ansible.builtin.block:
 
     - name: Ensure the Primary node SSFS_{{ hdb_hdb_sid | upper }}.DAT file exists
       when: ansible_hostname == primary_instance_name
@@ -39,7 +39,7 @@
 - name: Ensure key files are in place
   # If HSR is already enabled, we don't need to do this
   when: not hana_system_replication_enabled
-  block:
+  ansible.builtin.block:
 
     - name: Ensure {{ path_ssfs_dat }} file is copied
       import_tasks: copy_single_ssfs_key.yml
@@ -53,7 +53,7 @@
 
     - name: Ensure XSA key files are copied if they exist
       when: xsa_installed
-      block:
+      ansible.builtin.block:
 
         - name: Ensure {{ path_xsa_ssfs_dat }} file is copied
           import_tasks: copy_single_ssfs_key.yml

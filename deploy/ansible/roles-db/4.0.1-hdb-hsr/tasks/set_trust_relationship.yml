@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure ssh keys on both nodes
-  block:
+  ansible.builtin.block:
     - name: Check for existence of id_rsa file
       stat:
         path: "~/.ssh/id_rsa"
@@ -16,11 +16,11 @@
 
     - name: Ensure key pair files exist
       when: not (id_rsa_file_status.stat.exists or id_rsa_file_pub_status.stat.exists)
-      shell: >
+      ansible.builtin.shell >
         ssh-keygen -b 4096 -t rsa -f ~/.ssh/id_rsa -q -N ""
 
     - name: Ensure the Public SSH key is stored in a variable
-      shell: cat ~/.ssh/id_rsa.pub
+      ansible.builtin.shell cat ~/.ssh/id_rsa.pub
       register: "public_ssh_key" 
       changed_when: false
 
@@ -38,7 +38,7 @@
 
     - name: Ensure trust relationship is working from primary to secondary
       when: ansible_hostname == primary_instance_name
-      shell: >
+      ansible.builtin.shell >
         ssh -oStrictHostKeyChecking=no {{ secondary_instance_ip_admin }} "hostname -s"
       register: primary_to_secondary_ssh_result
       changed_when: false
@@ -46,7 +46,7 @@
 
     - name: Ensure trust relationship is working from secondary to primary
       when: ansible_hostname == secondary_instance_name
-      shell: >
+      ansible.builtin.shell >
         ssh -oStrictHostKeyChecking=no {{ primary_instance_ip_admin }} "hostname -s"
       register: secondary_to_primary_ssh_result
       changed_when: false

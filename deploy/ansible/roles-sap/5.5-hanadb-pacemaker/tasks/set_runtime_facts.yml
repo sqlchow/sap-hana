@@ -11,7 +11,7 @@
 # ----------------------------------------
 
 - name: " Retrieve Subscription ID and Resource Group Name"
-  shell: curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01" | jq
+  ansible.builtin.shell curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01" | jq
   register: hanavmmetadata
   no_log: false
   changed_when: false
@@ -42,12 +42,12 @@
     secondary_instance_ip_admin: "{{ hostvars[secondary_instance_name]['ansible_eth1']['ipv4']['address'] }}"
 
 - name: "Show Subscription ID"
-  debug:
+  ansible.builtin.debug:
     var: sap_hana_fencing_spn_subscription_id
     verbosity: 2
 
 - name: "Show Resource Group Name"
-  debug:
+  ansible.builtin.debug:
     var: resource_group_name
     verbosity: 2
 

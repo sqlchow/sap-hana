@@ -10,11 +10,21 @@
 
 # Analyse the package list for this distribution selecting only those
 # packages assigned to the active tier or 'all'.
-- name:             Determine packages appropriate for tier
+- name:             "Determine packages appropriate for tier on: {{ distro_id }}"
   ansible.builtin.set_fact:
-    packages_for_tier: "{{ packages[distro_id] |
+    packages_for_tier: "{{ packages[distro_id]  |
                            selectattr('tier', 'in', ['all', tier]) |
                            list }}"
+
+# Analyse the package list for this distribution selecting only those
+# packages assigned to the active tier or 'all'.
+- name:             "Determine packages appropriate for tier on: {{ distro_full_id }}"
+  ansible.builtin.set_fact:
+    packages_for_specific_tier: "{{ packages[distro_full_id]  |
+                           selectattr('tier', 'in', ['all', tier]) |
+                           list }}"
+    when: packages|selectattr(distro_full_id, "defined")|list|length >0
+
 
 # Print list of matching packages if verbosity it 1 or greater
 - ansible.builtin.debug:
@@ -30,6 +40,41 @@
 - name:             "1.4 - Update OS packages: {{ distro_name }}"
   package:
     name:           "{{ packages_for_tier |
+                        selectattr('state', 'equalto', item.state) |
+                        map(attribute='package') |
+                        list }}"
+    state:          "{{ item.state }}"
+  loop:
+    - { state: 'present' }  # First install required packages
+    - { state: 'absent' }   # Then remove packages that we don't want
+
+
+- name:             "1.4 - Update OS packages: {{ distro_name }}"
+  package:
+    name:           "{{ packages_for_tier |
+                        selectattr('state', 'equalto', item.state) |
+                        map(attribute='package') |
+                        list }}"
+    state:          "{{ item.state }}"
+  loop:
+    - { state: 'present' }  # First install required packages
+    - { state: 'absent' }   # Then remove packages that we don't want
+
+- name:             "1.4 - Update OS packages: {{ distro_full_id }}"
+  package:
+    name:           "{{ packages_for_specific_tier |
+                        selectattr('state', 'equalto', item.state) |
+                        map(attribute='package') |
+                        list }}"
+    state:          "{{ item.state }}"
+  loop:
+    - { state: 'present' }  # First install required packages
+    - { state: 'absent' }   # Then remove packages that we don't want
+
+
+- name:             "1.4 - Update OS packages: {{ distro_full_id }}"
+  package:
+    name:           "{{ packages_for_specific_tier |
                         selectattr('state', 'equalto', item.state) |
                         map(attribute='package') |
                         list }}"

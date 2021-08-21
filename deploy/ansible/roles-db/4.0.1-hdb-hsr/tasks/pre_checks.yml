@@ -21,7 +21,7 @@
 
 - name: Check that HANA was installed successfully and is running normally
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function GetProcessList
   register: hana_process_list_result
@@ -30,7 +30,7 @@
 
 - name: Check whether replication has already been set up
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     source ~/.bashrc ;
     {{ hdbnsutil_command }} -sr_state
   register: hana_replication_status
@@ -44,10 +44,10 @@
 - name: Check on the primary node whether installed HANA is single container or multi-container
   # If HSR is already enabled, we cannot read from the secondary node
   when: ansible_hostname == primary_instance_name or not hana_system_replication_enabled
-  block:
+  ansible.builtin.block:
   - name: Check whether HANA has been installed as a single container (no SYSTEMDB)
     become_user: "{{ hdb_sid_admin_user }}"
-    shell: >
+    ansible.builtin.shell >
       source ~/.bashrc ;
       {{ hdbsql_systemdb_command }} "SELECT DATABASE_NAME FROM SYS.M_DATABASES"
     register: hana_container_status
@@ -78,7 +78,7 @@
   # If HSR is already enabled, we cannot read from the secondary node
   when: (ansible_hostname == primary_instance_name) or not hana_system_replication_enabled
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     source ~/.bashrc ;
     {{ hdbsql_systemdb_command }} '{{ dummy_cmd }}'
   changed_when: false
@@ -89,7 +89,7 @@
     - hana_has_tenant_db is defined and hana_has_tenant_db
     - (ansible_hostname == primary_instance_name) or not hana_system_replication_enabled
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     source ~/.bashrc ;
     {{ hdbsql_tenant_command }} '{{ dummy_cmd }}'
   changed_when: false
@@ -98,7 +98,7 @@
   # If HSR is already enabled, we cannot read from the secondary node
   when: (ansible_hostname == primary_instance_name) or not hana_system_replication_enabled
   become_user: "{{ hdb_sid_admin_user }}"
-  shell: >
+  ansible.builtin.shell >
     source ~/.bashrc ;
     {{ hdbsql_systemdb_command }} "{{ get_log_mode_cmd }}"
   register: log_mode_status

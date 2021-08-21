@@ -32,7 +32,7 @@
     group: sapsys
 
 #- name: Prepare Hook as a root - splitted into ansible modules above 
-#  shell: |
+#  ansible.builtin.shell |
 #    mkdir -p /hana/shared/myHooks
 #    cp /usr/share/SAPHanaSR/SAPHanaSR.py /hana/shared/myHooks
 #    chown -R hn1adm:sapsys /hana/shared/myHooks
@@ -44,7 +44,7 @@
   
 
 - name: Adjust global.ini on each cluster node
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /hana/shared/{{ hdb_sid | upper }}/global/hdb/custom/config/ 
     block: |
       [ha_dr_provider_SAPHanaSR]
@@ -77,12 +77,12 @@ EOF
 
 - name: Ensure the Cluster STONITH is configured
   when: inventory_hostname == primary_instance.name
-  block:
+  ansible.builtin.block:
     - name: Ensure maintenance mode is enabled
-      shell: "crm configure property maintenance-mode=true"
+      ansible.builtin.shell "crm configure property maintenance-mode=true"
 
     - name: Ensure CIB Bootstrap Options are set
-      shell: >
+      ansible.builtin.shell >
         crm configure property \$id="cib-bootstrap-options"
         no-quorum-policy="ignore"
         stonith-enabled="true"
@@ -90,19 +90,19 @@ EOF
         stonith-timeout="900s"
 
     - name: Ensure the Resource Defaults are configured
-      shell: >
+      ansible.builtin.shell >
         crm configure rsc_defaults \$id="rsc-options"
         resource-stickiness="1000"
         migration-threshold="5000"
 
     # Operation Default recommendation from section 5.3.1 in https://www.suse.com/media/white-paper/suse_linux_enterprise_server_for_sap_applications_12_sp1.pdf#page=26
     - name: Ensure the Operation Defaults are configured
-      shell: >
+      ansible.builtin.shell >
         crm configure op_defaults \$id="op-options"
         timeout="600"
 
     - name: Ensure SAP HANA Topology resource is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure primitive rsc_SAPHanaTopology_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         ocf:suse:SAPHanaTopology
         operations \$id="rsc_sap2_{{ hdb_sid | upper }}_HDB{{ instance_number }}-operations"
@@ -112,13 +112,13 @@ EOF
         params SID="{{ hdb_sid | upper }}" InstanceNumber="{{ instance_number }}"
 
     - name: Ensure SAP HANA Topology clone set resource is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure clone cln_SAPHanaTopology_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         rsc_SAPHanaTopology_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         meta clone-node-max="1" target-role="Started" interleave="true"
 
     - name: Ensure SAP HANA primitive resource is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure primitive rsc_SAPHana_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         ocf:suse:SAPHana
         operations \$id="rsc_sap_{{ hdb_sid | upper }}_HDB{{ instance_number }}-operations"
@@ -135,14 +135,14 @@ EOF
         AUTOMATED_REGISTER="false"
 
     - name: Ensure SAP HANA master-slave resource is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure ms msl_SAPHana_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         rsc_SAPHana_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         meta notify="true" clone-max="2" clone-node-max="1"
         target-role="Started" interleave="true"
 
     - name: Ensure SAP HANA Virtual IP resource is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure primitive rsc_ip_{{ hdb_sid | upper }}_HDB{{ instance_number }} ocf:heartbeat:IPaddr2
         meta target-role="Started"
         operations \$id="rsc_ip_{{ hdb_sid | upper }}_HDB{{ instance_number }}-operations"
@@ -151,33 +151,33 @@ EOF
 
     # socat is recommended in place of netcat on Azure: https://www.suse.com/support/kb/doc/?id=000019536
     - name: Ensure SAP HANA Heartbeat socat resource is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure primitive rsc_nc_{{ hdb_sid | upper }}_HDB{{ instance_number }} anything
         params binfile="/usr/bin/socat" cmdline_options="-U TCP-LISTEN:625{{ instance_number }},backlog=10,fork,reuseaddr /dev/null"
         op monitor timeout=20s interval=10 depth=0
 
     - name: Ensure Group IP Address resource is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure group g_ip_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         rsc_ip_{{ sid | upper }}_HDB{{ instance_number }}
         rsc_nc_{{ sid | upper }}_HDB{{ instance_number }}
 
     - name: Ensure Co-Location constraint is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure colocation col_saphana_ip_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         4000:
         g_ip_{{ hdb_sid | upper }}_HDB{{ instance_number }}:Started
         msl_SAPHana_{{ hdb_sid | upper }}_HDB{{ instance_number }}:Master
 
     - name: Ensure Resource order is configured
-      shell: >
+      ansible.builtin.shell >
         crm configure order ord_SAPHana_{{ hdb_sid | upper }}_HDB{{ instance_number }}
         Optional:
         cln_SAPHanaTopology_{{ sid | upper }}_HDB{{ instance_number }}
         msl_SAPHana_{{ hdb_sid | upper }}_HDB{{ instance_number }}
 
     - name: Ensure any required cluster resources are cleaned up
-      shell: "crm resource cleanup rsc_SAPHana_{{ hdb_sid | upper }}_HDB{{ instance_number }}"
+      ansible.builtin.shell "crm resource cleanup rsc_SAPHana_{{ hdb_sid | upper }}_HDB{{ instance_number }}"
 
     - name: Ensure maintenance mode is disabled
-      shell: "crm configure property maintenance-mode=false"
+      ansible.builtin.shell "crm configure property maintenance-mode=false"
