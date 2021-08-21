@@ -131,7 +131,7 @@
 #
 # -------------------------------------+---------------------------------------8
 - name: Setup chrony with override settings
-  ansible.builtin.block:
+  block:
     - name:          Remove existing pool or server entries if
                      custom settings not yet applied
       shell: |

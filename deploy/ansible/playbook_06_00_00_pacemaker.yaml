@@ -41,10 +41,6 @@
     - vars/ansible-input-api.yaml                               # API Input template with defaults
 
 
-  #tasks:
-
-  # - name: Test Connection                                     # Simple connection test for troubleshooting
-  #   ping:
 
 
 # -------------------------------------+---------------------------------------8
@@ -84,6 +80,8 @@
 
   - include_role:
       name:     roles-os/1.17-generic-pacemaker                         # Configures the Pacemaker cluster with Azure fence agent 
+    tags:
+      - 1.17-generic-pacemaker
 
   
 #----------------------------------------
