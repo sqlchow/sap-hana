@@ -77,6 +77,10 @@ variable "license_type" {
 
 }
 
+variable "use_loadbalancers_for_standalone_deployments" {
+  description = "Defines if load balancers are used even for standalone deployments"
+  default     = true
+}
 
 locals {
   // Imports database sizing information
@@ -166,8 +170,9 @@ locals {
   db_sid       = lower(substr(local.anydb_platform, 0, 3))
   loadbalancer = try(local.anydb.loadbalancer, {})
 
-  node_count      = try(length(var.databases[0].dbnodes), 1)
+  node_count      = local.enable_deployment ? try(length(var.databases[0].dbnodes), 1) : 0
   db_server_count = local.anydb_ha ? local.node_count * 2 : local.node_count
+  enable_db_lb_deployment = local.db_server_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.db_server_count >  1)
 
   anydb_cred = try(local.anydb.credentials, {})
 
