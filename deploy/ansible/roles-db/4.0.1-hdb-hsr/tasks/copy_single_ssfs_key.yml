@@ -35,4 +35,4 @@
         dest: "{{ ssfs_file_path }}"
         mode: push
         archive: true
-      delegate_to: "{{ primary_instance_ip_admin }}"
+      delegate_to: "{{ primary_instance_ip_db }}"

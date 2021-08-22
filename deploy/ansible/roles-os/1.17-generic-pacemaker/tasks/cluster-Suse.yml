@@ -36,11 +36,11 @@
 #    line: "vm.dirty_background_bytes=314572800"
 #  register: reduce_dirty_cache_2
 
-# eth1 is the "db" NIC
+# eth0 is the "db" NIC
 - name: Ensure clustering can manage Virtual IPs on the Database Interface
   when: ansible_facts.packages['cloud-netconfig-azure'] and (ansible_facts.packages['cloud-netconfig-azure'][0].version | float) < 1.3
   ansible.builtin.lineinfile:
-    path: /etc/sysconfig/network/ifcfg-eth1
+    path: /etc/sysconfig/network/ifcfg-eth0
     state: present
     regexp: "^#?\\s*CLOUD_NETCONFIG_MANAGE="
     line: "CLOUD_NETCONFIG_MANAGE='no'"

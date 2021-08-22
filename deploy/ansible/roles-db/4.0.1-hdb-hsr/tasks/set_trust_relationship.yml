@@ -15,23 +15,29 @@
       failed_when: false
 
     - name: Ensure key pair files exist
-      when: not (id_rsa_file_status.stat.exists or id_rsa_file_pub_status.stat.exists)
       ansible.builtin.shell: >
         ssh-keygen -b 4096 -t rsa -f ~/.ssh/id_rsa -q -N ""
+      when: not (id_rsa_file_status.stat.exists or id_rsa_file_pub_status.stat.exists)
 
     - name: Ensure the Public SSH key is stored in a variable
       ansible.builtin.shell: cat ~/.ssh/id_rsa.pub
       register: "public_ssh_key" 
       changed_when: false
 
+    - name: Show key
+      ansible.builtin.debug:
+        var: public_ssh_key
+        verbosity: 4
+
+
     - name: Ensure the primary node public key is on the secondary node
-      authorized_key:
+      ansible.builtin.authorized_key:
         user: "root"
         key: "{{ hostvars[primary_instance_name].public_ssh_key.stdout }}"
       when: ansible_hostname == secondary_instance_name
 
     - name: Ensure the secondary node public key is on the primary node
-      authorized_key:
+      ansible.builtin.authorized_key:
         user: "root"
         key: "{{ hostvars[secondary_instance_name].public_ssh_key.stdout }}"
       when: ansible_hostname == primary_instance_name
