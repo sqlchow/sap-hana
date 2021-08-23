@@ -24,9 +24,9 @@
       register: "public_ssh_key" 
       changed_when: false
 
-    - name: HSR - Show key
+    - name: "HSR - Show key {{ ansible_hostname }}" 
       ansible.builtin.debug:
-        var: public_ssh_key
+        var: public_ssh_key.stdout
         verbosity: 4
 
 
