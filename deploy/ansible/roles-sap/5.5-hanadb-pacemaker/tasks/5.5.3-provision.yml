@@ -31,12 +31,12 @@
   changed_when: False
 
 - name: Ensure the Primary Node public key is authorized on all nodes, required for crm_clustering
-  authorized_key:
+  ansible.builtin.authorized_key:
     user: root
     key: "{{ hostvars[primary_instance.ip_admin].cluster_public_ssh_key.stdout }}"
 
 - name: Ensure the Secondary Node public key is authorized on all nodes, required for crm_clustering
-  authorized_key:
+  ansible.builtin.authorized_key:
     user: root
     key: "{{ hostvars[secondary_instance.ip_admin].cluster_public_ssh_key.stdout }}"
 
@@ -60,8 +60,8 @@
     line: "{{ secondary_instance.ip_db }} {{ secondary_instance.name }}"
 
 # Clustering commands are based on the Host OS
-- name: Cluster based on OS in VM
-  include_tasks: "cluster-{{ ansible_os_family }}.yml"
+- name: "Cluster based on OS in VM {{ ansible_host }}"
+  include_tasks: "5.5.3.0-cluster-{{ ansible_os_family }}.yml"
   when: hdb_size != "LargeInstance"
 
 - name: Ensure cluster is configured in Large Instance

@@ -67,7 +67,7 @@ EOF
 
 -name: Verify the hook Installation 
  become: {{ hdb_sid }}adm
- shell: |
+ ansible.builtin.shell: |
    cdtrace
    awk '/ha_dr_SAPHanaSR.*crm_attribute/ \
    { printf "%s %s %s %s\n",$2,$3,$5,$16 }' nameserver_*

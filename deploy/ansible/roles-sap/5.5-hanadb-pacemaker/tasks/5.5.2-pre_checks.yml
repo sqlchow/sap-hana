@@ -19,7 +19,7 @@
       - "password_ha_db_cluster | trim | length > 0"
 
 - name: Check the required Clustering scripts are available
-  stat:
+  ansible.builtin.stat:
     path: "{{ item }}"
   loop:
     - "/usr/sbin/ha-cluster-init"

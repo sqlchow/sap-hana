@@ -54,19 +54,12 @@
     tags:
       - always
 
-  - ansible.builtin.set_fact:
+  - name: "Setting the pacemaker facts -DB"
+    ansible.builtin.set_fact:
       primary_instance_name:                     "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
-
-  - ansible.builtin.set_fact:
       secondary_instance_name:                   "{{ ansible_play_hosts_all[1] }}"         # Setting up Secondary Instance Name
-
-  - ansible.builtin.set_fact:
       sap_hana_fencing_spn_client_id:            "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
-
-  - ansible.builtin.set_fact:
       sap_hana_fencing_spn_client_pwd:           "{{ hostvars.localhost.sap_fencing_spn_pwd }}"
-
-  - ansible.builtin.set_fact:
       sap_hana_fencing_spn_tenant_id:            "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
 
   # - block:
@@ -94,8 +87,8 @@
     tags:
       - 1.17-generic-pacemaker
 
-- hosts:          "{{ sap_sid|upper }}_SCS"  
-- hosts:          "{{ sap_sid|upper }}_ERS"  
+- hosts:          "{{ sap_sid|upper }}_SCS  :
+                  {{ sap_sid|upper }}_ERS"  
 
   name:           PACEMAKER - General - Config - Central Services
   remote_user:    "{{ orchestration_ansible_user }}"                
@@ -120,19 +113,12 @@
     tags:
       - always
 
-  - ansible.builtin.set_fact:
+  - name: "Setting the pacemaker facts - SCS"
+    ansible.builtin.set_fact:
       primary_instance_name:                     "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
-
-  - ansible.builtin.set_fact:
       secondary_instance_name:                   "{{ ansible_play_hosts_all[1] }}"         # Setting up Secondary Instance Name
-
-  - ansible.builtin.set_fact:
       sap_hana_fencing_spn_client_id:            "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
-
-  - ansible.builtin.set_fact:
       sap_hana_fencing_spn_client_pwd:           "{{ hostvars.localhost.sap_fencing_spn_pwd }}"
-
-  - ansible.builtin.set_fact:
       sap_hana_fencing_spn_tenant_id:            "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
 
   # - block:
@@ -156,7 +142,7 @@
   - block:
       - include_role:
           name:     roles-os/1.17-generic-pacemaker                         # Configures the Pacemaker cluster with Azure fence agent 
-        when: scs_high_availability == true
+        when: scs_high_availability == true and false                       # Needs more logic
     tags:
       - 1.17-generic-pacemaker
 
