@@ -38,7 +38,7 @@
 
 # Clustering commands are based on the Host OS
 - name: Cluster based on OS in VM
-  include_tasks: "cluster-{{ ansible_os_family }}.yml"
+  include_tasks: "1.17.2.0-cluster-{{ ansible_os_family }}.yml"
   
 
 # HLI not in scope for the MVP release
