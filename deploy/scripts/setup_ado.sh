@@ -42,7 +42,35 @@ if [ $answer == 'Y' ]; then
 fi
 
 
+read -p "Clone the repo? Y/N "  ans
+answer=${ans^^}
+if [ $answer == 'Y' ]; then
 
-cd /home/azureadm/Azure_SAP_Automated_Deployment || exit
+    echo "Cloning the repo"
 
-git -c http.extraHeader="Authorization: Basic ${B64_PAT}" clone https://dev.azure.com/$ORGANIZATION/$PROJECT/_git/$REPONAME WORKSPACES
+    cd /home/azureadm/Azure_SAP_Automated_Deployment || exit
+
+    git -c http.extraHeader="Authorization: Basic ${B64_PAT}" clone https://dev.azure.com/$ORGANIZATION/$PROJECT/_git/$REPONAME WORKSPACES
+fi
+
+
+read -p "Make the VM the Azure DevOps agent? Y/N "  ans
+answer=${ans^^}
+if [ $answer == 'Y' ]; then
+
+    mkdir -p /home/azureadm/agent; cd $_
+
+    wget https://vstsagentpackage.azureedge.net/agent/2.190.0/vsts-agent-linux-x64-2.190.0.tar.gz
+
+    tar zxvf vsts-agent-linux-x64-2.190.0.tar.gz
+
+    ./config.sh
+fi
+
+read -p "Start the agent agent? Y/N "  ans
+answer=${ans^^}
+if [ $answer == 'Y' ]; then
+  sudo ./svc.sh install azureadm
+  sudo ./svc.sh start
+fi
+
