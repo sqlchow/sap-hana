@@ -39,7 +39,7 @@ resource "null_resource" "prepare-deployer" {
       "set -o xtrace",
       "set -o verbose",
       "set -o errexit",
-      
+
       //
       // Make configure_deployer.sh executable and run it
       //
