@@ -54,8 +54,6 @@
     state: absent
   when: reinstall == true 
 
-reinstall:                    false                                                     # Provide a way to override the idempotency flags for SAP tasks
-
 - name:               "SAP DBLOAD Install"
   ansible.builtin.shell: |
                       set -o errexit
