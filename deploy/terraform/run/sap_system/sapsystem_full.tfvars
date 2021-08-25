@@ -102,17 +102,12 @@ sid = "PRD"
 #app_tier_use_DHCP=false
 #app_tier_dual_nics=false
 #app_tier_vm_sizing="New"
+#app_disk_sizes_filename=""
 
 # Application Server
 
 application_server_count = 3
-#application_server_app_nic_ips=[]
-#application_server_app_admin_nic_ips=[]
 #application_server_sku="Standard_D4s_v3"
-#application_server_no_avset=false
-#application_server_no_ppg=false
-#application_server_tags={},
-#application_server_zones=["1","2","3"]
 #application_server_image= {
 #  os_type=""
 #  source_image_id=""
@@ -120,6 +115,14 @@ application_server_count = 3
 #  offer="sles-sap-12-sp5"
 #  sku="gen1"
 #}
+#application_server_zones=["1","2","3"]
+#application_server_app_nic_ips=[]
+#application_server_app_admin_nic_ips=[]
+
+#application_server_no_avset=false
+#application_server_no_ppg=false
+
+#application_server_tags={},
 
 # SCS Server
 
