@@ -225,6 +225,15 @@ required_pkgs=(
     unzip
 )
 
+cli_pkgs=(
+    ca-certificates 
+    curl 
+    apt-transport-https 
+    lsb-release 
+    gnupg    
+)
+
+
 # Include distro version agnostic packages into required packages list
 case "$(get_distro_name)" in
 (ubuntu|sles)
@@ -249,6 +258,10 @@ pkg_mgr_refresh
 
 # Install required packages as determined above
 pkg_mgr_install "$${required_pkgs[@]}"
+
+# Install required packages as determined above
+pkg_mgr_install "$${cli_pkgs[@]}"
+
 
 # Prepare Azure SAP Automated Deployment folder structure
 mkdir -p \
@@ -279,9 +292,6 @@ sudo ln -vfs ../$(basename $${tf_dir})/terraform $${tf_bin}/terraform
 # Install az cli using provided scripting
 #
 
-sudo apt-get update -y
-sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg
-
 curl -sL https://packages.microsoft.com/keys/microsoft.asc |
     gpg --dearmor |
     sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
@@ -290,8 +300,9 @@ AZ_REPO=$(lsb_release -cs)
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
     sudo tee /etc/apt/sources.list.d/azure-cli.list
 
-sudo apt-get update -y
-sudo apt-get install -y azure-cli
+# Install required packages as determined above
+pkg_mgr_install "azure-cli"
+
 
 #
 # Install latest Ansible revision of specified version for all users.
