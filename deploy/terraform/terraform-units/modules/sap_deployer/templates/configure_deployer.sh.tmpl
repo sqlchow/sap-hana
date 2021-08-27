@@ -278,10 +278,9 @@ sudo ln -vfs ../$(basename $${tf_dir})/terraform $${tf_bin}/terraform
 #
 # Install az cli using provided scripting
 #
-#curl -sL https://aka.ms/InstallAzureCLI${pkg_type^} | sudo bash
 
-sudo apt-get update
-sudo apt-get install ca-certificates curl apt-transport-https lsb-release gnupg
+sudo apt-get update -y
+sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg
 
 curl -sL https://packages.microsoft.com/keys/microsoft.asc |
     gpg --dearmor |
@@ -291,8 +290,8 @@ AZ_REPO=$(lsb_release -cs)
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
     sudo tee /etc/apt/sources.list.d/azure-cli.list
 
-sudo apt-get update
-sudo apt-get install azure-cli
+sudo apt-get update -y
+sudo apt-get install -y azure-cli
 
 #
 # Install latest Ansible revision of specified version for all users.
