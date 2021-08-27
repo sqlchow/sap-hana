@@ -110,7 +110,7 @@ function missing {
 
 force=0
 
-INPUT_ARGUMENTS=$(getopt -n prepare_region -o d:l:s:c:p:t:ifh --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n prepare_region -o d:l:s:c:p:t:ifoh --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,only_deployer,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -128,6 +128,7 @@ do
         -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
         -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
         -f | --force)                              force=1                          ; shift ;;
+        -o | --only_deployer)                      only_deployer=1                  ; shift ;;
         -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
         -h | --help)                               showhelp
         exit 3                           ; shift ;;
@@ -415,6 +416,13 @@ else
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
+fi
+
+if [ 1 = "${only_deployer:-}" ]; then
+    load_config_vars "${deployer_config_information}" deployer_public_ip_address
+    echo ""
+    echo -e "Please ${cyan}login${resetformatting} to the deployer node (${boldred}${deployer_public_ip_address}${resetformatting}) and re-run ${boldred}$(basename ${0})${resetformatting} to continue."
+    exit 0
 fi
 
 unset TF_DATA_DIR
