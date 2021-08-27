@@ -175,6 +175,30 @@ pkg_mgr_install()
     esac
 }
 
+pkg_mgr_upgrade()
+{
+    typeset -g pkg_mgr pkg_mgr_upgraded
+
+    if [[ -z "$${pkg_mgr:-}" ]]; then
+        pkg_mgr_init
+    fi
+
+    if [[ -n "$${pkg_mgr_upgraded:-}" ]]; then
+        return
+    fi
+
+    case "$${pkg_mgr}" in
+    (apt-get)
+        sudo $${pkg_mgr} upgrade --quiet --yes
+        ;;
+    (zypper)
+        sudo $${pkg_mgr} --gpg-auto-import-keys --quiet update --yes
+        ;;
+    esac
+
+    pkg_mgr_upgraded=true
+}
+
 #
 # Directories and paths
 #
@@ -231,6 +255,10 @@ cli_pkgs=(
     apt-transport-https 
     lsb-release 
     gnupg    
+)
+
+cli=(
+    azure-cli
 )
 
 
@@ -300,10 +328,11 @@ AZ_REPO=$(lsb_release -cs)
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
     sudo tee /etc/apt/sources.list.d/azure-cli.list
 
-# Install required packages as determined above
-pkg_mgr_install "azure-cli"
+# Install cli package
+pkg_mgr_install "$${cli[@]}"
 
-
+#Upgrade packages
+pkg_mgr_upgrade()
 #
 # Install latest Ansible revision of specified version for all users.
 #

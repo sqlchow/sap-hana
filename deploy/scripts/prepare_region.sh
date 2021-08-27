@@ -364,6 +364,9 @@ if [ 0 == $step ]; then
     
     step=1
     save_config_var "step" "${deployer_config_information}"
+
+
+    cd "$root_dirname" || exit
     
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -380,7 +383,13 @@ if [ 0 == $step ]; then
     
     if [ ! -z ${sshsecret} ]
     then
-        printf "%s\n" "Collecting secrets from KV"
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo -e "#                            $cyan Collecting secrets from KV $resetformatting                               #"
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        echo ""
+
         temp_file=$(mktemp)
         ppk=$(az keyvault secret show --vault-name "${keyvault}" --name "${sshsecret}" | jq -r .value)
         echo "${ppk}" > "${temp_file}"
@@ -389,10 +398,6 @@ if [ 0 == $step ]; then
         remote_deployer_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$deployer_parameter_file")
         remote_library_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$library_parameter_file")
         remote_config_dir="~/.sap_deployment_automation"
-        
-        echo "$remote_deployer_dir"
-        echo "$remote_library_dir"
-        echo "$deployer_parameter_file"
         
         ssh -i "${temp_file}" -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" "mkdir -p ${remote_deployer_dir}"/.terraform
         scp -i "${temp_file}" -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$deployer_parameter_file" azureadm@"${deployer_public_ip_address}":"${remote_deployer_dir}"/.
@@ -422,6 +427,7 @@ if [ 1 = "${only_deployer:-}" ]; then
     load_config_vars "${deployer_config_information}" deployer_public_ip_address
     echo ""
     echo -e "Please ${cyan}login${resetformatting} to the deployer node (${boldred}${deployer_public_ip_address}${resetformatting}) and re-run ${boldred}$(basename ${0})${resetformatting} to continue."
+    unset TF_DATA_DIR
     exit 0
 fi
 
