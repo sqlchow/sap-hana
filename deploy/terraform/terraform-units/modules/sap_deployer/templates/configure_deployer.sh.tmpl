@@ -293,21 +293,18 @@ wget -nv -O /tmp/$${tf_zip} https://releases.hashicorp.com/terraform/$${tfversio
 sudo unzip -o /tmp/$${tf_zip} -d $${tf_dir}
 sudo ln -vfs ../$(basename $${tf_dir})/terraform $${tf_bin}/terraform
 
+rel=$(lsb_release -a | grep Release | cut -d':' -f2 | xargs)
+# Ubuntu 20.04 (Focal Fossa) and 20.10 (Groovy Gorilla) include an azure-cli package with version 2.0.81 provided by the universe repository. 
+# This package is outdated and not recommended. If this package is installed, remove the package
+if [ "$rel" == "20.04" ]; then
+  sudo apt remove azure-cli -y 
+  sudo apt autoremove -y.
+fi
 #
 # Install az cli using provided scripting
 #
 
-curl -sL https://packages.microsoft.com/keys/microsoft.asc |
-    gpg --dearmor |
-    sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
-
-AZ_REPO=$(lsb_release -cs)
-echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
-    sudo tee /etc/apt/sources.list.d/azure-cli.list
-
-# Install cli package
-pkg_mgr_install "$${cli[@]}"
-
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 #
 # Install latest Ansible revision of specified version for all users.
 #
