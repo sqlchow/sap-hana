@@ -226,19 +226,6 @@ required_pkgs=(
     unzip
 )
 
-cli_pkgs=(
-    ca-certificates 
-    curl 
-    apt-transport-https 
-    lsb-release 
-    gnupg    
-)
-
-cli=(
-    azure-cli
-)
-
-
 # Include distro version agnostic packages into required packages list
 case "$(get_distro_name)" in
 (ubuntu|sles)
@@ -263,9 +250,6 @@ pkg_mgr_refresh
 
 # Install required packages as determined above
 pkg_mgr_install "$${required_pkgs[@]}"
-
-# Install required packages as determined above
-pkg_mgr_install "$${cli_pkgs[@]}"
 
 
 # Prepare Azure SAP Automated Deployment folder structure
@@ -304,7 +288,7 @@ fi
 # Install az cli using provided scripting
 #
 
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+curl -sL https://aka.ms/InstallAzureCLI${pkg_type^} | sudo bash  </dev/null
 #
 # Install latest Ansible revision of specified version for all users.
 #
