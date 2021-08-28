@@ -315,22 +315,19 @@ rel=$(lsb_release -a | grep Release | cut -d':' -f2 | xargs)
 # Ubuntu 20.04 (Focal Fossa) and 20.10 (Groovy Gorilla) include an azure-cli package with version 2.0.81 provided by the universe repository. 
 # This package is outdated and not recommended. If this package is installed, remove the package
 if [ "$rel" == "20.04" ]; then
+  echo "Removing Azure CLI"
   sudo apt remove azure-cli -y 
   sudo apt autoremove -y
+  sudo apt update -y
 fi
 #
 # Install az cli using provided scripting
 #
 
-curl -sL https://packages.microsoft.com/keys/microsoft.asc |
-    gpg --dearmor |
-    sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash > /dev/null
 
 # Ensure our package metadata cache is up to date
 pkg_mgr_refresh
-
-# Install required packages as determined above
-pkg_mgr_install "$${cli_pkgs[@]}"
 
 pkg_mgr_upgrade
 
