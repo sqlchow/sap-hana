@@ -633,6 +633,9 @@ if [ 5 == $step ]; then
             
             
         fi
+    else
+        step=3
+        save_config_var "step" ${deployer_config_information}
     fi
 fi
 unset TF_DATA_DIR
