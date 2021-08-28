@@ -159,6 +159,31 @@ pkg_mgr_refresh()
     pkg_mgr_refreshed=true
 }
 
+
+pkg_mgr_upgrade()
+{
+    typeset -g pkg_mgr pkg_mgr_upgraded
+
+    if [[ -z "$${pkg_mgr:-}" ]]; then
+        pkg_mgr_init
+    fi
+
+    if [[ -n "$${pkg_mgr_upgraded:-}" ]]; then
+        return
+    fi
+
+    case "$${pkg_mgr}" in
+    (apt-get)
+        sudo $${pkg_mgr} upgrade --quiet
+        ;;
+    (zypper)
+        sudo $${pkg_mgr} --gpg-auto-import-keys --quiet upgrade 
+        ;;
+    esac
+
+    pkg_mgr_upgraded=true
+}
+
 pkg_mgr_install()
 {
     typeset -g pkg_mgr
@@ -224,6 +249,15 @@ esac
 required_pkgs=(
     jq
     unzip
+    ca-certificates
+    curl
+    apt-transport-https
+    lsb-release
+    gnupg
+)
+
+cli_pkgs=(
+    azure-cli
 )
 
 # Include distro version agnostic packages into required packages list
@@ -288,7 +322,18 @@ fi
 # Install az cli using provided scripting
 #
 
-curl -sL https://aka.ms/InstallAzureCLI${pkg_type^} | sudo bash  </dev/null
+curl -sL https://packages.microsoft.com/keys/microsoft.asc |
+    gpg --dearmor |
+    sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+
+# Ensure our package metadata cache is up to date
+pkg_mgr_refresh
+
+# Install required packages as determined above
+pkg_mgr_install "$${cli_pkgs[@]}"
+
+pkg_mgr_upgrade
+
 #
 # Install latest Ansible revision of specified version for all users.
 #
