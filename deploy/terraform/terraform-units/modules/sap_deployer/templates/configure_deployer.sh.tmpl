@@ -174,7 +174,7 @@ pkg_mgr_upgrade()
 
     case "$${pkg_mgr}" in
     (apt-get)
-        sudo $${pkg_mgr} upgrade --quiet
+        sudo $${pkg_mgr} upgrade --quiet -y
         ;;
     (zypper)
         sudo $${pkg_mgr} --gpg-auto-import-keys --quiet upgrade 
