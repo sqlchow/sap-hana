@@ -74,7 +74,7 @@ resource "azurerm_role_definition" "fencing_role" {
 ## Fencing agent
 
 resource "azurerm_key_vault_secret" "fencing_spn_id" {
-  provider     = azurerm.deployer
+  provider     = azurerm.main
   count        = var.create_spn ? 0 : 0
   content_type = ""
   name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.fencing_agent_id), "/[^A-Za-z0-9-]/", "")
@@ -83,7 +83,7 @@ resource "azurerm_key_vault_secret" "fencing_spn_id" {
 }
 
 resource "azurerm_key_vault_secret" "fencing_agent_pwd" {
-  provider     = azurerm.deployer
+  provider     = azurerm.main
   count        = var.create_spn ? 0 : 0
   content_type = ""
   name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.fencing_agent_pwd), "/[^A-Za-z0-9-]/", "")
@@ -92,7 +92,7 @@ resource "azurerm_key_vault_secret" "fencing_agent_pwd" {
 }
 
 resource "azurerm_key_vault_secret" "fencing_agent_tenant" {
-  provider     = azurerm.deployer
+  provider     = azurerm.main
   count        = var.create_spn ? 1 : 0
   content_type = ""
   name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.fencing_agent_tenant), "/[^A-Za-z0-9-]/", "")
@@ -101,7 +101,7 @@ resource "azurerm_key_vault_secret" "fencing_agent_tenant" {
 }
 
 resource "azurerm_key_vault_secret" "fencing_agent_sub" {
-  provider     = azurerm.deployer
+  provider     = azurerm.main
   count        = var.create_spn ? 1 : 0
   content_type = ""
   name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.fencing_agent_sub), "/[^A-Za-z0-9-]/", "")
