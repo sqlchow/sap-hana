@@ -19,6 +19,18 @@ variable "use_deployer" {
   description = "Use the deployer"
 }
 
+variable "ANF_settings" {
+  description = "ANF settings"
+  default = {
+    use    = false
+    name   = ""
+    arm_id = ""
+    service_level = "Standard"
+    size_in_tb    = 4
+
+  }
+}
+  
 variable "create_spn" {
   description = "Flag controlling the Fencing SPN creation"
 }
