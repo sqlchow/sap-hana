@@ -34,12 +34,6 @@ provider "azuread" {
   tenant_id     = local.spn.tenant_id
 }
 
-provider "azuread" {
-  client_id     = null
-  client_secret = null
-  tenant_id     = local.spn.tenant_id
-  alias         = "fencing"
-}
 
 terraform {
   required_version = ">= 0.14"
