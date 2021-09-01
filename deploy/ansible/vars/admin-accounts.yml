@@ -56,6 +56,7 @@ admin_users:
     uid:          "{{ sapadm_uid }}"
     group:        sapsys
     groups:       ["sapsys"]
+    password:     "some_password_string"
     sudoers_role: "admin_no_password"
     shell:        /bin/csh
     state:        present
@@ -68,11 +69,12 @@ admin_users:
     uid:          "{{ sidadm_uid }}"
     group:        sapsys
     groups:       ["sapsys"]
+    password:     "some_password_string"
     sudoers_role: "admin_no_password"
     shell:        /bin/csh
     state:        present
     tier:         sapos
-    node_tier:    [scs, pas, ers, app]
+    node_tier:    all
     enabled:      true
 
   - name:         "{{ hdb_sid|lower }}adm"
@@ -80,10 +82,11 @@ admin_users:
     uid:          "{{ hdbadm_uid }}"
     group:        sapsys
     groups:       ["sapsys"]
+    password:     "some_password_string"
     sudoers_role: "admin_no_password"
     shell:        /bin/csh
     state:        present
     tier:         sapos
-    node_tier:    hana
+    node_tier:    all
     enabled:      true
 
