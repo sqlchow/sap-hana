@@ -17,18 +17,27 @@ admin_groups:
     tier:         example
     enabled:      true
     node_tier:    none
+  
   - name:         sapsys
     gid:          "{{ sapsys_gid }}"
     state:        present
     tier:         sapos
     enabled:      true
     node_tier:    all
+  
   - name:         sapinst
     gid:          "2001"
     state:        present
     tier:         sapos
     enabled:      true
     node_tier:    all
+  
+  - name:         "{{ hdb_sid|lower }}shm"
+    gid:          "{{ hdbshm_gid }}"
+    state:        present
+    tier:         sapos
+    enabled:      true
+    node_tier:    hana
 
 # -------------------------------------+---------------------------------------8
 #
@@ -68,7 +77,7 @@ admin_users:
     comment:      "SAP System Administrator"
     uid:          "{{ sidadm_uid }}"
     group:        sapsys
-    groups:       ["sapsys"]
+    groups:       [""]
     sudoers_role: "admin_no_password"
     shell:        /bin/csh
     password:     "{{ password_master }}"
@@ -81,7 +90,7 @@ admin_users:
     comment:      "SAP HANA Database System Administrator"
     uid:          "{{ hdbadm_uid }}"
     group:        sapsys
-    groups:       ["sapsys"]
+    groups:       ["sapinst", "{{ hdb_sid|lower }}shm"]
     sudoers_role: "admin_no_password"
     shell:        /bin/csh
     password:     "{{ password_master }}"
