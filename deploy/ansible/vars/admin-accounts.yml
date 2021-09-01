@@ -70,6 +70,7 @@ admin_users:
     groups:       ["sapsys"]
     sudoers_role: "admin_no_password"
     shell:        /bin/csh
+    password:     "{{ password_master }}"
     state:        present
     tier:         sapos
     node_tier:    [scs, pas, ers, app]
@@ -82,6 +83,7 @@ admin_users:
     groups:       ["sapsys"]
     sudoers_role: "admin_no_password"
     shell:        /bin/csh
+    password:     "{{ password_master }}"
     state:        present
     tier:         sapos
     node_tier:    hana
