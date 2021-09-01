@@ -58,6 +58,7 @@ admin_users:
     groups:       ["sapsys"]
     sudoers_role: "admin_no_password"
     shell:        /bin/csh
+    password:     "{{ password_master }}"
     state:        present
     tier:         sapos
     node_tier:    all
@@ -73,7 +74,7 @@ admin_users:
     password:     "{{ password_master }}"
     state:        present
     tier:         sapos
-    node_tier:    [scs, pas, ers, app]
+    node_tier:    all
     enabled:      true
 
   - name:         "{{ hdb_sid|lower }}adm"
