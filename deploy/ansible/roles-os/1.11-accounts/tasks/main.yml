@@ -47,7 +47,6 @@
     group:         "{{ item.group | default(item.name) }}"
     groups:        "{{ item.groups }}"
     shell:         "{{ item.shell | default('/bin/bash') }}"
-    append:        yes
     create_home:   yes
     home:          "/home/{{ item.name }}"
     password:      "{{ item.password |
