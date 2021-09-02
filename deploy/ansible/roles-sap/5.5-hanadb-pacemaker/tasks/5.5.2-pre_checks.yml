@@ -1,16 +1,5 @@
 ---
 
-- name: Check the fencing agent configuration variables are set
-  assert:
-    that:
-      - "sap_hana_fencing_spn_subscription_id is defined"
-      - "sap_hana_fencing_spn_subscription_id | trim | length > 0"
-      - "sap_hana_fencing_spn_tenant_id is defined"
-      - "sap_hana_fencing_spn_tenant_id | trim | length > 0"
-      - "sap_hana_fencing_spn_client_id is defined"
-      - "sap_hana_fencing_spn_client_id | trim | length > 0"
-      - "sap_hana_fencing_spn_client_pwd is defined"
-      - "sap_hana_fencing_spn_client_pwd | trim | length > 0"
 
 - name: Check the required cluster password is set
   assert:

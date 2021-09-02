@@ -127,6 +127,7 @@ packages:
       - { tier: 'ha',    package: 'resource-agents>=4.3',               node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'fence-agents>=4.4.0',                node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'cloud-netconfig-azure>=1.3',         node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'SAPHanaSR>=0.153',                   node_tier: 'hana',    state: 'present' }
     #Assumption: Public_Cloud_Module_x86_64 already available 
       - { tier: 'ha',    package: 'python-azure-mgmt-compute=4.6.2',    node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'python-azure-mgmt-compute=4.6.2',    node_tier: 'scs',     state: 'present' }
@@ -148,11 +149,12 @@ packages:
       - { tier: 'sapos', package: 'libatomic1',                                               state: 'present' }
       - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
     #----------------------- Begin - Packages required for Clustering -------------------------------------8
-      - { tier: 'ha',    package: 'socat',                                                    state: 'present' }
+      - { tier: 'ha',    package: 'socat',                                                          state: 'present' }
       - { tier: 'ha',    package: 'corosync',                           node_tier: 'hana',          state: 'present' }
       - { tier: 'ha',    package: 'resource-agents>=4.3',               node_tier: 'hana',          state: 'present' }
       - { tier: 'ha',    package: 'fence-agents>=4.4.0',                node_tier: 'hana',          state: 'present' }
       - { tier: 'ha',    package: 'cloud-netconfig-azure>=1.3',         node_tier: 'hana',          state: 'present' }
+      - { tier: 'ha',    package: 'SAPHanaSR>=0.153',                   node_tier: 'hana',          state: 'present' }
     #Assumption: Public_Cloud_Module_x86_64 already available 
       - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',   node_tier: 'hana',          state: 'present' }
       - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',   node_tier: 'scs',           state: 'present' }
