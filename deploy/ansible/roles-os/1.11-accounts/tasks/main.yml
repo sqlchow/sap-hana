@@ -53,6 +53,7 @@
     password:      "{{ item.password |
                       password_hash('sha512') }}"
     state:         "{{ item.state | default('present') }}"
+    append:        yes
   loop:            "{{ admin_users }}"
   loop_control:
     label:         "{{ item.name }}"
@@ -81,7 +82,11 @@
   when:
     -              item.enabled | bool
     -              item.tier in ["all", tier]
+<<<<<<< HEAD
     -              item.node_tier == "all" or node_tier in item.node_tier
+=======
+    -              item.node_tier in ["all", node_tier]
+>>>>>>> b2b17aaa2e9322ff8e6305acc42bbbb41b950622
 
 # Remove groups after user action has removed the users that may have
 # referenced them
@@ -95,5 +100,9 @@
   when:
     -              item.enabled | bool
     -              item.tier in ["all", tier]
+<<<<<<< HEAD
     -              item.node_tier == "all" or node_tier in item.node_tier
+=======
+    -              item.node_tier in ["all", node_tier]
+>>>>>>> b2b17aaa2e9322ff8e6305acc42bbbb41b950622
     -              (item.state | default('present')) == "absent"
