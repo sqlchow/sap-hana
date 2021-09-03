@@ -38,12 +38,13 @@ pas_instance_number:          "00"
 password_hana_system:         ""
 password_master:              ""                                                        # SAP Install
 sap_fqdn:                     ""                                                        # SAP Install
-sapadm_uid:                   2100
 sapinst_gid:                  2001
 sapsys_gid:                   2000
 scs_hostname:                 ""
 scs_instance_number:          "00"                                                      # SAP Install
 sidadm_uid:                   2000
+sapadm_uid:                   2100
+hdbadm_uid:                   2200
 scs_lb_ip:                    ""                                                        # SAP HA   
 db_lb_ip:                     ""                                                        # SAP HA
 

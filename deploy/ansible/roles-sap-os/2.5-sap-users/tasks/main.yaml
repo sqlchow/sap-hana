@@ -63,6 +63,7 @@
     comment:      "{{ item.comment }}"
     uid:          "{{ item.uid }}"
     group:        "{{ item.group }}"
+    password:     "{{ password_master |  password_hash('sha512', ( 65534 | random(seed=inventory_hostname) | string )) }}"
     append:       no
     shell:        /bin/csh
     create_home:  yes
@@ -72,6 +73,7 @@
     - { tier: 'scs',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
     - { tier: 'pas',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
     - { tier: 'app',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    - { tier: 'hdb',         user: '{{ hdb_sid | lower }}adm', uid: '{{ hdbadm_uid }}', group: 'sapsys', home: '/home/{{ hdb_sid|lower }}adm', comment: 'SAP {{ hdb_sid|upper }} Admin' }
     # TODO: add user for WebDisp Functionality
     # - { tier: 'WEB',         user: 'webadm',                   uid: '32002',            group: 'sapsys', home: '/home/webadm',                 comment: 'SAP WebDisp Admin' }
   when:     item.tier == "all" or

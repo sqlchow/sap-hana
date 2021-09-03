@@ -30,6 +30,17 @@
     tags:
       - always
 
+# -------------------------------------+---------------------------------------8
+# Role: 2.5-sap-users
+#
+# Description: Create Users for SAP
+#              Create Users for SAP
+#
+  - include_role:
+      name:     roles-sap-os/2.5-sap-users
+    
+# -------------------------------------+---------------------------------------8
+
   - include_role:
       name:     roles-sap/5.0.0-scs-install
 
