@@ -54,6 +54,7 @@ packages:
       - { tier: 'ha',    package: 'pcs',                                node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'resource-agents-sap-hana',           node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'pcs',                                node_tier: 'scs',     state: 'present' }
       - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'scs',     state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'scs',     state: 'present' }
@@ -102,6 +103,7 @@ packages:
       - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'fence-agents-azure-arm',             node_tier: 'hana',    state: 'present' }
+      - { tier: 'ha',    package: 'resource-agents-sap-hana',           node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'pcs',                                node_tier: 'scs',     state: 'present' }
       - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'scs',     state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'scs',     state: 'present' }
