@@ -69,6 +69,10 @@
   ansible.builtin.shell: |
                       set -o errexit
                       export TMPDIR=/usr/sap/install
+                      chmod -R ug+rwx /usr/sap/install
+                      setfacl -R -d -m g:sapinst:rwx /usr/sap/install
+                      setfacl -R -d -m u:{{ sap_sid|lower }}adm:rwx /usr/sap/install
+                      setfacl -R -d -m o::rwx /usr/sap/install
                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.app }}                          \
                                 SAPINST_SKIP_DIALOGS=true                                                     \
