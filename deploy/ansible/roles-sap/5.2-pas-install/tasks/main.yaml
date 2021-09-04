@@ -59,7 +59,11 @@
                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.pas }}                          \
                                 SAPINST_SKIP_DIALOGS=true                                                     \
-                                SAPINST_START_GUISERVER=false
+                                SAPINST_START_GUISERVER=false                                                 \
+                                SAPINST_REMOTE_ACCESS_USER={{ sap_sid | lower}}adm                            \
+                                SAPINST_REMOTE_ACCESS_USER_IS_TRUSTED=true                                    \
+                                SAPINST_SKIP_ERRORSTEP=true                                                   \
+                                SAPINST_CWD=/usr/sap/install/SWPM                                             
                       touch /etc/sap_deployment_automation/sap_deployment_pas.txt
   args:
     chdir:            /usr/sap/install/SWPM
