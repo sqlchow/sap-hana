@@ -64,6 +64,15 @@
     state: absent
   when: reinstall == true 
 
+- name: SAP Application install variables
+  debug:
+    msg: "{{ sap_inifile }}"
+    verbosity: 2
+
+- name: SAP Application install variables
+  debug:
+    msg: "{{ bom.product_ids.app }}"
+    verbosity: 2
 
 - name:               "SAP APP Install"
   ansible.builtin.shell: |
