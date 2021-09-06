@@ -10,6 +10,15 @@
 # settings to be used when creating/managing admin groups
 # -------------------------------------+---------------------------------------8
 
+# Create User Groups for SAP:
+#   sapsys - once defined, typically remains constant across all systems. Used
+#   for file access in shared directories between SID's.
+#
+#   sapinst - typically only used durring install, and removed after. Potentially
+#   can be depracated. 
+# 
+
+
 admin_groups:
   - name:         example
     gid:          "2000"
