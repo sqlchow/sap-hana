@@ -138,6 +138,8 @@
     EOF
     ```
     <br/>
+    
+    For a deployment to *westeurope* use this:
 
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE; cd $_
@@ -190,7 +192,9 @@
     EOF
     ```
     <br/>
-
+    
+    For a deployment to *westeurope* use this:
+    
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/DEMO-WEEU-SAP_LIBRARY; cd $_
 
@@ -227,7 +231,8 @@
     ```
 
     <br/>
-
+    For a deployment to *westeurope* use this:
+    
     ```bash
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh --parameterfile DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE/DEMO-WEEU-DEP00-INFRASTRUCTURE.json \
                                                        --type sap_deployer
@@ -244,6 +249,8 @@
         --auto-approve
     ```
     <br/>
+    For a deployment to *westeurope* use this:
+
     ```bash
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                   \
         --deployer_parameter_file DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE/DEMO-WEEU-DEP00-INFRASTRUCTURE.json  \
@@ -271,6 +278,8 @@
         --tenant_id ttttttttt-tttt-tttt-tttt-ttttttttttt                                                       \
         --auto-approve
     ```
+
+For a deployment to *westeurope* use this:
     
         ```bash
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                   \
