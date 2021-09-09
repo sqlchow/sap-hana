@@ -51,45 +51,24 @@
 
 # Basic Pacemaker cluster configuration:
 # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/cluster-RedHat.yml
-- name: Create the cluster on the primary node
-  when: ansible_hostname == primary_instance_name 
-=======
 - name: "Create the cluster on the primary node: {{ primary_instance_name }}" 
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/1.17.2.0-cluster-RedHat.yml
   block:
     - name: Ensure the cluster can authenticate nodes as hacluster
       ansible.builtin.shell: "pcs cluster auth {{ primary_instance_name }} {{ secondary_instance_name }} -u hacluster -p {{ password_ha_db_cluster }}"
       when: ansible_distribution_major_version == "7"
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/cluster-RedHat.yml
-      shell: "pcs cluster auth {{ primary_instance_name }} {{ secondary_instance_name }} -u hacluster -p {{ password_ha_db_cluster }}"
-=======
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/1.17.2.0-cluster-RedHat.yml
     
     - name: Ensure the cluster can authenticate nodes as hacluster
       ansible.builtin.shell: "pcs host auth {{ primary_instance_name }} {{ secondary_instance_name }} -u hacluster -p {{ password_ha_db_cluster }}"
       when: ansible_distribution_major_version == "8"
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/cluster-RedHat.yml
-      shell: "pcs host auth {{ primary_instance_name }} {{ secondary_instance_name }} -u hacluster -p {{ password_ha_db_cluster }}"
-=======
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/1.17.2.0-cluster-RedHat.yml
 
     # Ref https://docs.microsoft.com/en-us/azure/virtual-machines/maintenance-and-updates#maintenance-that-doesnt-require-a-reboot
     - name: Ensure the cluster is created with a token large enough to allow memory preserving maintenance
       ansible.builtin.shell: "pcs cluster setup --name {{ hdb_sid | upper }}_cluster {{ primary_instance_name }} {{ secondary_instance_name }} --token {{ cluster_totem.token }}"
       when: ansible_distribution_major_version == "7"
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/cluster-RedHat.yml
-      shell: "pcs cluster setup --name {{ hdb_sid | upper }}_cluster {{ primary_instance_name }} {{ secondary_instance_name }} --token {{ cluster_totem.token }}"
-=======
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/1.17.2.0-cluster-RedHat.yml
 
     - name: Ensure the cluster is created with a token large enough to allow memory preserving maintenance
       ansible.builtin.shell: "pcs cluster setup {{ hdb_sid | upper }}_cluster {{ primary_instance_name }} {{ secondary_instance_name }} totem token={{ cluster_totem.token }}"
       when: ansible_distribution_major_version == "8"
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/cluster-RedHat.yml
-      shell: "pcs cluster setup {{ hdb_sid | upper }}_cluster {{ primary_instance_name }} {{ secondary_instance_name }} totem token {{ cluster_totem.token }}"
-=======
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/1.17.2.0-cluster-RedHat.yml
 
     - name: Ensure the cluster is starting on all nodes
       ansible.builtin.shell: pcs cluster start --all
@@ -100,9 +79,6 @@
       retries: 30
       delay: 10
       until: "'{{ primary_instance_name }} {{ secondary_instance_name }}' in cluster_stable_check.stdout or '{{ secondary_instance_name }} {{ primary_instance_name }}' in cluster_stable_check.stdout"
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/cluster-RedHat.yml
-    
-=======
       when: ansible_distribution_major_version != "8"
 
     - name: Wait until cluster has stabilised
@@ -113,7 +89,6 @@
       until: "'{{ primary_instance_name }} {{ secondary_instance_name }}' in cluster_stable_check.stdout or '{{ secondary_instance_name }} {{ primary_instance_name }}' in cluster_stable_check.stdout"
       when: ansible_distribution_major_version == "8"
 
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/1.17.2.0-cluster-RedHat.yml
     - name: Allow Concurrent Fencing 
       ansible.builtin.shell: pcs property set concurrent-fencing=true
   when: ansible_hostname == primary_instance_name 
@@ -122,10 +97,6 @@
   ansible.builtin.shell: "pcs quorum expected-votes {{ cluster_quorum.expected_votes }}"
 
 - name: Configure the cluster STONITH device on the primary node
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/cluster-RedHat.yml
-  when: ansible_hostname == primary_instance_name
-=======
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/1.17.2.0-cluster-RedHat.yml
   block:
     - name: Ensure STONITH timeout is raised
       ansible.builtin.shell: pcs property set stonith-timeout=900

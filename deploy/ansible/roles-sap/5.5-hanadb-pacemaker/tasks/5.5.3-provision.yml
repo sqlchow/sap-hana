@@ -1,11 +1,5 @@
 ---
 
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/provision.yml
-################################################################################################## 
-# This file runs common pre-provisioning tasks before the OS specific clustering is performed    8
-##################################################################################################
-
-=======
 #############################################################################################
 # This file runs common pre-provisioning tasks before the OS specific clustering is performed
 #############################################################################################
@@ -15,7 +9,6 @@
     state: present
   loop: "{{ ha_packages[ansible_os_family] | flatten(levels=1) }}"
   when: hdb_size != "LargeInstance"
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.3-provision.yml
 
 - name: Ensure systemctl daemon is reloaded
   ansible.builtin.systemd:
@@ -47,20 +40,6 @@
     user: root
     key: "{{ hostvars[secondary_instance_name].cluster_public_ssh_key.stdout }}"
 
-<<<<<<< HEAD:deploy/ansible/roles-os/1.17-generic-pacemaker/tasks/provision.yml
-
-# Clustering commands are based on the Host OS
-- name: Cluster based on OS in VM
-  include_tasks: "cluster-{{ ansible_os_family }}.yml"
-  
-
-# HLI not in scope for the MVP release
-#- name: Ensure cluster is configured in Large Instance
-#  include_tasks: "cluster-{{ ansible_os_family }}-large-instance.yml"
-#  when:
-#    - hdb_size == "LargeInstance"
-#    - ansible_os_family == "Suse"
-=======
 # Set up Hosts entries for the cluster nodes
 - name: Ensure the Primary node hosts entry exists
   ansible.builtin.lineinfile:
@@ -88,4 +67,3 @@
   when:
     - hdb_size == "LargeInstance"
     - ansible_os_family == "Suse"
->>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.3-provision.yml
