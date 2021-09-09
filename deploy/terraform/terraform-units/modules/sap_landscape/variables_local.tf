@@ -19,6 +19,18 @@ variable "use_deployer" {
   description = "Use the deployer"
 }
 
+variable "ANF_settings" {
+  description = "ANF settings"
+  default = {
+    use    = false
+    name   = ""
+    arm_id = ""
+    service_level = "Standard"
+    size_in_tb    = 4
+
+  }
+}
+  
 variable "create_spn" {
   description = "Flag controlling the Fencing SPN creation"
 }
@@ -293,5 +305,8 @@ locals {
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet_nsg)
     )
   )
+
+  # Store the Deployer KV in workload zone KV
+  deployer_kv_user_name = try(var.deployer_tfstate.deployer_kv_user_name, "") 
 
 }

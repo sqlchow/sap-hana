@@ -99,14 +99,12 @@ ext=$(echo ${parameterfile} | cut -d. -f2)
 # Helper variables
 if [ "${ext}" == json ]; then
     environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+    location=$(jq --raw-output .infrastructure.region "${parameterfile}")
     use_deployer=$(jq --raw-output .deployer.use "${parameterfile}")
 else
     
-    load_config_vars "${param_dirname}"/"${parameterfile}" "library_environment"
-    environment=$(echo ${library_environment} | xargs)
-    load_config_vars "${param_dirname}"/"${parameterfile}" "library_location"
-    region=$(echo ${library_location} | xargs)
+    load_config_vars "${param_dirname}"/"${parameterfile}" "environment"
+    load_config_vars "${param_dirname}"/"${parameterfile}" "location"
 
     load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_use"
     use_deployer=$deployer_use
@@ -125,20 +123,20 @@ then
     echo "#                                                                                       #"
     echo "#                           Incorrect parameter file.                                   #"
     echo "#                                                                                       #"
-    echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
+    echo "#              The file needs to contain the environment attribute!!                    #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
     exit -1
 fi
 
-if [ ! -n "${region}" ]
+if [ ! -n "${location}" ]
 then
     echo "#########################################################################################"
     echo "#                                                                                       #"
     echo "#                           Incorrect parameter file.                                   #"
     echo "#                                                                                       #"
-    echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
+    echo "#               The file needs to contain the location attribute!!                      #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -166,7 +164,7 @@ fi
 #Persisting the parameters across executions
 automation_config_directory=~/.sap_deployment_automation/
 generic_config_information="${automation_config_directory}"config
-library_config_information="${automation_config_directory}""${environment}""${region}"
+library_config_information="${automation_config_directory}""${environment}""${location}"
 
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
@@ -313,11 +311,11 @@ if [ -n "${str1}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#                          $boldreduscore Errors during the plan phase $resetformatting                                #"    
+    echo -e "#                          $boldreduscore Errors during the plan phase $resetformatting                               #"    
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    echo $str1
+    cat plan_output.log
     rm plan_output.log
     exit -1
 fi
@@ -341,6 +339,7 @@ then
 else
     terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" 2>error.log
 fi
+return_value=$?
  
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]

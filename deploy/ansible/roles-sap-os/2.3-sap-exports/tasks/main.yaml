@@ -3,11 +3,11 @@
   file:
     path:   "{{ item.path }}"
     state:  directory
-    mode:   0755
+    mode:   '{{ item.mode }}'
   loop:
-    - { tier: 'preparation', path: '/usr/sap/install' }
-    - { tier: 'preparation', path: '/usr/sap/trans' }
-    - { tier: 'preparation', path: '/sapmnt/{{ sap_sid|upper }}' }
+    - { tier: 'preparation', path: '/usr/sap/install', mode: '0777' }
+    - { tier: 'preparation', path: '/usr/sap/trans', mode: '0755' }
+    - { tier: 'preparation', path: '/sapmnt/{{ sap_sid|upper }}', mode: '0755' }
   when:     item.tier == "all" or
             item.tier == tier
 
@@ -62,7 +62,7 @@
 #     state: present
 
 # - name: Ensure NFS Server is running
-#   systemd:
+#   ansible.builtin.systemd
 #     name: nfsserver
 #     state: started
 #     enabled: yes
@@ -89,7 +89,7 @@
 #   loop: "{{ nfs_exports }}"
 
 # - name: Ensure nfsserver is running
-#   systemd:
+#   ansible.builtin.systemd
 #     state: started
 #     name: nfsserver
 #     daemon_reload: yes

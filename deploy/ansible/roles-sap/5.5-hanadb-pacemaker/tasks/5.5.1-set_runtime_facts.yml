@@ -11,6 +11,7 @@
 # ----------------------------------------
 
 - name: " Retrieve Subscription ID and Resource Group Name"
+<<<<<<< HEAD
   shell: curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01" | jq
   register: hanavmmetadata
   no_log: false
@@ -18,35 +19,72 @@
 
 - name: save the Json data to a Variable as a Fact
   set_fact:
+=======
+  ansible.builtin.shell: curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01"
+  register: hanavmmetadata
+  changed_when: false
+  args:
+    warn: false
+
+- name: "Show IMDS results"
+  ansible.builtin.debug:
+    var: hanavmmetadata
+    verbosity: 2
+
+- name: Save the Json data to a Variable as a Fact
+  ansible.builtin.set_fact:
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
     jsondata: "{{ hanavmmetadata.stdout | from_json }}"
   no_log: true
 
 - name: " Extract Subscription ID "
+<<<<<<< HEAD
   set_fact:
+=======
+  ansible.builtin.set_fact:
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
     sap_hana_fencing_spn_subscription_id: "{{ jsondata | json_query('compute.subscriptionId') }}"
   no_log: true
     
 - name: " Extract ResourceGroup Name "
+<<<<<<< HEAD
   set_fact:
     resource_group_name: "{{ jsondata | json_query('compute.resourceGroupName') }}"
   no_log: true
    
 - name: set the primary intance db nic and admin nic IP
   set_fact:
+=======
+  ansible.builtin.set_fact:
+    resource_group_name: "{{ jsondata | json_query('compute.resourceGroupName') }}"
+  no_log: true
+   
+- name: Set the primary intance db nic and admin nic IP
+  ansible.builtin.set_fact:
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
     primary_instance_ip_db: "{{ hostvars[primary_instance_name]['ansible_eth0']['ipv4']['address'] }}"
     primary_instance_ip_admin: "{{ hostvars[primary_instance_name]['ansible_eth1']['ipv4']['address'] }}"
 
 - name: set the secondary intance db nic and admin nic IP
+<<<<<<< HEAD
   set_fact:
+=======
+  ansible.builtin.set_fact:
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
     secondary_instance_ip_db: "{{ hostvars[secondary_instance_name]['ansible_eth0']['ipv4']['address'] }}"
     secondary_instance_ip_admin: "{{ hostvars[secondary_instance_name]['ansible_eth1']['ipv4']['address'] }}"
 
 - name: "Show Subscription ID"
+<<<<<<< HEAD
   debug:
+=======
+  ansible.builtin.debug:
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
     var: sap_hana_fencing_spn_subscription_id
     verbosity: 2
 
 - name: "Show Resource Group Name"
+<<<<<<< HEAD
   debug:
     var: resource_group_name
     verbosity: 2
@@ -71,6 +109,12 @@
     - debug:
         var: hdb_version[0:2]
 
+=======
+  ansible.builtin.debug:
+    var: resource_group_name
+    verbosity: 2
+
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
 
 # /*---------------------------------------------------------------------------8
 # |                                   END                                     |

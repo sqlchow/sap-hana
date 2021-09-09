@@ -2,11 +2,12 @@
 
 bom_base_name:                 ${bom}
 sapbits_location_base_path:    ${sapbits}
-password_master:               ${pass}
-sap_fqdn:                      ${dns}                      
+sapbits_sas_token:             ${token}
 
 # TERRAFORM CREATED
+sap_fqdn:                      ${dns}                      
 sap_sid:                       ${sid}
+hdb_sid:                       ${db_sid}
 kv_uri:                        ${kv_uri}
 secret_prefix:                 ${secret_prefix}
 scs_high_availability:         ${scs_ha}

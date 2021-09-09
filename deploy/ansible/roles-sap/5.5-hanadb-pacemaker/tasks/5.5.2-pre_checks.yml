@@ -1,5 +1,19 @@
 ---
 
+<<<<<<< HEAD
+=======
+- name: Check the fencing agent configuration variables are set
+  assert:
+    that:
+      - "sap_hana_fencing_spn_subscription_id is defined"
+      - "sap_hana_fencing_spn_subscription_id | trim | length > 0"
+      - "sap_hana_fencing_spn_tenant_id is defined"
+      - "sap_hana_fencing_spn_tenant_id | trim | length > 0"
+      - "sap_hana_fencing_spn_client_id is defined"
+      - "sap_hana_fencing_spn_client_id | trim | length > 0"
+      - "sap_hana_fencing_spn_client_pwd is defined"
+      - "sap_hana_fencing_spn_client_pwd | trim | length > 0"
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
 
 - name: Check the required cluster password is set
   assert:
@@ -8,17 +22,28 @@
       - "password_ha_db_cluster | trim | length > 0"
 
 - name: Check the required Clustering scripts are available
+<<<<<<< HEAD
   when: ansible_os_family == 'Suse'
   stat:
+=======
+  ansible.builtin.stat:
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
     path: "{{ item }}"
   loop:
     - "/usr/sbin/ha-cluster-init"
     - "/usr/sbin/ha-cluster-join"
   register: cluster_scripts_status_results
   failed_when: not cluster_scripts_status_results.stat.exists
+<<<<<<< HEAD
 
 - name: Check if a cluster has already been prepared
   shell: "{{ cluster_status_cmd[ansible_os_family] }}"
+=======
+  when: ansible_os_family == 'Suse'
+
+- name: Check if a cluster has already been prepared
+  ansible.builtin.shell: "{{ cluster_status_cmd[ansible_os_family] }}"
+>>>>>>> 150cde09203b85ba925e7bd6d4d24f3e41b7ae8d
   register: cluster_existence_check_result
   changed_when: false
   failed_when: false

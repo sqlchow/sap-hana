@@ -263,6 +263,15 @@ variable "database_size" {
   default = ""
 }
 
+variable "database_sid" {
+  default = ""
+}
+
+variable "database_instance_number" {
+  default = "01"
+}
+
+
 variable "database_vm_zones" {
   default = []
 }
@@ -283,6 +292,10 @@ variable "database_loadbalancer_ip" {
   default = ""
 }
 
+variable "database_tags" {
+  default = {}
+}
+
 variable "database_vm_nodes" {
   default = [{
     "name"            = ""
@@ -292,7 +305,7 @@ variable "database_vm_nodes" {
   }]
 }
 
-variable "HANA_use_ANF" {
+variable "database_HANA_use_ANF_scaleout_scenario" {
   default = false
 }
 

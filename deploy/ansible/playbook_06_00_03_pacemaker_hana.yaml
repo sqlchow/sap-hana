@@ -5,6 +5,53 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
+- hosts:          "{{ sap_sid|upper }}_DB" 
+
+  name:           PACEMAKER - HANA
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+  tasks:
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+
+
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/
+
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                       Playbook for Pacemaker -HANA                         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+- hosts: localhost
+  name: Get SPN from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.set_fact:
+      tier:  fencing
+
+  - include_role:
+      name:     roles-misc/0.2-kv-secrets
+    tags:
+       - kv-secrets
+
 - hosts:          "{{ sap_sid|upper }}_DB"
   
   name:           "PACEMAKER - HANA"
@@ -33,20 +80,29 @@
       sap_hana_fencing_spn_tenant_id:            "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
     tags:
       - always
-  
-  - block:
-      - include_role:
-          name:     roles-os/1.11-accounts
-          tasks_from: setup_hanausers_sudoers.yml
-    tags:
-      - 1.11-accounts
 
   - block:
       - include_role:
           name:     roles-sap/5.5-hanadb-pacemaker
+        when: db_high_availability == true          
     tags:
       - 5.5-hanadb-pacemaker
 ...
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step603"
+      state: touch
+
+
 
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |

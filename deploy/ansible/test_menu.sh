@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/opt/terraform/bin:/opt/ansible/bin:${PATH}
+
 cmd_dir="$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")"
 
 
@@ -53,6 +55,7 @@ sap_sid="$(awk '$1 == "sap_sid:" {print $2}' ${sap_params_file})"
 export           ANSIBLE_HOST_KEY_CHECKING=False
 export           ANSIBLE_INVENTORY="${sap_sid}_hosts.yaml"
 export           ANSIBLE_PRIVATE_KEY_FILE=sshkey
+export           ANSIBLE_COLLECTIONS_PATHS=/opt/ansible/collections${ANSIBLE_COLLECTIONS_PATHS:+${ANSIBLE_COLLECTIONS_PATHS}}
 
 # We really should be determining the user dynamically, or requiring
 # that it be specified in the inventory settings (currently true)
@@ -99,8 +102,9 @@ options=(
         "Pacemaker HANA Setup"
 
         # Special menu entries
-        "BOM Validator"
-        "BOM Downloader"
+        "BOM Download"
+        "BOM Upload"
+        "Tester"
         "Install SAP (1-7)"
         "Post SAP Install (8-12)"
         "All Playbooks"
@@ -125,8 +129,11 @@ all_playbooks=(
         ${cmd_dir}/playbook_06_00_00_pacemaker.yaml
         ${cmd_dir}/playbook_06_00_01_pacemaker_scs.yaml
         ${cmd_dir}/playbook_06_00_03_pacemaker_hana.yaml
-        ${cmd_dir}/playbook_bom_validator.yaml
+        ${cmd_dir}/tester.yaml
+        ${cmd_dir}/tester.yaml
+        ${cmd_dir}/tester.yaml
         ${cmd_dir}/playbook_bom_downloader.yaml
+        ${cmd_dir}/playbook_bom_uploader.yaml
 )
 
 # Set of options that will be passed to the ansible-playbook command
@@ -150,12 +157,13 @@ do
 
         case $opt in
         "${options[-1]}")   # Quit
+                rm sshkey       
                 break;;
         "${options[-2]}")   # Run through all playbooks
                 playbooks+=( "${all_playbooks[@]}" );;
-        "${options[-3]}")   # Run through last 5 playbooks
-                playbooks+=( "${all_playbooks[@]:7:5}" );;
-        "${options[-4]}")   # Run through first 7 playbooks
+        "${options[-3]}")   # Run through post installation playbooks
+                playbooks+=( "${all_playbooks[@]:7:6}" );;
+        "${options[-4]}")   # Run through first 7 playbooks i.e.  SAP installation
                 playbooks+=( "${all_playbooks[@]:0:7}" );;
         *)
                 # If not a numeric reply

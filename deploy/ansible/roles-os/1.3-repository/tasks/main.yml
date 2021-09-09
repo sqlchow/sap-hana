@@ -54,7 +54,7 @@
 
     - name: Verify that zypper repos are configured after re-registering \
             SLE instance
-      command: zypper lr
+      ansible.builtin.command: zypper lr
       args:
         warn: false  # quieten warning about using zypper directly
 
@@ -102,7 +102,7 @@
   block:
     # If there are no repos configured zypper lr will fail with rc == 6
     - name:     Check that zypper repos are registered
-      command:    zypper lr
+      ansible.builtin.command:    zypper lr
       # command/shell actions always report changed even if they are
       # not making any changes; we know this command action doesn't
       # change anything so ensure it doesn't report as changed.
@@ -164,7 +164,7 @@
   when:     ansible_os_family|upper == 'SUSE'
 
 - name:              Add the repositories result
-  debug:
+  ansible.builtin.debug:
     var: zypresult
     verbosity: 2
 
