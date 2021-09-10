@@ -7,6 +7,7 @@
   when:
     - hdb_version[0:2] == "2."
   block:
+      
 
     - name:                      Ensure a list of package version is available for checking the SAPHanaSR package version
       ansible.builtin.package_facts:
@@ -27,7 +28,9 @@
 
     - name:                     Rename myHooks
       ansible.builtin.command:  mv /hana/shared/myHooks /hana/shared/myHooks.Sample
-      when:                     myHooks_stat.stat.exists
+      when:                     
+       - myHooks_stat.stat.exists == false
+       - ansible_hostname == primary_instance_name
 
   
     - name:                    copy SAPHanaSR.py (SUSE)

@@ -39,6 +39,7 @@
   register:             saphanasr
   failed_when:          saphanasr != SOK
   changed_when:         false
+  when:                 ansible_hostname == primary_instance_name
 
 - name:                 Verify the hook Installation 
   ansible.builtin.debug:

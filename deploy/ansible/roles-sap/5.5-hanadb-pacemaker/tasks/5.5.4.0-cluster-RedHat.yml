@@ -18,7 +18,7 @@
 
     - name: Ensure the SAP HANA Topology resource is created
       ansible.builtin.shell: >
-        pcs resource create SAPHanaTopology_{{ sid | upper }}_{{ instance_number }} SAPHanaTopology
+        pcs resource create SAPHanaTopology_{{ hdb_sid | upper }}_{{ instance_number }} SAPHanaTopology
         SID={{ sid | upper }} InstanceNumber={{ instance_number }}
         op start timeout=600
         op stop timeout=300
@@ -27,7 +27,7 @@
 
     - name: Ensure the SAP HANA resource is created
       ansible.builtin.shell: >
-        pcs resource create SAPHana_{{ sid | upper }}_{{ instance_number }} SAPHana
+        pcs resource create SAPHana_{{ hdb_sid | upper }}_{{ instance_number }} SAPHana
         SID={{ sid | upper }} InstanceNumber={{ instance_number }}
         PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
         AUTOMATED_REGISTER=false
@@ -42,7 +42,7 @@
     
     - name: Ensure the SAP HANA resource is created
       ansible.builtin.shell: >
-        pcs resource create SAPHana_{{ sid | upper }}_{{ instance_number }} SAPHana
+        pcs resource create SAPHana_{{ hdb_sid | upper }}_{{ instance_number }} SAPHana
         SID={{ sid | upper }} InstanceNumber={{ instance_number }}
         PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
         AUTOMATED_REGISTER=false
@@ -57,19 +57,19 @@
 
 
     - name: Ensure the Virtual IP resource for the Load Balancer Front End IP is created
-      ansible.builtin.shell: pcs resource create vip_{{ sid | upper }}_{{ instance_number }} IPaddr2 ip="{{ hdb_lb_feip }}"
+      ansible.builtin.shell: pcs resource create vip_{{ hdb_sid | upper }}_{{ instance_number }} IPaddr2 ip="{{ hdb_lb_feip }}"
 
     - name: Ensure the netcat resource for the Load Balancer Healthprobe is created
-      ansible.builtin.shell: pcs resource create nc_{{ sid | upper }}_{{ instance_number }} azure-lb port=625{{ instance_number }}
+      ansible.builtin.shell: pcs resource create nc_{{ hdb_sid | upper }}_{{ instance_number }} azure-lb port=625{{ instance_number }}
 
     - name: Ensure the Virtual IP group resource is created
-      ansible.builtin.shell: pcs resource group add g_ip_{{ sid | upper }}_{{ instance_number }} nc_{{ sid | upper }}_{{ instance_number }} vip_{{ sid | upper }}_{{ instance_number }}
+      ansible.builtin.shell: pcs resource group add g_ip_{{ hdb_sid | upper }}_{{ instance_number }} nc_{{ sid | upper }}_{{ instance_number }} vip_{{ sid | upper }}_{{ instance_number }}
 
     - name: Ensure the order constraint for the SAP HANA Topology is configured
-      ansible.builtin.shell: pcs constraint order SAPHanaTopology_{{ sid | upper }}_{{ instance_number }}-clone then SAPHana_{{ sid | upper }}_{{ instance_number }}-master symmetrical=false
+      ansible.builtin.shell: pcs constraint order SAPHanaTopology_{{ hdb_sid | upper }}_{{ instance_number }}-clone then SAPHana_{{ sid | upper }}_{{ instance_number }}-master symmetrical=false
 
     - name: Ensure the Virtual IP group is configured to the Master node
-      ansible.builtin.shell: pcs constraint colocation add g_ip_{{ sid | upper }}_{{ instance_number }} with master SAPHana_{{ sid | upper }}_{{ instance_number }}-master 4000
+      ansible.builtin.shell: pcs constraint colocation add g_ip_{{ hdb_sid | upper }}_{{ instance_number }} with master SAPHana_{{ sid | upper }}_{{ instance_number }}-master 4000
 
     - name: Ensure the Virtual IP group is configured to the Master node
       when: ansible_distribution_major_version == "8"
