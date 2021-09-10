@@ -31,7 +31,7 @@
 
 # /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |                       Playbook for Pacemaker -HANA                         |
+# |                       Retrieving the SPN details                           |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 
@@ -51,6 +51,20 @@
       name:     roles-misc/0.2-kv-secrets
     tags:
        - kv-secrets
+
+  - include_role:
+      name:     roles-misc/0.1-passwords
+      public:   yes      
+    tags:
+       - 0.1-passwords
+
+
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                       Playbook for Pacemaker -HANA                         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
 
 - hosts:          "{{ sap_sid|upper }}_DB"
   
@@ -72,7 +86,8 @@
      msg: "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
 
   - set_fact:
-      tier:                                      [ ha, fencing ]
+      tier:                                      ha
+      hana_password_master:                      "{{ hostvars.localhost.sap_password }}"
       primary_instance_name:                     "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
       secondary_instance_name:                   "{{ ansible_play_hosts_all[1] }}"         # Setting up Secondary Instance Name
       sap_hana_fencing_spn_client_id:            "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
@@ -83,11 +98,24 @@
 
   - block:
       - include_role:
+          name:     roles-os/1.11-accounts
+          tasks_from: setup_hanausers_sudoers.yml
+    tags:
+      - 1.11-accounts
+  - block:
+      - include_role:
           name:     roles-sap/5.5-hanadb-pacemaker
         when: db_high_availability == true          
     tags:
       - 5.5-hanadb-pacemaker
-...
+
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                       Logging the results                                  |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+
 
 - hosts: localhost
   name: Log results
@@ -102,7 +130,7 @@
       path: "{{ _workspace_directory }}/.step603"
       state: touch
 
-
+...
 
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |
