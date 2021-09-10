@@ -18,13 +18,8 @@
 
     - name: Ensure the SAP HANA Topology resource is created
       ansible.builtin.shell: >
-<<<<<<< HEAD:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.4.0-cluster-RedHat.yml
         pcs resource create SAPHanaTopology_{{ hdb_sid | upper }}_{{ hdb_instance_number }} SAPHanaTopology
         SID={{ sid | upper }} InstanceNumber={{ hdb_instance_number }}
-=======
-        pcs resource create SAPHanaTopology_{{ sid | upper }}_{{ instance_number }} SAPHanaTopology
-        SID={{ sid | upper }} InstanceNumber={{ instance_number }}
->>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.3.0-cluster-RedHat.yml
         op start timeout=600
         op stop timeout=300
         op monitor interval=10 timeout=600
@@ -32,13 +27,8 @@
 
     - name: Ensure the SAP HANA resource is created
       ansible.builtin.shell: >
-<<<<<<< HEAD:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.4.0-cluster-RedHat.yml
         pcs resource create SAPHana_{{ hdb_sid | upper }}_{{ instance_number }} SAPHana
         SID={{ sid | upper }} InstanceNumber={{ hdb_instance_number }}
-=======
-        pcs resource create SAPHana_{{ sid | upper }}_{{ instance_number }} SAPHana
-        SID={{ sid | upper }} InstanceNumber={{ instance_number }}
->>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.3.0-cluster-RedHat.yml
         PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
         AUTOMATED_REGISTER=false
         op start timeout={{ cluster_SAPHana_timeouts.start }}
@@ -52,13 +42,8 @@
     
     - name: Ensure the SAP HANA resource is created
       ansible.builtin.shell: >
-<<<<<<< HEAD:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.4.0-cluster-RedHat.yml
         pcs resource create SAPHana_{{ hdb_sid | upper }}_{{ hdb_instance_number }} SAPHana
         SID={{ sid | upper }} InstanceNumber={{ hdb_instance_number }}
-=======
-        pcs resource create SAPHana_{{ sid | upper }}_{{ instance_number }} SAPHana
-        SID={{ sid | upper }} InstanceNumber={{ instance_number }}
->>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.3.0-cluster-RedHat.yml
         PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
         AUTOMATED_REGISTER=false
         op start timeout={{ cluster_SAPHana_timeouts.start }}
@@ -72,7 +57,6 @@
 
 
     - name: Ensure the Virtual IP resource for the Load Balancer Front End IP is created
-<<<<<<< HEAD:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.4.0-cluster-RedHat.yml
       ansible.builtin.shell: pcs resource create vip_{{ hdb_sid | upper }}_{{ hdb_instance_number }} IPaddr2 ip="{{ hdb_lb_feip }}"
 
     - name: Ensure the netcat resource for the Load Balancer Healthprobe is created
@@ -86,21 +70,6 @@
 
     - name: Ensure the Virtual IP group is configured to the Master node
       ansible.builtin.shell: pcs constraint colocation add g_ip_{{ hdb_sid | upper }}_{{ hdb_instance_number }} with master SAPHana_{{ sid | upper }}_{{ instance_number }}-master 4000
-=======
-      ansible.builtin.shell: pcs resource create vip_{{ sid | upper }}_{{ instance_number }} IPaddr2 ip="{{ hdb_lb_feip }}"
-
-    - name: Ensure the netcat resource for the Load Balancer Healthprobe is created
-      ansible.builtin.shell: pcs resource create nc_{{ sid | upper }}_{{ instance_number }} azure-lb port=625{{ instance_number }}
-
-    - name: Ensure the Virtual IP group resource is created
-      ansible.builtin.shell: pcs resource group add g_ip_{{ sid | upper }}_{{ instance_number }} nc_{{ sid | upper }}_{{ instance_number }} vip_{{ sid | upper }}_{{ instance_number }}
-
-    - name: Ensure the order constraint for the SAP HANA Topology is configured
-      ansible.builtin.shell: pcs constraint order SAPHanaTopology_{{ sid | upper }}_{{ instance_number }}-clone then SAPHana_{{ sid | upper }}_{{ instance_number }}-master symmetrical=false
-
-    - name: Ensure the Virtual IP group is configured to the Master node
-      ansible.builtin.shell: pcs constraint colocation add g_ip_{{ sid | upper }}_{{ instance_number }} with master SAPHana_{{ sid | upper }}_{{ instance_number }}-master 4000
->>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.3.0-cluster-RedHat.yml
 
     - name: Ensure the Virtual IP group is configured to the Master node
       when: ansible_distribution_major_version == "8"
@@ -123,10 +92,6 @@
       delay: 10
       until: "'{{ primary_instance.name }} {{ secondary_instance.name }}' in cluster_stable_check.stdout or '{{ secondary_instance.name }} {{ primary_instance.name }}' in cluster_stable_check.stdout"
 
-<<<<<<< HEAD:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.4.0-cluster-RedHat.yml
-  when: ansible_hostname == primary_instance_name
-=======
   when: ansible_hostname == primary_instance.name
->>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93:deploy/ansible/roles-sap/5.5-hanadb-pacemaker/tasks/5.5.3.0-cluster-RedHat.yml
     
 #End of HANA clustering resources 

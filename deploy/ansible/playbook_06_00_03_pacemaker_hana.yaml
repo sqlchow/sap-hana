@@ -15,7 +15,6 @@
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
 
-<<<<<<< HEAD
   tasks:
 
 
@@ -44,13 +43,10 @@
   gather_facts:   yes
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
-=======
->>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
   tasks:
   - ansible.builtin.set_fact:
       tier:  fencing
 
-<<<<<<< HEAD
   - include_role:
       name:     roles-misc/0.2-kv-secrets
     tags:
@@ -69,8 +65,6 @@
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 
-=======
->>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
 
 - hosts:          "{{ sap_sid|upper }}_DB"
   
