@@ -130,14 +130,19 @@
 
 # Analyse the repo list for this distribution selecting only those
 # packages assigned to the active tier or 'all'.
+<<<<<<< HEAD
 - name:             "Determine repos appropriate for tier"
   set_fact:
+=======
+- name:             Determine repos appropriate for tier
+  ansible.builtin.set_fact:
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
     repos_for_tier: "{{ repos[distro_full_id] |
                           selectattr('tier', 'in', ['all', tier] | flatten) | 
                           list }}"
 
-- name: Print list of matching repos if verbosity it 1 or greater
-  debug:
+# Print list of matching repos if verbosity it 1 or greater
+- ansible.builtin.debug:
     var: "{{ repos_for_tier }}"
     verbosity: 1
 

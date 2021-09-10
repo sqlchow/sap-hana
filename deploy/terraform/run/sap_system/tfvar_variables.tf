@@ -264,7 +264,7 @@ variable "database_size" {
 }
 
 variable "database_sid" {
-  default = ""
+  default = "HDB"
 }
 
 variable "database_instance_number" {
@@ -513,6 +513,21 @@ variable "legacy_nic_order" {
 variable "enable_purge_control_for_keyvaults" {
   default = true
 }
+
+#ANF Settings
+
+variable "anf_sapmnt_volume_size" {
+  default = 512
+}
+
+variable "anf_shared_volume_size" {
+  default = 512
+}
+
+variable "use_ANF" {
+  default = false
+}
+
 
 variable "use_loadbalancers_for_standalone_deployments" {
   default = true

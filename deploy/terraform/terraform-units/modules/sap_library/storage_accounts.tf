@@ -177,8 +177,6 @@ data "azurerm_storage_account_blob_container_sas" "sapbits_sas_token" {
     list    = false
     add     = false
     create  = false
-    update  = false
-    process = false
   }
 }
 

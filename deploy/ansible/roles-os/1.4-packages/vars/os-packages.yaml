@@ -44,6 +44,10 @@ packages:
       - { tier: 'os',    package: 'lvm2',                                                     state: 'present' }
       - { tier: 'os',    package: 'numad',                                                    state: 'present' }
       - { tier: 'os',    package: 'cifs-utils',                                               state: 'present' }
+<<<<<<< HEAD
+=======
+      - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
       - { tier: 'sapos', package: 'tuned-profiles-sap*',                                      state: 'present' } 
       - { tier: 'sapos', package: 'compat-sap-c++-*',                                         state: 'present' }
       - { tier: 'sapos', package: 'libatomic',                                                state: 'present' }
@@ -51,6 +55,7 @@ packages:
       - { tier: 'sapos', package: 'csh',                                                      state: 'present' }     
     #------------------------- Begin - Packages required for Clustering ---------------------------------------8
       - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
+<<<<<<< HEAD
       - { tier: 'ha',    package: 'pcs',                                node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'hana',    state: 'present' }
@@ -61,6 +66,11 @@ packages:
       - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'scs',     state: 'present' }
       - { tier: 'ha',    package: 'fence-agents-azure-arm',             node_tier: 'scs',     state: 'present' }
       #     - { tier: 'ha',    package: 'SAPHanaSR>=0.153',                   node_tier: 'hana',    state: 'present' }
+=======
+      - { tier: 'ha',    package: 'pcs',                                                      state: 'present' }
+      - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
+      - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
     #------------------------- End - Packages required for Clustering -----------------------------------------8
     redhat7.4: 
       # Install Right Version of Azure Fence Agent 
@@ -112,6 +122,10 @@ packages:
       - { tier: 'os',    package: 'lvm2',                                                     state: 'present' }
       - { tier: 'os',    package: 'numad',                                                    state: 'present' }
       - { tier: 'os',    package: 'cifs-utils',                                               state: 'present' }
+<<<<<<< HEAD
+=======
+      - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
       - { tier: 'sapos', package: 'tuned-profiles-sap*',                                      state: 'present' } 
       - { tier: 'sapos', package: 'compat-sap-c++-*',                                         state: 'present' }
       - { tier: 'sapos', package: 'libatomic',                                                state: 'present' }
@@ -143,6 +157,7 @@ packages:
       - { tier: 'os',    package: 'tuned',                                                    state: 'present' }
       - { tier: 'os',    package: 'numad',                                                    state: 'present' }
       - { tier: 'os',    package: 'ntp',                                                      state: 'absent' }
+      - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
       - { tier: 'sapos', package: 'saptune',                                                  state: 'present' }
       - { tier: 'sapos', package: 'libgcc_s1',                                                state: 'present' }
       - { tier: 'sapos', package: 'libstdc++6',                                               state: 'present' }
@@ -170,6 +185,7 @@ packages:
       - { tier: 'os',    package: 'tuned',                                                    state: 'present' }
       - { tier: 'os',    package: 'numad',                                                    state: 'present' }
       - { tier: 'os',    package: 'ntp',                                                      state: 'absent' }
+      - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
       - { tier: 'sapos', package: 'saptune',                                                  state: 'present' }
       - { tier: 'sapos', package: 'libgcc_s1',                                                state: 'present' }
       - { tier: 'sapos', package: 'libstdc++6',                                               state: 'present' }
@@ -190,3 +206,4 @@ packages:
       # than /usr/bin/python.
       # Required to enable ansible to use /usr/bin/python on SLE 15 SP2
       - { tier: 'os', package: 'python2-rpm',                                                state: 'present' }
+    suse15.1:

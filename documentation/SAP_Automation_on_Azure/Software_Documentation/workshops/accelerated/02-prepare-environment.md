@@ -281,6 +281,19 @@ For a deployment to *westeurope* use this:
         --auto-approve
     ```
 
+For a deployment to *westeurope* use this:
+    
+        ```bash
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                   \
+        --deployer_parameter_file DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE/DEMO-WEEU-DEP00-INFRASTRUCTURE.json  \
+        --library_parameter_file LIBRARY/DEMO-WEEU-SAP_LIBRARY/DEMO-WEEU-SAP_LIBRARY.json                      \
+        --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                                                    \ 
+        --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                                                          \
+        --spn_secret "zzzzzzzzzzzzzzz"                                                                         \
+        --tenant_id ttttttttt-tttt-tttt-tttt-ttttttttttt                                                       \
+        --auto-approve
+    ```
+
 
 7.  Post Processing
     1. In Output Section make note of the following 

@@ -23,6 +23,11 @@
     tags:
        - 0.1-passwords
 
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step2"
+      state: absent
+
+
 - hosts:          "{{ sap_sid|upper }}_DB  :
                    {{ sap_sid|upper }}_SCS :
                    {{ sap_sid|upper }}_PAS :
@@ -76,6 +81,7 @@
           name: roles-os/1.5-disk-setup
     tags:
       - 1.5-disk-setup
+<<<<<<< HEAD
 
   - block:
       - include_role:
@@ -87,6 +93,25 @@
     - include_role:
         name:     roles-sap-os/2.6-sap-mounts
     tags:
+=======
+  
+  - block:
+      - include_role:
+          name: roles-os/1.9-kernelparameters
+    tags:
+      - 1.9-kernelparameters
+
+  - block:
+      - include_role:
+          name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
+    tags:
+      - 2.5-sap-users
+
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.6-sap-mounts
+    tags:
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
       - 2.6-sap-mounts
 
 # - role: 2.10-sap-notes                                        # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)

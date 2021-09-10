@@ -173,3 +173,8 @@ automation_username = "azureadm"
 resource_offset = 0
 #vm_disk_encryption_set_id=""
 #nsg_asg_with_vnet=false
+
+
+#ANF
+anf_sapmnt_volume_size=512
+anf_shared_volume_size=512

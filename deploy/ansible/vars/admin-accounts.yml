@@ -26,6 +26,7 @@ admin_groups:
     tier:         example
     enabled:      true
     node_tier:    none
+<<<<<<< HEAD
   - name:         sapsys
     gid:          "{{ sapsys_gid }}"
     state:        present
@@ -38,6 +39,20 @@ admin_groups:
     tier:         ha
     enabled:      true
     node_tier:    all
+=======
+#  - name:         sapsys
+#    gid:          "{{ sapsys_gid }}"
+#    state:        present
+#    tier:         sapos
+#    enabled:      true
+#    node_tier:    all
+#  - name:         sapinst
+#    gid:          "2001"
+#    state:        present
+#    tier:         sapos
+#    enabled:      true
+#    node_tier:    all
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
 
 # -------------------------------------+---------------------------------------8
 #
@@ -59,6 +74,7 @@ admin_users:
     tier:         example
     enabled:      true
     node_tier:    none
+<<<<<<< HEAD
  
   # - name:         "{{ hdb_sid|lower }}adm"
   #   comment:      "SAP HANA Database System Administrator"
@@ -73,6 +89,8 @@ admin_users:
   #   node_tier:    all
   #   enabled:      true
  
+=======
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
 
 #  - name:         sapadm
 #   comment:      "SAP Host Agent"
@@ -100,4 +118,19 @@ admin_users:
 #    node_tier:    all
 #    enabled:      true
 
+<<<<<<< HEAD
+=======
+#  - name:         "{{ hdb_sid|lower }}adm"
+#    comment:      "SAP HANA Database System Administrator"
+#    uid:          "{{ hdbadm_uid }}"
+#    group:        sapsys
+#    groups:       ["sapsys"]
+#    password:     "some_password_string"
+#    sudoers_role: "admin_no_password"
+#    shell:        /bin/csh
+#    state:        present
+#    tier:         sapos
+#    node_tier:    all
+#    enabled:      true
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
 

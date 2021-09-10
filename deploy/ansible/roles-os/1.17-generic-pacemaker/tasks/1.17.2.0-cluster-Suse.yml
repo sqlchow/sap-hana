@@ -127,14 +127,13 @@
         tenantId="{{ sap_hana_fencing_spn_tenant_id }}"
         login="{{ sap_hana_fencing_spn_client_id }}"
         passwd="{{ sap_hana_fencing_spn_client_pwd }}"
-      
     
     - name: Stonith Timeout Property
       shell: sudo crm configure property stonith-timeout=900
-  when: inventory_hostname == primary_instance_name
 
 - name: Ensure Azure scheduled events is configured
-  ansible.builtin.block:
+  when: inventory_hostname == primary_instance_name
+  block:
   # After configuring the Pacemaker resources for azure-events agent, when you place the cluster in or out of maintenance mode, you may get warning messages like:
   # WARNING: cib-bootstrap-options: unknown attribute 'hostName_ hostname'
   # WARNING: cib-bootstrap-options: unknown attribute 'azure-events_globalPullState'

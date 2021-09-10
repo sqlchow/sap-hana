@@ -12,7 +12,6 @@
 # For example, XX.Y where XX is the major version and Y is the minor version
 repos:
     redhat7.9:
-
     redhat8.2:
       - { tier: 'ha', repo: 'rhel-8-for-x86_64-highavailability-rpms',                                           state: 'present'}
       - { tier: 'ha', repo: 'rhel-8-for-x86_64-sap-solutions-rpms',                                              state: 'present'}

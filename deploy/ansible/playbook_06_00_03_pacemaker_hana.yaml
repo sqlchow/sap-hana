@@ -15,6 +15,7 @@
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
 
+<<<<<<< HEAD
   tasks:
 
 
@@ -43,10 +44,13 @@
   gather_facts:   yes
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
+=======
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
   tasks:
   - ansible.builtin.set_fact:
       tier:  fencing
 
+<<<<<<< HEAD
   - include_role:
       name:     roles-misc/0.2-kv-secrets
     tags:
@@ -65,6 +69,8 @@
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 
+=======
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
 
 - hosts:          "{{ sap_sid|upper }}_DB"
   
@@ -115,7 +121,22 @@
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 
+- hosts: localhost
+  name: Get SPN from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.set_fact:
+      tier:  fencing
 
+  - include_role:
+      name:     roles-misc/0.2-kv-secrets
+    tags:
+       - kv-secrets
 
 - hosts: localhost
   name: Log results
@@ -130,7 +151,47 @@
       path: "{{ _workspace_directory }}/.step603"
       state: touch
 
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+  - debug:
+     msg: "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
+
+  - set_fact:
+      tier:                                      [ ha, fencing ]
+      primary_instance_name:                     "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
+      secondary_instance_name:                   "{{ ansible_play_hosts_all[1] }}"         # Setting up Secondary Instance Name
+      sap_hana_fencing_spn_client_id:            "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
+      sap_hana_fencing_spn_client_pwd:           "{{ hostvars.localhost.sap_fencing_spn_pwd }}"
+      sap_hana_fencing_spn_tenant_id:            "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
+    tags:
+      - always
+
+  - block:
+      - include_role:
+          name:     roles-sap/5.5-hanadb-pacemaker
+        when: db_high_availability == true          
+    tags:
+      - 5.5-hanadb-pacemaker
 ...
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step603"
+      state: touch
+
+
 
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |

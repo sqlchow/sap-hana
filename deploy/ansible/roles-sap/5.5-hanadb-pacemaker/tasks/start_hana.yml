@@ -12,8 +12,13 @@
 #     4  GetProcessList succeeded, all processes stopped
 
 - name: Determine if HANA is running
+<<<<<<< HEAD
   become_user: "{{ hdb_sid | lower }}adm"
   shell: >
+=======
+  become_user: "{{ hdb_sid_admin_user }}"
+  ansible.builtin.shell: >
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function GetProcessList
   failed_when: false
@@ -21,15 +26,25 @@
   register: hana_running
 
 - name: Ensure HANA is running
+<<<<<<< HEAD
   become_user: "{{ hdb_sid | lower }}adm"
   shell: >
+=======
+  become_user: "{{ hdb_sid_admin_user }}"
+  ansible.builtin.shell: >
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function StartWait {{ hana_stop_start_timeout_in_seconds }} {{ hana_stop_start_delay_in_seconds }}
   when: hana_running.rc != 3
 
 - name: Check HANA is running
+<<<<<<< HEAD
   become_user: "{{ hdb_sid | lower }}adm"
   shell: >
+=======
+  become_user: "{{ hdb_sid_admin_user }}"
+  ansible.builtin.shell: >
+>>>>>>> d4cf3b4b07f16988073e40fefe411c99f7d9ff93
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function GetProcessList
   changed_when: false

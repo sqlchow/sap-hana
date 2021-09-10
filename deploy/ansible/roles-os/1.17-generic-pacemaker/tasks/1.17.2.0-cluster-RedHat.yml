@@ -6,32 +6,6 @@
 # @TODO Subscribe to subscriptions/repos if required
 # This code assumes the deployment is using RHEL SAP image
 
-# Install Right Version of Azure Fence Agent 
-# https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
-- name: Install right version of Fence Agents based on Rhel version >= 7.7
-  when: ansible_distribution_version >= "7.7"
-  package:
-    name: fence-agents-azure-arm
-    state: latest
-
-- name: Install right version of Fence Agents based on Rhel version - RHEL 7.6 
-  when: ansible_distribution_version == "7.6"
-  package:
-    name: fence-agents-azure-arm-4.2.1-11.el7_6.8
-    state: present
-
-- name: Install right version of Fence Agents based on Rhel version  - RHEL 7.5
-  when: ansible_distribution_version == "7.5"
-  package:
-    name: fence-agents-azure-arm-4.0.11-86.el7_5.8
-    state: present
-
-- name: Install right version of Fence Agents based on Rhel version - RHEL 7.4
-  when: ansible_distribution_version == "7.4"
-  package:
-    name: fence-agents-azure-arm-4.0.11-66.el7_4.12
-    state: present
-
 - name: Ensure HA Cluster password is set to something secure
   ansible.builtin.user:
     name: hacluster
