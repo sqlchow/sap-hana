@@ -30,7 +30,7 @@
       when:                     myHooks_stat.stat.exists
 
   
-    - name:                    copy SAPHanaSR.py
+    - name:                    copy SAPHanaSR.py (SUSE)
       ansible.builtin.copy:
         src:                   /usr/share/SAPHanaSR/SAPHanaSR.py
         dest:                  /hana/shared/myHooks/
@@ -38,6 +38,20 @@
         owner:                 root
         group:                 root      #TODO - check the correct group once the python hook package is installed
         mode:                  '0644'
+      when:                      
+        - ansible_os_family | upper == "SUSE"
+
+    - name:                    copy SAPHanaSR.py (RHEL)
+      ansible.builtin.copy:
+        src:                   /usr/share/SAPHanaSR/srHook/SAPHanaSR.py
+        dest:                  /hana/shared/myHooks/
+        remote_src:            yes
+        owner:                 root
+        group:                 root      #TODO - check the correct group once the python hook package is installed
+        mode:                  '0644'
+      when:                      
+        - ansible_os_family | upper == "REDHAT"
+
 
     - name:                    Change ownership of the directory
       ansible.builtin.file:
