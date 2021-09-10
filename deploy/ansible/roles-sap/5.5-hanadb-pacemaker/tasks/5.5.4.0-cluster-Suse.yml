@@ -38,6 +38,10 @@
         op start interval="0" timeout="600"
         op stop interval="0" timeout="300"
         params SID="{{ hdb_sid | upper }}" InstanceNumber="{{ hdb_instance_number }}"
+      register:             SAPHanaTopology
+      failed_when:          SAPHanaTopology.rc > 1
+
+
     - name: Ensure SAP HANA Topology clone set resource is configured
       ansible.builtin.shell: >
         crm configure clone cln_SAPHanaTopology_{{ hdb_sid | upper }}_HDB{{ hdb_instance_number }}

@@ -33,3 +33,7 @@
   register: cluster_existence_check_result
   changed_when: false
   failed_when: false
+
+- name: Check if a cluster has already been prepared
+  debug: 
+    msg: "{{ cluster_existence_check_result }}"
