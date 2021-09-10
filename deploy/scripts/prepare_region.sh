@@ -399,9 +399,9 @@ if [ 0 == $step ]; then
             echo "${ppk}" > "${temp_file}"
             chmod 600 "${temp_file}"
             
-            remote_deployer_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$deployer_parameter_file")
-            remote_library_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$library_parameter_file")
-            remote_config_dir="~/.sap_deployment_automation"
+            remote_deployer_dir="$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$deployer_parameter_file")
+            remote_library_dir="$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$library_parameter_file")
+            remote_config_dir="$HOME/.sap_deployment_automation"
             
             ssh -i "${temp_file}" -o StrictHostKeyChecking=no -o ConnectTimeout=10 azureadm@"${deployer_public_ip_address}" "mkdir -p ${remote_deployer_dir}"/.terraform
             scp -i "${temp_file}" -o StrictHostKeyChecking=no -o ConnectTimeout=120 "$deployer_parameter_file" azureadm@"${deployer_public_ip_address}":"${remote_deployer_dir}"/.
