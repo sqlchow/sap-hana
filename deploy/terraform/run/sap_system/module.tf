@@ -49,6 +49,9 @@ module "common_infrastructure" {
   deployment                         = var.deployment
   license_type                       = var.license_type
   enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
+  anf_shared_volume_size             = var.anf_shared_volume_size
+  anf_sapmnt_volume_size             = var.anf_sapmnt_volume_size
+  use_ANF                            = var.use_ANF
 
 
 }
@@ -196,5 +199,6 @@ module "output_files" {
   ansible_user          = module.common_infrastructure.sid_username
   scs_lb_ip             = module.app_tier.scs_lb_ip
   db_lb_ip              = upper(try(local.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_lb_ip : module.anydb_node.db_lb_ip
+  sap_mnt               = module.common_infrastructure.sapmnt_path
 
 }

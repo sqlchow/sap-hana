@@ -23,6 +23,10 @@
     tags:
        - 0.1-passwords
 
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step1"
+      state: absent
+
 # -------------------------------------+---------------------------------------8
 #
 # <Comment Header> 
@@ -31,6 +35,7 @@
 
 - hosts:              "{{ sap_sid|upper }}_DB  :
                        {{ sap_sid|upper }}_SCS :
+                       {{ sap_sid|upper }}_ERS :
                        {{ sap_sid|upper }}_PAS :
                        {{ sap_sid|upper }}_ERS :
                        {{ sap_sid|upper }}_APP :
