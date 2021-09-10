@@ -90,8 +90,8 @@
       register: hana_cluster_resource_check
       retries: 30
       delay: 10
-      until: "'{{ primary_instance.name }} {{ secondary_instance.name }}' in cluster_stable_check.stdout or '{{ secondary_instance.name }} {{ primary_instance.name }}' in cluster_stable_check.stdout"
+      until: "'{{ primary_instance_name }} {{ secondary_instance.name }}' in cluster_stable_check.stdout or '{{ secondary_instance.name }} {{ primary_instance_name }}' in cluster_stable_check.stdout"
 
-  when: ansible_hostname == primary_instance.name
+  when: ansible_hostname == primary_instance_name
     
 #End of HANA clustering resources 

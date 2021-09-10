@@ -48,8 +48,8 @@
     path: /etc/hosts
     state: present
     insertafter: EOF
-    regexp: "{{ primary_instance.name }}"
-    line: "{{ primary_instance.ip_db }} {{ primary_instance.name }}"
+    regexp: "{{ primary_instance_name }}"
+    line: "{{ primary_instance.ip_db }} {{ primary_instance_name }}"
 
 - name: Ensure the Secondary node hosts entry exists
   ansible.builtin.lineinfile:

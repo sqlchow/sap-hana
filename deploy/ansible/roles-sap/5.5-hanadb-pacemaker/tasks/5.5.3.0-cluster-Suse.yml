@@ -58,7 +58,7 @@
 -name: Sudoers configuration -  # Todo - should we put this in the actual sudoers file ?? 
 cat << EOF > /etc/sudoers.d/20-saphana
 # Needed for SAPHanaSR python hook
-hn1adm ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_hn1_site_srHook_*
+{{ hdb_sid_admin_user }} ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_{{ hdb_sid | lower }}_site_srHook_*
 EOF
 
 - name: Start HANA on both nodes
@@ -180,4 +180,4 @@ EOF
 
     - name: Ensure maintenance mode is disabled
       ansible.builtin.shell: "crm configure property maintenance-mode=false"
-  when: inventory_hostname == primary_instance.name
+  when: inventory_hostname == primary_instance_name

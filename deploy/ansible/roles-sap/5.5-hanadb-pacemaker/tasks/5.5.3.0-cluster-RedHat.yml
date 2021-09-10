@@ -19,7 +19,7 @@
     - name: Ensure the SAP HANA Topology resource is created
       ansible.builtin.shell: >
         pcs resource create SAPHanaTopology_{{ hdb_sid | upper }}_{{ hdb_instance_number }} SAPHanaTopology
-        SID={{ sid | upper }} InstanceNumber={{ hdb_instance_number }}
+        SID={{ hdb_sid | upper }} InstanceNumber={{ hdb_instance_number }}
         op start timeout=600
         op stop timeout=300
         op monitor interval=10 timeout=600
@@ -28,7 +28,7 @@
     - name: Ensure the SAP HANA resource is created
       ansible.builtin.shell: >
         pcs resource create SAPHana_{{ hdb_sid | upper }}_{{ instance_number }} SAPHana
-        SID={{ sid | upper }} InstanceNumber={{ hdb_instance_number }}
+        SID={{ hdb_sid | upper }} InstanceNumber={{ hdb_instance_number }}
         PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
         AUTOMATED_REGISTER=false
         op start timeout={{ cluster_SAPHana_timeouts.start }}
@@ -43,7 +43,7 @@
     - name: Ensure the SAP HANA resource is created
       ansible.builtin.shell: >
         pcs resource create SAPHana_{{ hdb_sid | upper }}_{{ hdb_instance_number }} SAPHana
-        SID={{ sid | upper }} InstanceNumber={{ hdb_instance_number }}
+        SID={{ hdb_sid | upper }} InstanceNumber={{ hdb_instance_number }}
         PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
         AUTOMATED_REGISTER=false
         op start timeout={{ cluster_SAPHana_timeouts.start }}
@@ -63,13 +63,13 @@
       ansible.builtin.shell: pcs resource create nc_{{ hdb_sid | upper }}_{{ hdb_instance_number }} azure-lb port=625{{ instance_number }}
 
     - name: Ensure the Virtual IP group resource is created
-      ansible.builtin.shell: pcs resource group add g_ip_{{ hdb_sid | upper }}_{{ hdb_instance_number }} nc_{{ sid | upper }}_{{ instance_number }} vip_{{ sid | upper }}_{{ instance_number }}
+      ansible.builtin.shell: pcs resource group add g_ip_{{ hdb_sid | upper }}_{{ hdb_instance_number }} nc_{{ hdb_sid | upper }}_{{ instance_number }} vip_{{ hdb_sid | upper }}_{{ instance_number }}
 
     - name: Ensure the order constraint for the SAP HANA Topology is configured
-      ansible.builtin.shell: pcs constraint order SAPHanaTopology_{{ hdb_sid | upper }}_{{ hdb_instance_number }}-clone then SAPHana_{{ sid | upper }}_{{ instance_number }}-master symmetrical=false
+      ansible.builtin.shell: pcs constraint order SAPHanaTopology_{{ hdb_sid | upper }}_{{ hdb_instance_number }}-clone then SAPHana_{{ hdb_sid | upper }}_{{ instance_number }}-master symmetrical=false
 
     - name: Ensure the Virtual IP group is configured to the Master node
-      ansible.builtin.shell: pcs constraint colocation add g_ip_{{ hdb_sid | upper }}_{{ hdb_instance_number }} with master SAPHana_{{ sid | upper }}_{{ instance_number }}-master 4000
+      ansible.builtin.shell: pcs constraint colocation add g_ip_{{ hdb_sid | upper }}_{{ hdb_instance_number }} with master SAPHana_{{ hdb_sid | upper }}_{{ instance_number }}-master 4000
 
     - name: Ensure the Virtual IP group is configured to the Master node
       when: ansible_distribution_major_version == "8"
@@ -90,7 +90,7 @@
       register: hana_cluster_resource_check
       retries: 30
       delay: 10
-      until: "'{{ primary_instance.name }} {{ secondary_instance.name }}' in cluster_stable_check.stdout or '{{ secondary_instance.name }} {{ primary_instance.name }}' in cluster_stable_check.stdout"
+      until: "'{{ primary_instance_name }} {{ secondary_instance.name }}' in cluster_stable_check.stdout or '{{ secondary_instance.name }} {{ primary_instance_name }}' in cluster_stable_check.stdout"
 
   when: ansible_hostname == primary_instance_name
     
