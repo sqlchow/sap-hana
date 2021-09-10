@@ -23,6 +23,11 @@
     tags:
        - 0.1-passwords
 
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step2"
+      state: absent
+
+
 - hosts:          "{{ sap_sid|upper }}_DB  :
                    {{ sap_sid|upper }}_SCS :
                    {{ sap_sid|upper }}_PAS :
@@ -76,6 +81,12 @@
           name: roles-os/1.5-disk-setup
     tags:
       - 1.5-disk-setup
+  
+  - block:
+      - include_role:
+          name: roles-os/1.9-kernelparameters
+    tags:
+      - 1.9-kernelparameters
 
   - block:
       - include_role:

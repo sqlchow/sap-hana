@@ -48,7 +48,6 @@
 # 2230669 - System Provisioning Using a Parameter Input File
 #
 
-
 - name:     "Create run flag directory"
   ansible.builtin.file:
     path:   /etc/sap_deployment_automation
@@ -61,6 +60,18 @@
     path: /etc/sap_deployment_automation/sap_deployment_dbload.txt
     state: absent
   when: reinstall == true 
+
+- name: SAP DBLOAD install variables
+  debug:
+    msg: "{{ sap_inifile }}"
+    verbosity: 2
+
+- name: SAP DBLOAD install variables
+  debug:
+    msg: "{{ bom.product_ids.dbl }}"
+    verbosity: 2
+
+
 
 - name:               "SAP DBLOAD Install"
   ansible.builtin.shell: |

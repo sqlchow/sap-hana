@@ -23,10 +23,10 @@ deployer_tfstate_key  = null
 #########################################################################################
 
 # The environment value is a mandatory field, it is used for partitioning the environments, for example (PROD and NP)
-environment = "DEV"
+environment="DEV"
 
 # The location valus is a mandatory field, it is used to control where the resources are deployed
-location      = "westeurope"
+location="westeurope"
 
 # RESOURCEGROUP
 # The two resource group name and arm_id can be used to control the naming and the creation of the resource group
@@ -265,7 +265,21 @@ automation_username="azureadm"
 #########################################################################################
 # use_ANF is a boolean flag controlling if Azure NetApp files is used for storage
 
-#use_ANF=false
+use_ANF=false
+
+# ANF_account_arm_id is the Azure resource identifier for an existing Netapp Account
+# ANF_account_arm_id=""
+
+# ANF_account_name is the name for the Netapp Account
+#ANF_account_name=""
+
+#ANF_service_level is the service level for the NetApp pool
+#ANF_service_level="Standard"
+
+#ANF_pool_size is the pool size for the NetApp pool
+
+#ANF_pool_size=4
+
 
 /* anf subnet information */
 # If defined these parameters control the subnet name and the subnet prefix
