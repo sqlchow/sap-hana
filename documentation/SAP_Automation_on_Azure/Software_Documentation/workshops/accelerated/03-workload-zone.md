@@ -142,7 +142,9 @@ For *westeurope* use
      tenant_id=ttttttttt-tttt-tttt-tttt-ttttttttttt
      deployer_environment=DEMO
 
-     
+```
+
+```bash
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
      --parameterfile DEMO-SCUS-SAP00-INFRASTRUCTURE.json                     \
      --deployer_environment $deployer_environment                            \
@@ -159,12 +161,6 @@ For *westeurope* use:
 </br>
 
 ```bash
-     subscription=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-     spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
-     spn_secret=zzzzzzzzzzzzzzz                                          
-     tenant_id=ttttttttt-tttt-tttt-tttt-ttttttttttt
-     deployer_environment=DEMO
-
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
      --parameterfile DEMO-WEEU-SAP00-INFRASTRUCTURE.json                     \
      --deployer_environment $deployer_environment                            \
@@ -173,9 +169,6 @@ For *westeurope* use:
      --spn_secret "$spn_secret"                                              \
      --tenant_id $tenant_id                                                  \     
      --auto-approve
-     ```
-
-
-<br/><br/><br/><br/>
+```
 
 # Next: [SAP Deployment Unit - SDU](04-sdu.md) <!-- omit in toc -->
