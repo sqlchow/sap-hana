@@ -126,7 +126,7 @@
     }
     EOF
     ```
-For a seployment to westeurope use:
+For a deployment to westeurope use:
 
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-WEEU-SAP00-X00; cd $_
@@ -183,19 +183,19 @@ For a seployment to westeurope use:
 
 3. Deployment
    
-     ```bash
-     $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh            \
-     --parameterfile DEMO-SCUS-SAP00-X00.json                     \
-     --type sap_system                                            \
-     --auto-approve
-     ```
+```bash
+$DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh            \
+--parameterfile DEMO-SCUS-SAP00-X00.json                     \
+--type sap_system                                            \
+--auto-approve
+```
+
+For a deployment to westeurope use:
 
 
-for westeurope use
-
-     ```bash
-     $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh            \
-     --parameterfile DEMO-WEEU-SAP00-X00.json                     \
-     --type sap_system                                            \
-     --auto-approve
-     ```
+```bash
+   $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh            \
+   --parameterfile DEMO-WEEU-SAP00-X00.json                     \
+   --type sap_system                                            \
+   --auto-approve
+```
