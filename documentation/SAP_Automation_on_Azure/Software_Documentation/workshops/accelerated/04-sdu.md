@@ -195,8 +195,9 @@ For a deployment to westeurope use:
 
 
 ```bash
-   $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh            \
-   --parameterfile DEMO-WEEU-SAP00-X00.json                     \
-   --type sap_system                                            \
-   --auto-approve
+ $DEPLOYMENT_REPO_PATH/deploy/scripts/installer.sh            \
+ --parameterfile DEMO-WEEU-SAP00-X00.json                     \
+ --type sap_system                                            \
+ --auto-approve
+
 ```
