@@ -135,13 +135,19 @@ For *westeurope* use
 
     <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
      ```bash
+     
+     subscription=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+     spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+     spn_secret=zzzzzzzzzzzzzzz                                          
+     tenant_id=ttttttttt-tttt-tttt-tttt-ttttttttttt
+     
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
      --parameterfile DEMO-SCUS-SAP00-INFRASTRUCTURE.json                     \
      --deployer_environment DEMO                                             \
-     --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                     \ 
-     --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                           \
-     --spn_secret "zzzzzzzzzzzzzzz"                                          \
-     --tenant_id ttttttttt-tttt-tttt-tttt-ttttttttttt                        \     
+     --subscription $subscription                                            \ 
+     --spn_id $spn_id                                                        \
+     --spn_secret "$spn_secret"                                              \
+     --tenant_id $tenant_id                                                  \     
      --auto-approve
     ```
 
@@ -149,13 +155,18 @@ For *westeurope* use
 
     <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
      ```bash
+     subscription=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+     spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+     spn_secret=zzzzzzzzzzzzzzz                                          
+     tenant_id=ttttttttt-tttt-tttt-tttt-ttttttttttt
+
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
      --parameterfile DEMO-WEEU-SAP00-INFRASTRUCTURE.json                     \
      --deployer_environment DEMO                                             \
-     --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                     \ 
-     --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                           \
-     --spn_secret "zzzzzzzzzzzzzzz"                                          \
-     --tenant_id ttttttttt-tttt-tttt-tttt-ttttttttttt                        \     
+     --subscription $subscription                                            \ 
+     --spn_id $spn_id                                                        \
+     --spn_secret "$spn_secret"                                              \
+     --tenant_id $tenant_id                                                  \     
      --auto-approve
      ```
 
