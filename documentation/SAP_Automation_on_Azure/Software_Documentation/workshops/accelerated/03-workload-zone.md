@@ -133,9 +133,9 @@ For *westeurope* use
 
 4. Deployment providing the SPN Details. In this option the deployment of the workload zone requires different deployment credentials
 
-    <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
-     ```bash
-     
+    <br/>*Use the deployment data from the previous step for storageaccountname and vault.*<br/>
+
+```bash
      subscription=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
      spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
      spn_secret=zzzzzzzzzzzzzzz                                          
@@ -151,12 +151,14 @@ For *westeurope* use
      --spn_secret "$spn_secret"                                              \
      --tenant_id $tenant_id                                                  \     
      --auto-approve
-    ```
+```
 
-For *westeurope* use
+</br>
+For *westeurope* use:
 
-    <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
-     ```bash
+</br>
+
+```bash
      subscription=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
      spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
      spn_secret=zzzzzzzzzzzzzzz                                          
