@@ -126,60 +126,61 @@
     }
     EOF
     ```
+
 For a deployment to westeurope use:
 
-    ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-WEEU-SAP00-X00; cd $_
 
-    cat <<EOF > DEMO-WEEU-SAP00-X00.json
-    {
-      "infrastructure": {
-        "environment"                         : "DEMO",
-        "region"                              : "westeurope",
-        "vnets": {
-          "sap": {
-            "name"                            : "SAP00",
-            "subnet_db": {
-              "prefix"                        : "10.1.1.0/28"
-            },
-            "subnet_web": {
-              "prefix"                        : "10.1.1.16/28"
-            },
-            "subnet_app": {
-              "prefix"                        : "10.1.1.32/27"
-            },
-            "subnet_admin": {
-              "prefix"                        : "10.1.1.64/27"
-            }
+  ```bash
+
+  mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEMO-WEEU-SAP00-X00; cd $_
+
+  cat <<EOF > DEMO-WEEU-SAP00-X00.json
+  {
+    "infrastructure": {
+      "environment"                         : "DEMO",
+      "region"                              : "westeurope",
+      "vnets": {
+        "sap": {
+          "name"                            : "SAP00",
+          "subnet_db": {
+            "prefix"                        : "10.1.1.0/28"
+          },
+          "subnet_web": {
+            "prefix"                        : "10.1.1.16/28"
+          },
+          "subnet_app": {
+            "prefix"                        : "10.1.1.32/27"
+          },
+          "subnet_admin": {
+            "prefix"                        : "10.1.1.64/27"
           }
         }
-      },
-      "databases": [
-        {
-          "platform"                          : "HANA",
-          "high_availability"                 : false,
-          "size"                              : "S4Demo",
-          "os": {
-            "publisher"                       : "SUSE",
-            "offer"                           : "sles-sap-12-sp5",
-            "sku"                             : "gen1"
-          }
-        }
-      ],
-      "application": {
-        "enable_deployment"                   : true,
-        "sid"                                 : "X00",
-        "scs_instance_number"                 : "00",
-        "ers_instance_number"                 : "10",
-        "scs_high_availability"               : false,
-        "application_server_count"            : 3,
-        "webdispatcher_count"                 : 1
       }
+    },
+    "databases": [
+      {
+        "platform"                          : "HANA",
+        "high_availability"                 : false,
+        "size"                              : "S4Demo",
+        "os": {
+          "publisher"                       : "SUSE",
+          "offer"                           : "sles-sap-12-sp5",
+          "sku"                             : "gen1"
+        }
+      }
+    ],
+    "application": {
+      "enable_deployment"                   : true,
+      "sid"                                 : "X00",
+      "scs_instance_number"                 : "00",
+      "ers_instance_number"                 : "10",
+      "scs_high_availability"               : false,
+      "application_server_count"            : 3,
+      "webdispatcher_count"                 : 1
     }
-    EOF
-    ```
-
-
+  }
+  EOF
+  ```
 
 3. Deployment
    
