@@ -140,10 +140,12 @@ For *westeurope* use
      spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
      spn_secret=zzzzzzzzzzzzzzz                                          
      tenant_id=ttttttttt-tttt-tttt-tttt-ttttttttttt
+     deployer_environment=DEMO
+
      
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
      --parameterfile DEMO-SCUS-SAP00-INFRASTRUCTURE.json                     \
-     --deployer_environment DEMO                                             \
+     --deployer_environment $deployer_environment                            \
      --subscription $subscription                                            \ 
      --spn_id $spn_id                                                        \
      --spn_secret "$spn_secret"                                              \
@@ -159,10 +161,11 @@ For *westeurope* use
      spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
      spn_secret=zzzzzzzzzzzzzzz                                          
      tenant_id=ttttttttt-tttt-tttt-tttt-ttttttttttt
+     deployer_environment=DEMO
 
      $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
      --parameterfile DEMO-WEEU-SAP00-INFRASTRUCTURE.json                     \
-     --deployer_environment DEMO                                             \
+     --deployer_environment $deployer_environment                            \
      --subscription $subscription                                            \ 
      --spn_id $spn_id                                                        \
      --spn_secret "$spn_secret"                                              \
