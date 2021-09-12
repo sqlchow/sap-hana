@@ -47,7 +47,7 @@ data "azurerm_subnet" "subnet_sap_web" {
 # Create the SCS Load Balancer
 resource "azurerm_lb" "scs" {
   provider            = azurerm.main
-  count               = local.enable_deployment && local.scs_server_count > 0 ? 1 : 0
+  count               = local.enable_scs_lb_deployment ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
@@ -68,7 +68,7 @@ resource "azurerm_lb" "scs" {
 
 resource "azurerm_lb_backend_address_pool" "scs" {
   provider        = azurerm.main
-  count           = local.enable_deployment && local.scs_server_count > 0 ? 1 : 0
+  count           = local.enable_scs_lb_deployment ? 1 : 0
   name            = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb_bepool)
   loadbalancer_id = azurerm_lb.scs[0].id
 
@@ -76,7 +76,7 @@ resource "azurerm_lb_backend_address_pool" "scs" {
 
 resource "azurerm_lb_probe" "scs" {
   provider            = azurerm.main
-  count               = local.enable_deployment && local.scs_server_count > 0 ? (local.scs_high_availability ? 2 : 1) : 0
+  count               = local.enable_scs_lb_deployment ? (local.scs_high_availability ? 2 : 1) : 0
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.scs[0].id
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes[count.index == 0 ? "scs_alb_hp" : "scs_ers_hp"])
@@ -88,7 +88,7 @@ resource "azurerm_lb_probe" "scs" {
 
 resource "azurerm_lb_probe" "clst" {
   provider            = azurerm.main
-  count               = local.enable_deployment && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? 1 : 0
+  count               = local.enable_scs_lb_deployment && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? 1 : 0
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.scs[0].id
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_clst_hp)
@@ -100,7 +100,7 @@ resource "azurerm_lb_probe" "clst" {
 
 resource "azurerm_lb_probe" "fs" {
   provider            = azurerm.main
-  count               = local.enable_deployment && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? 1 : 0
+  count               = local.enable_scs_lb_deployment && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? 1 : 0
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.scs[0].id
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_fs_hp)
@@ -114,7 +114,7 @@ resource "azurerm_lb_probe" "fs" {
 # Create the SCS Load Balancer Rules
 resource "azurerm_lb_rule" "scs" {
   provider                       = azurerm.main
-  count                          = local.enable_deployment && local.scs_server_count > 0 ? 1 : 0
+  count                          = local.enable_scs_lb_deployment ? 1 : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.scs[0].id
   name                           = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_scs_rule)
@@ -130,7 +130,7 @@ resource "azurerm_lb_rule" "scs" {
 # Create the ERS Load balancer rules only in High Availability configurations
 resource "azurerm_lb_rule" "ers" {
   provider                       = azurerm.main
-  count                          = local.enable_deployment && local.scs_server_count > 0 ? (local.scs_high_availability ? 1 : 0) : 0
+  count                          = local.enable_scs_lb_deployment && local.scs_high_availability ? 1 : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.scs[0].id
   name                           = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_ers_rule)
@@ -210,7 +210,7 @@ resource "azurerm_availability_set" "app" {
 # Create the Web dispatcher Load Balancer
 resource "azurerm_lb" "web" {
   provider            = azurerm.main
-  count               = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
+  count               = local.enable_web_lb_deployment ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
@@ -239,7 +239,7 @@ resource "azurerm_lb_backend_address_pool" "web" {
 # Create the Web dispatcher Load Balancer Rules
 resource "azurerm_lb_rule" "web" {
   provider                       = azurerm.main
-  count                          = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
+  count                          = local.enable_web_lb_deployment ? 1 : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.web[0].id
   name                           = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_inrule)
