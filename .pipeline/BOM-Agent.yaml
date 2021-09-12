@@ -2,14 +2,13 @@
 name: BOM Download
 variables:
 - group: 'BOM Validation'
-trigger:
-  branches:
-    include:
-    - master
-    - beta/*
+
+schedules:
+- cron: "0 12 * * 0"
+  displayName: Weekly build
   paths:
     include:
-    - deploy/ansible/BOM-catalog/*.yaml
+    - deploy/ansible/BOM-catalog
 
 
 pool:
