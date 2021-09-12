@@ -11,7 +11,7 @@ resetformatting="\e[0m"
 full_script_path="$(realpath "${BASH_SOURCE[0]}")"
 script_directory="$(dirname "${full_script_path}")"
 
-#call stack has full scriptname when using source 
+#call stack has full scriptname when using source
 source "${script_directory}/deploy_utils.sh"
 
 function showhelp {
@@ -49,7 +49,7 @@ function showhelp {
     echo "#   [REPO-ROOT]deploy/scripts/installer.sh \                                            #"
     echo "#      --parameterfile DEV-WEEU-SAP01-X00 \                                             #"
     echo "#      --type sap_system                                                                #"
-    echo "#      --auto-approve                                                                   #"  
+    echo "#      --auto-approve                                                                   #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
@@ -78,7 +78,7 @@ INPUT_ARGUMENTS=$(getopt -n installer -o p:t:o:d:l:s:ahif --longoptions type:,pa
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
-  showhelp
+    showhelp
 fi
 
 eval set -- "$INPUT_ARGUMENTS"
@@ -232,7 +232,7 @@ param_dirname=$(pwd)
 
 init "${automation_config_directory}" "${generic_config_information}" "${system_config_information}"
 
-var_file="${param_dirname}"/"${parameterfile}" 
+var_file="${param_dirname}"/"${parameterfile}"
 
 extra_vars=""
 
@@ -245,7 +245,7 @@ then
     deployer_tfstate_key=${key}.terraform.tfstate
 fi
 
-if [ -z "$REMOTE_STATE_SA" ]; 
+if [ -z "$REMOTE_STATE_SA" ];
 then
     load_config_vars "${system_config_information}" "REMOTE_STATE_SA"
 else
@@ -335,15 +335,15 @@ fi
 
 if [ ! -n "${REMOTE_STATE_SA}" ]; then
     read -p "Terraform state storage account name:"  REMOTE_STATE_SA
-
+    
     get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
     load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
     load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
     load_config_vars "${system_config_information}" "tfstate_resource_id"
-
+    
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
-        if [ $account_set==0 ] 
+        if [ $account_set==0 ]
         then
             $(az account set --sub "${STATE_SUBSCRIPTION}")
             account_set=1
@@ -363,10 +363,10 @@ if [ -z "${REMOTE_STATE_RG}" ]; then
     load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
     load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
     load_config_vars "${system_config_information}" "tfstate_resource_id"
-
+    
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
-        if [ $account_set==0 ] 
+        if [ $account_set==0 ]
         then
             $(az account set --sub "${STATE_SUBSCRIPTION}")
             account_set=1
@@ -386,16 +386,16 @@ then
         
     fi
     tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
-
+    
     if [ -z "${deployer_tfstate_key}" ]; then
         deployer_tfstate_key_parameter=" "
     else
         deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
     fi
-
+    
 else
     tfstate_parameter=" "
-
+    
     save_config_vars "${system_config_information}" deployer_tfstate_key
 fi
 
@@ -440,7 +440,7 @@ new_deployment=false
 
 check_output=0
 
-if [ $account_set==0 ] 
+if [ $account_set==0 ]
 then
     $(az account set --sub "${STATE_SUBSCRIPTION}")
     account_set=1
@@ -482,7 +482,7 @@ else
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
-        if [ ! -n ${approve} ] 
+        if [ ! -n ${approve} ]
         then
             read -p "Do you want to redeploy Y/N?"  ans
             answer=${ans^^}
@@ -521,7 +521,7 @@ fi
 if [ 1 == $check_output ]
 then
     terraform -chdir=$terraform_module_directory refresh -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars}
-
+    
     outputs=$(terraform -chdir="${terraform_module_directory}" output )
     if echo "${outputs}" | grep "No outputs"; then
         ok_to_proceed=true
@@ -533,7 +533,7 @@ then
         echo "#########################################################################################"
         
         deployment_parameter=" -var deployment=new "
-
+        
     else
         echo ""
         echo "#########################################################################################"
@@ -542,11 +542,11 @@ then
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
-
+        
         deployment_parameter=" "
-
+        
         deployed_using_version=$(terraform -chdir="${terraform_module_directory}" output automation_version | tr -d \")
-
+        
         if [ ! -n "${deployed_using_version}" ]; then
             echo ""
             echo "#########################################################################################"
@@ -604,9 +604,9 @@ fi
 allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
 echo $allParams
 
-terraform -chdir="$terraform_module_directory" plan -no-color $allParams > plan_output.log
-str1=$(grep "Error: " error.log)
-if [ -n "${str1}" ]
+terraform -chdir="$terraform_module_directory" plan -no-color -detailed-exitcode $allParams > plan_output.log
+return_value=$?
+if [ 1 == $return_value ]
 then
     echo ""
     echo "#########################################################################################"
@@ -621,33 +621,29 @@ then
         rm plan_output.log
     fi
     unset TF_DATA_DIR
-    exit 1
+    exit $return_value
 fi
 
-if [ -f plan_output.log ]
+if [ 0 == $return_value ] ; then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#                          $cyan Infrastructure is up to date $resetformatting                               #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    if [ -f plan_output.log ]
     then
-    str1=$(grep "0 to add, 0 to change, 0 to destroy" plan_output.log)
-    str2=$(grep "No changes" plan_output.log)
-    if [ -n "${str1}" ] || [ -n "${str2}" ]; then
-        echo ""
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo -e "#                          $cyan Infrastructure is up to date $resetformatting                               #"
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-        echo ""
         rm plan_output.log
-        
-        if [ "${deployment_system}" == sap_landscape ]
+    fi
+    
+    if [ "${deployment_system}" == sap_landscape ]
+    then
+        if [ $landscape_tfstate_key_exists == false ]
         then
-            if [ $landscape_tfstate_key_exists == false ]
-            then
-                save_config_vars "${system_config_information}" \
-                landscape_tfstate_key
-            fi
+            save_config_vars "${system_config_information}" \
+            landscape_tfstate_key
         fi
-        unset TF_DATA_DIR
-        exit 0
     fi
 
     if [ "${deployment_system}" == sap_library ]
@@ -716,7 +712,7 @@ if [ $ok_to_proceed ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-
+    
     allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
     
     terraform -chdir="${terraform_module_directory}" apply -parallelism=$parallelism ${approve} $allParams  2>error.log
@@ -733,9 +729,9 @@ if [ $ok_to_proceed ]; then
         cat error.log
         rm error.log
         unset TF_DATA_DIR
-        exit 1
+        exit $return_value
     fi
-        
+    
 fi
 
 if [ "${deployment_system}" == sap_landscape ]
@@ -753,10 +749,10 @@ then
     az account set --sub $STATE_SUBSCRIPTION
 
     REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
-
+    
     get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
     
 fi
 
 unset TF_DATA_DIR
-exit 0
+exit $return_value
