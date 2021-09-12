@@ -196,6 +196,7 @@ if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
+    unset TF_DATA_DIR
     exit 4
 fi
 
@@ -217,6 +218,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
+    unset TF_DATA_DIR
     exit 3
 fi
 
@@ -233,6 +235,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
+    unset TF_DATA_DIR
     exit -1
 fi
 
@@ -284,7 +287,20 @@ else
                 fi
             fi
             terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure -backend-config "path=${param_dirname}/terraform.tfstate"
+            return_value=$?
+            if [ 0 != $return_value ] ; then
+                echo ""
+                echo "#########################################################################################"
+                echo "#                                                                                       #"
+                echo -e "#                          $boldreduscore Errors during the init phase $resetformatting                               #"    
+                echo "#                                                                                       #"
+                echo "#########################################################################################"
+                echo ""
+                unset TF_DATA_DIR
+                exit $return_value
+            fi
         else
+            unset TF_DATA_DIR
             exit 0
         fi
     fi
@@ -315,12 +331,17 @@ if [ 1 == $return_value ] ; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    cat plan_output.log
-    rm plan_output.log
+
+    if [ -f plan_output.log ]; then
+        cat plan_output.log
+        rm plan_output.log
+    fi
+    unset TF_DATA_DIR
     exit $return_value
 fi
 
 if [ -f plan_output.log ]; then
+    cat plan_output.log
     rm plan_output.log
 fi
 
@@ -335,9 +356,9 @@ echo ""
 if [ -n "${deployer_statefile_foldername}" ]; 
 then
     echo "Deployer folder specified:" "${deployer_statefile_foldername}"
-    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" -var deployer_statefile_foldername="${deployer_statefile_foldername}" 2>error.log
+    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" -var deployer_statefile_foldername="${deployer_statefile_foldername}" 
 else
-    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" 2>error.log
+    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" 
 fi
 return_value=$?
  
@@ -349,11 +370,10 @@ if [ 0 != $return_value ] ; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    cat error.log
-    rm error.log
     unset TF_DATA_DIR
     exit $return_value
 fi
+
 REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
 temp=$(echo "${REMOTE_STATE_SA}" | grep -m1 "Warning")
 if [ -z "${temp}" ]
@@ -361,9 +381,7 @@ then
     temp=$(echo "${REMOTE_STATE_SA}" | grep "Backend reinitialization required")
     if [ -z "${temp}" ]
     then
-        echo "save"
         save_config_var "REMOTE_STATE_SA" "${library_config_information}"
-        return_value=0
     fi
 fi
 
@@ -375,7 +393,6 @@ then
     if [ -z "${temp}" ]
     then
         save_config_var "tfstate_resource_id" "${library_config_information}"
-        return_value=0
     fi
 fi
 

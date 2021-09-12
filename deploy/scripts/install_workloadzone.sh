@@ -228,8 +228,6 @@ then
     mkdir "$HOME/.terraform.d/plugin-cache"
 fi
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
-export ARM_USE_MSI=false
-
 
 init "${automation_config_directory}" "${generic_config_information}" "${workload_config_information}"
 
@@ -281,6 +279,11 @@ then
   REMOTE_STATE_RG=$(echo $tfstate_resource_id | cut -d / -f5)
   REMOTE_STATE_SA=$(echo $tfstate_resource_id | cut -d / -f9)
   STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d / -f3)
+  save_config_vars "${workload_config_information}" \
+    tfstate_resource_id \
+    REMOTE_STATE_SA \
+    REMOTE_STATE_RG \
+    STATE_SUBSCRIPTION
 fi
 
 
@@ -299,7 +302,7 @@ if [ -n "${temp}" ]; then
     then
         rm stdout.az
     fi
-    exit -1
+    exit 67                                                                                             #addressee unknown
 else
     if [ -f stdout.az ]
     then
@@ -307,6 +310,22 @@ else
     fi
 fi
 account_set=0
+
+cloudIDUsed=$(az account show | grep "cloudShellID")
+if [ ! -z "${cloudIDUsed}" ];
+then 
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#         $boldred Please login using your credentials or service principal credentials! $resetformatting       #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit 67                                                                                             #addressee unknown
+fi
+
+#setting the user environment variables
+set_executing_user_environment_variables "${spn_secret}"
 
 if [ ! -z $STATE_SUBSCRIPTION ]
 then
@@ -338,6 +357,14 @@ then
         load_config_vars "${deployer_config_information}" "REMOTE_STATE_SA"
         load_config_vars "${deployer_config_information}" "tfstate_resource_id"
         load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
+
+        save_config_vars "${workload_config_information}" \
+        keyvault \
+        deployer_tfstate_key \
+        tfstate_resource_id \
+        REMOTE_STATE_SA \
+        REMOTE_STATE_RG
+
     fi
 
     if [ -z $STATE_SUBSCRIPTION ]
@@ -345,6 +372,7 @@ then
         # Retain post processing in case tfstate_resource_id was set by earlier
         # version of script tools.
         STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+        az account set --sub $STATE_SUBSCRIPTION
     fi
     
     if [ -z $REMOTE_STATE_RG ]
@@ -367,7 +395,10 @@ then
 
     save_config_vars "${workload_config_information}" \
     keyvault \
-    deployer_tfstate_key
+    deployer_tfstate_key \
+    tfstate_resource_id \
+    REMOTE_STATE_SA \
+    REMOTE_STATE_RG
     
     if [ -n $STATE_SUBSCRIPTION ]
     then

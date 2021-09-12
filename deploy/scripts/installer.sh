@@ -212,6 +212,15 @@ system_config_information="${automation_config_directory}""${environment}""${reg
 deployer_tfstate_key_parameter=''
 landscape_tfstate_key_parameter=''
 
+parallelism=10
+
+#Provide a way to limit the number of parallell tasks for Terraform
+if [ -n "${TF_PARALLELLISM}" ]; then
+    parallelism=TF_PARALLELLISM
+   
+fi
+
+echo "Parallelism count $parallelism"
 
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
@@ -291,7 +300,7 @@ if [ -n "${temp}" ]; then
     then
         rm stdout.az
     fi
-    exit 1
+    exit 67                                                                                             #addressee unknown
 else
     if [ -f stdout.az ]
     then
@@ -301,6 +310,23 @@ else
 fi
 
 account_set=0
+
+cloudIDUsed=$(az account show | grep "cloudShellID")
+if [ ! -z "${cloudIDUsed}" ];
+then 
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#         $boldred Please login using your credentials or service principal credentials! $resetformatting       #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit 67                                                                                             #addressee unknown
+fi
+
+#setting the user environment variables
+set_executing_user_environment_variables "none"
+
 
 if [ ! -z "${STATE_SUBSCRIPTION}" ]
 then
@@ -620,6 +646,21 @@ if [ 0 == $return_value ] ; then
             landscape_tfstate_key
         fi
     fi
+
+    if [ "${deployment_system}" == sap_library ]
+    then
+        
+        tfstate_resource_id=$(terraform -chdir="${terraform_module_directory}" output tfstate_resource_id| tr -d \")
+        STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+
+        az account set --sub $STATE_SUBSCRIPTION
+
+        REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
+        
+        get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+        
+    fi
+
     unset TF_DATA_DIR
     exit $return_value
 fi
@@ -675,7 +716,7 @@ if [ $ok_to_proceed ]; then
     
     allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
     
-    terraform -chdir="${terraform_module_directory}" apply ${approve} $allParams  2>error.log
+    terraform -chdir="${terraform_module_directory}" apply -parallelism=$parallelism ${approve} $allParams  2>error.log
     return_value=$?
     
     if [ 0 != $return_value ] ; then
@@ -703,6 +744,11 @@ fi
 if [ "${deployment_system}" == sap_library ]
 then
     
+    tfstate_resource_id=$(terraform -chdir="${terraform_module_directory}" output tfstate_resource_id| tr -d \")
+    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+
+    az account set --sub $STATE_SUBSCRIPTION
+
     REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
     
     get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
