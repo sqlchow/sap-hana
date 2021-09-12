@@ -54,7 +54,9 @@
 
 # Import this task only if the sap_mnt is defined, i.e. ANF is used
 - import_tasks: 2.6.1-anf-mounts.yaml
-  when: sap_mnt is defined
+  when: 
+  - sap_mnt is defined
+  - sap_mnt | trim | length != 0
 
 
 ...
