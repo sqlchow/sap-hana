@@ -182,6 +182,9 @@ locals {
   node_count      = try(length(local.hdb.dbnodes), 1)
   db_server_count = local.hdb_ha ? local.node_count * 2 : local.node_count
 
+  enable_db_lb_deployment = local.db_server_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.db_server_count > 1)
+
+
   hdb_ins = try(local.hdb.instance, {})
   hdb_sid = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
   hdb_nr  = try(local.hdb_ins.instance_number, "01")

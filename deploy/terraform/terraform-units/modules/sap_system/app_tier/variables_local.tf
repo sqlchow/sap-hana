@@ -94,7 +94,7 @@ locals {
   // Imports Disk sizing sizing information
 
   default_filepath = format("%s%s", path.module, "/../../../../../configs/app_sizes.json")
-  custom_sizing = length(var.custom_disk_sizes_filename) > 0
+  custom_sizing    = length(var.custom_disk_sizes_filename) > 0
 
   // Imports application tier sizing information
   file_name = local.custom_sizing ? (
@@ -228,6 +228,8 @@ locals {
   scs_high_availability    = var.application.scs_high_availability
   application_server_count = var.application.application_server_count
   scs_server_count         = var.application.scs_server_count * (local.scs_high_availability ? 2 : 1)
+  enable_scs_lb_deployment = local.scs_server_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.scs_server_count > 1)
+
   webdispatcher_count      = var.application.webdispatcher_count
 
   app_nic_ips       = try(var.application.app_nic_ips, [])

@@ -270,27 +270,38 @@
 
 For a deployment to *westeurope* use this:
     
-        ```bash
+    Execute
+    ```bash
+    subscription=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+    spn_secret=zzzzzzzzzzzzzzz                                          
+    tenant_id=ttttttttt-tttt-tttt-tttt-ttttttttttt
+ 
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                   \
-        --deployer_parameter_file DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE/DEMO-WEEU-DEP00-INFRASTRUCTURE.json  \
-        --library_parameter_file LIBRARY/DEMO-WEEU-SAP_LIBRARY/DEMO-WEEU-SAP_LIBRARY.json                      \
-        --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                                                    \ 
-        --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                                                          \
-        --spn_secret "zzzzzzzzzzzzzzz"                                                                         \
-        --tenant_id ttttttttt-tttt-tttt-tttt-ttttttttttt                                                       \
+        --deployer_parameter_file DEPLOYER/DEMO-SCUS-DEP00-INFRASTRUCTURE/DEMO-SCUS-DEP00-INFRASTRUCTURE.json  \
+        --library_parameter_file LIBRARY/DEMO-SCUS-SAP_LIBRARY/DEMO-SCUS-SAP_LIBRARY.json                      \
+        --subscription $subscription                                                                           \ 
+        --spn_id $spn_id                                                                                       \
+        --spn_secret "$spn_secret"                                                                             \
+        --tenant_id $tenant_id                                                                                 \
         --auto-approve
     ```
 
 For a deployment to *westeurope* use this:
     
         ```bash
+    subscription=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    spn_id=yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+    spn_secret=zzzzzzzzzzzzzzz                                          
+    tenant_id=ttttttttt-tttt-tttt-tttt-ttttttttttt
+
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                   \
         --deployer_parameter_file DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE/DEMO-WEEU-DEP00-INFRASTRUCTURE.json  \
         --library_parameter_file LIBRARY/DEMO-WEEU-SAP_LIBRARY/DEMO-WEEU-SAP_LIBRARY.json                      \
-        --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                                                    \ 
-        --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                                                          \
-        --spn_secret "zzzzzzzzzzzzzzz"                                                                         \
-        --tenant_id ttttttttt-tttt-tttt-tttt-ttttttttttt                                                       \
+        --subscription $subscription                                                                           \ 
+        --spn_id $spn_id                                                                                       \
+        --spn_secret "$spn_secret"                                                                             \
+        --tenant_id $tenant_id                                                                                 \
         --auto-approve
     ```
 
