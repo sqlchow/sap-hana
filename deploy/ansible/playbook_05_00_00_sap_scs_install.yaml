@@ -48,7 +48,7 @@
 #
 # -------------------------------------+---------------------------------------8
 
-  - set_fact:
+  - ansible.builtin.set_fact:
       tier:     scs
       hana_password_master:    "{{ hostvars.localhost.sap_password }}"
     tags:

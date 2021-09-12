@@ -1,20 +1,20 @@
 ---
 
 - name: "Exports: Create SAP Directories"
-  file:
+  ansible.builtin.file:
     path:   "{{ item.path }}"
     state:  directory
-    mode:   '{{ item.mode }}'
+    mode:   0755
   loop:
-    - { tier: 'preparation', path: '/usr/sap/install', mode: '0755' }
-    - { tier: 'preparation', path: '/usr/sap/trans', mode: '0755' }
-    - { tier: 'preparation', path: '/sapmnt/{{ sap_sid|upper }}', mode: '0755' }
+    - { tier: 'preparation', path: '/usr/sap/install' }
+    - { tier: 'preparation', path: '/usr/sap/trans' }
+    - { tier: 'preparation', path: '/sapmnt/{{ sap_sid|upper }}' }
   when:     item.tier == "all" or
             item.tier == tier
 
 
 - name: "Exports: NFS Server Config on Suse"
-  lineinfile:
+  ansible.builtin.lineinfile:
     path:   "{{ item.path }}"
     regexp: "{{ item.regexp }}"
     line:   "{{ item.line }}"
@@ -82,7 +82,7 @@
 
 # Leveraging functionality from the 1.16-serices role
 # - name: "Exports: Enable NFS Service on Suse"
-#   service:
+#   ansible.builtin.service:
 #     name:    nfsserver
 #     state:   restarted
 #     enabled: yes
@@ -101,7 +101,7 @@
 #     enabled: yes
 
 # - name: Ensure expected base directories are present
-#   file:
+#   ansible.builtin.file:
 #     path: "{{ item.path }}"
 #     state: directory
 #     owner: "{{ item.owner | default(omit) }}"
@@ -110,7 +110,7 @@
 #   loop: "{{ nfs_exports }}"
 
 # - name: Ensure exports file exists
-#   lineinfile:
+#   ansible.builtin.lineinfile:
 #     dest: /etc/exports
 #     create: yes
 #     line: "{{ item.path }}    {{ item.export_settings }}"
@@ -128,7 +128,7 @@
 #     daemon_reload: yes
 
 # - name: Ensure file systems are exported
-#   command: exportfs -a
+#   ansible.builtin.command: exportfs -a
 
 
 # nfs_exports:

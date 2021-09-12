@@ -52,16 +52,6 @@ packages:
       - { tier: 'sapos', package: 'csh',                                                      state: 'present' }     
     #------------------------- Begin - Packages required for Clustering ---------------------------------------8
       - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
-      - { tier: 'ha',    package: 'pcs',                                node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',             node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'resource-agents-sap-hana',           node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'pcs',                                node_tier: 'scs',     state: 'present' }
-      - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'scs',     state: 'present' }
-      - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'scs',     state: 'present' }
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',             node_tier: 'scs',     state: 'present' }
-      #     - { tier: 'ha',    package: 'SAPHanaSR>=0.153',                   node_tier: 'hana',    state: 'present' }
       - { tier: 'ha',    package: 'pcs',                                                      state: 'present' }
       - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
@@ -124,17 +114,10 @@ packages:
       - { tier: 'sapos', package: 'csh',                                                      state: 'present' }
      #------------------------- Begin - Packages required for Clustering ---------------------------------------8
       - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
-      - { tier: 'ha',    package: 'pcs',                                node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',             node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'resource-agents-sap-hana',           node_tier: 'hana',    state: 'present' }
-      - { tier: 'ha',    package: 'pcs',                                node_tier: 'scs',     state: 'present' }
-      - { tier: 'ha',    package: 'pacemaker',                          node_tier: 'scs',     state: 'present' }
-      - { tier: 'ha',    package: 'nmap-ncat',                          node_tier: 'scs',     state: 'present' }
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',             node_tier: 'scs',     state: 'present' }
-      #      - { tier: 'ha',    package: 'SAPHanaSR>=0.153',                   node_tier: 'hana',    state: 'present' }
-      
+      - { tier: 'ha',    package: 'pcs',                                                      state: 'present' }
+      - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
+      - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
+      - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
     #------------------------- End - Packages required for Clustering -----------------------------------------8
     redhat8.1:
       - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
@@ -160,11 +143,10 @@ packages:
       - { tier: 'ha',    package: 'resource-agents>=4.3',                                     state: 'present' }
       - { tier: 'ha',    package: 'fence-agents>=4.4.0',                                      state: 'present' }
       - { tier: 'ha',    package: 'cloud-netconfig-azure>=1.3',                               state: 'present' }
-      - { tier: 'ha',    package: 'SAPHanaSR>=0.153',                   node_tier: 'hana',    state: 'present' }
-      #Assumption: Public_Cloud_Module_x86_64 already available 
+    #Assumption: Public_Cloud_Module_x86_64 already available 
       - { tier: 'ha',    package: 'python-azure-mgmt-compute=4.6.2',                          state: 'present' }
       - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
-#      - { tier: 'ha',    package: 'sap-suse-cluster-connector',         node_tier: 'scs',     state: 'present' }
+      - { tier: 'ha',    package: 'sap-suse-cluster-connector',         node_tier: 'scs',     state: 'present' }
     #-------------------------- End - packages required for Clustering ------------------------------------8
     suse12.4:
     suse12.5:
@@ -188,10 +170,12 @@ packages:
       - { tier: 'ha',    package: 'resource-agents>=4.3',               node_tier: 'hana',          state: 'present' }
       - { tier: 'ha',    package: 'fence-agents>=4.4.0',                node_tier: 'hana',          state: 'present' }
       - { tier: 'ha',    package: 'cloud-netconfig-azure>=1.3',         node_tier: 'hana',          state: 'present' }
-      - { tier: 'ha',    package: 'SAPHanaSR>=0.153',                   node_tier: 'hana',          state: 'present' }
     #Assumption: Public_Cloud_Module_x86_64 already available 
-      - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',                               state: 'present' }
-      - { tier: 'ha',    package: 'jq',                                                             state: 'present' }
+      - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',   node_tier: 'hana',          state: 'present' }
+      - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',   node_tier: 'scs',           state: 'present' }
+      - { tier: 'ha',    package: 'jq',                                 node_tier: 'scs',           state: 'present' }
+      - { tier: 'ha',    package: 'jq',                                 node_tier: 'hana',          state: 'present' }
+      - { tier: 'ha',    package: 'sap-suse-cluster-connector',         node_tier: 'scs',           state: 'present' }
     #------------------------ End - packages required for Clustering --------------------------------------8
       # TODO(rtamalin): Ensure SLE 15 SP2 uses /usr/bin/python3 rather
       # than /usr/bin/python.

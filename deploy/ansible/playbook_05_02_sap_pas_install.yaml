@@ -46,7 +46,7 @@
 # Build the list of tasks to be executed in order here. 
 #
 # -------------------------------------+---------------------------------------8
-  - set_fact:
+  - ansible.builtin.set_fact:
       tier:     pas                                                             # SAP Install phase: PAS - Primary Application Server
       hana_password_master:    "{{ hostvars.localhost.sap_password }}"
     tags:

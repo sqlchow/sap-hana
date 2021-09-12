@@ -29,7 +29,7 @@
     - name:                     Rename myHooks
       ansible.builtin.command:  mv /hana/shared/myHooks /hana/shared/myHooks.Sample
       when:                     
-       - myHooks_stat.stat.exists == false
+       - myHooks_stat.stat.exists
        - ansible_hostname == primary_instance_name
 
   
@@ -43,7 +43,8 @@
         mode:                  '0644'
       when:                      
         - ansible_os_family | upper == "SUSE"
-
+        - myHooks_stat.stat.exists == false
+      
     - name:                    copy SAPHanaSR.py (RHEL)
       ansible.builtin.copy:
         src:                   /usr/share/SAPHanaSR/srHook/SAPHanaSR.py
@@ -54,6 +55,7 @@
         mode:                  '0644'
       when:                      
         - ansible_os_family | upper == "REDHAT"
+        - myHooks_stat.stat.exists == false
 
 
     - name:                    Change ownership of the directory

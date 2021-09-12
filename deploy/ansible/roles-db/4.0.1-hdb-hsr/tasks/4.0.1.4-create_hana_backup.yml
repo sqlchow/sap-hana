@@ -19,10 +19,7 @@
     - name: HSR - Ensure backup exists for SYSTEMDB database for System Identifier {{ hdb_sid }}
       ansible.builtin.shell: >
         . ~/.bashrc && {{ hdbsql_systemdb_command }} "{{ backup_cmd_for_systemdb }}"
-      vars:
-        # Note. Conditional bare variables deprecation notice is supressed here by ansible.cfg
-        backup_required: "('{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_systemdb_result.stdout) "
-      when: backup_required
+      when: ('{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_systemdb_result.stdout)
 
     - name: HSR - Check if there is a tenant db needing backup
       block:
@@ -36,8 +33,6 @@
         - name: HSR - Ensure backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ hdb_sid }}
           ansible.builtin.shell: >
             . ~/.bashrc && {{ hdbsql_tenant_command }} "{{ backup_cmd_for_tenant }}"
-          vars:
-            backup_required: "('{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_tenant_result.stdout)"
-          when: backup_required
+          when: ('{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_tenant_result.stdout)
       when: hana_has_tenant_db
   when: ansible_hostname == primary_instance_name and not hana_system_replication_enabled

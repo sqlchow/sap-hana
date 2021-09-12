@@ -33,7 +33,7 @@ admin_groups:
     enabled:      true
     node_tier:    all
   - name:         sapinst
-    gid:          "2001"
+    gid:          "{{ sapinst_gid }}"
     state:        present
     tier:         ha
     enabled:      true

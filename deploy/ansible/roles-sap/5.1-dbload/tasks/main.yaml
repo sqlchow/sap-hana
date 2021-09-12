@@ -4,7 +4,7 @@
 
 ---
 - name:  
-  set_fact:
+  ansible.builtin.set_fact:
     sap_inifile:                  "{{ bom_base_name }}-dbload-{{ ansible_hostname }}.params"
     sap_inifile_template:         "{{ bom_base_name }}-dbload-inifile-param.j2"
 
@@ -74,7 +74,7 @@
 
 
 - name:               "SAP DBLOAD Install"
-  shell: |
+  ansible.builtin.shell: |
                       set -o errexit
                       export TMPDIR=/usr/sap/install
                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
