@@ -212,6 +212,14 @@ system_config_information="${automation_config_directory}""${environment}""${reg
 deployer_tfstate_key_parameter=''
 landscape_tfstate_key_parameter=''
 
+parallelism=10
+
+#Provide a way to limit the number of parallell tasks for Terraform
+if [ -n "${TF_PARALLELLISM}" ]; then
+    parallelism=TF_PARALLELLISM
+fi
+
+echo "Parallelism count $parallelism"
 
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]

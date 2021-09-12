@@ -251,6 +251,22 @@ fi
 
 account_set=0
 
+cloudIDUsed=$(az account show | grep "cloudShellID")
+if [ ! -z "${cloudIDUsed}" ];
+then 
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#         $boldred Please login using your credentials or service principal credentials! $resetformatting       #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit 67                                                                                             #addressee unknown
+fi
+
+#setting the user environment variables
+set_executing_user_environment_variables "none"
+
 if [ ! -z "${STATE_SUBSCRIPTION}" ]; then
     $(az account set --sub "${STATE_SUBSCRIPTION}")
     account_set=1
