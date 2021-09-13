@@ -216,7 +216,7 @@ parallelism=10
 
 #Provide a way to limit the number of parallell tasks for Terraform
 if [ -n "${TF_PARALLELLISM}" ]; then
-    parallelism=TF_PARALLELLISM
+    parallelism=$TF_PARALLELLISM
 fi
 
 echo "Parallelism count $parallelism"
