@@ -17,14 +17,28 @@ function __init_logger() {
 function __init_log() {
 
     #global variables
-    #readonly LOG_FILE_NAME="${LOG_FILE_NAME:-$(basename "$0")}.log}"
+    
     SCRIPTPATH_FULL="$(realpath "${BASH_SOURCE[0]}")"
     SCRIPTDIR="$(dirname "${SCRIPTPATH_FULL}")"
-    SCRIPTNAME="$(basename ${BASH_SOURCE[0]})"
+    #SCRIPTNAME="$(basename ${BASH_SOURCE[0]})"
     DATETIME=$(date +%Y%m%d%H%M%S)
     INFOLOGFILENAME="infolog-${DATETIME}.txt"
     DEBUGLOGFILENAME="debuglog-${DATETIME}.txt"
-    PROCESS_OF_LOG="$$"
+    PROCESS_OF_LOG_MODULE="$$"
+
+    readonly PROCESS_OF_LOG_MODULE
+
+    # initialize log files and redirect stdout and stderr to log files
+    printf "Execution started at : %s\n" "${DATETIME}" > "${INFOLOGFILENAME}" 
+    printf "Execution started at : %s\n" "${DATETIME}" > "${DEBUGLOGFILENAME}"
+    
+    exec 3>&1 4>&2
+    
+    tail -f "${INFOLOGFILENAME}" &
+    PROCESS_OF_BCK_LOGGER=$!
+
+    # redirect stdout and stderr to log files
+    exec 1> >(tee -a "${INFOLOGFILENAME}" "${DEBUGLOGFILENAME}") 2> >(tee -a "${DEBUGLOGFILENAME}" >&2)
 
     # letting colors be defined, use cat, less -R or tail to see the colors
     # if cat is not displaying colors, then the control characters may not be
@@ -69,18 +83,6 @@ function __init_log() {
     # set default log level mapper to INFO
     log_level_mapper["default"]=3
     
-    # initialize log files and redirect stdout and stderr to log files
-    printf "Execution started at : %s\n" "${DATETIME}" > "${INFOLOGFILENAME}" 
-    printf "Execution started at : %s\n" "${DATETIME}" > "${DEBUGLOGFILENAME}"
-    exec 3>&1 4>&2
-    
-    tail -f "${INFOLOGFILENAME}" &
-
-    readonly PROCESS_OF_LOG="$$"
-
-    exec 3> >(exec 4> >(tee -a "${DEBUGLOGFILENAME}" 2>&1))
-    #exec 3> >(tee "${DEBUGLOGFILENAME}") 4> >(tee "${DEBUGLOGFILENAME}" 2>&1)
-
     # shellcheck disable=SC2034
     trap reset_file_descriptors EXIT HUP INT ABRT QUIT TERM
 }
@@ -252,7 +254,7 @@ function reset_file_descriptors() {
     # close all file descriptors
     exec 3>&- 4>&-
     # remove the background process for log file
-    pkill -P "${PROCESS_OF_LOG}"
+    pkill -P "${PROCESS_OF_LOG_MODULE}"
 }
 
 dump_stack_trace() {
@@ -325,10 +327,10 @@ __init_logger
 # DATETIME=$(date +%Y%m%d%H%M%S)
 # INFOLOGFILENAME="infolog-${DATETIME}.txt"
 # DEBUGLOGFILENAME="debuglog-${DATETIME}.txt"
-# PROCESS_OF_LOG="$$"
+# PROCESS_OF_LOG_MODULE="$$"
 
 # function log_info() {
-#     echo -e "${INFO_COLOR}${PROCESS_OF_LOG} ${1}${RESET_COLOR}"
+#     echo -e "${INFO_COLOR}${PROCESS_OF_LOG_MODULE} ${1}${RESET_COLOR}"
 # }
 
 # function strip_colors() {
