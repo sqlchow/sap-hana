@@ -55,6 +55,7 @@ packages:
       - { tier: 'ha',    package: 'pcs',                                                      state: 'present' }
       - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
+      - { tier: 'ha',    package: 'resource-agents-sap-hana',                                 state: 'present' }
     #------------------------- End - Packages required for Clustering -----------------------------------------8
     redhat7.4: 
       # Install Right Version of Azure Fence Agent 
@@ -118,6 +119,7 @@ packages:
       - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
       - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
       - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
+      - { tier: 'ha',    package: 'resource-agents-sap-hana',                                 state: 'present' }
     #------------------------- End - Packages required for Clustering -----------------------------------------8
     redhat8.1:
       - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
