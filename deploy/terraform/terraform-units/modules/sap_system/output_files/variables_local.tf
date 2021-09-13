@@ -144,6 +144,9 @@ variable "sap_mnt" {
   default     = ""
 }
 
+variable "database_admin_ips" {
+  description = "List of Admin NICs for the DB VMs"
+}
 
 locals {
 
