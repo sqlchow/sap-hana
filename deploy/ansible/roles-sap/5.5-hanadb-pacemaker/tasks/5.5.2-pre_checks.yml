@@ -33,3 +33,12 @@
   register: cluster_existence_check_result
   changed_when: false
   failed_when: false
+
+- name: Check if a cluster has already been prepared (save)
+  ansible.builtin.set_fact: 
+    cluster_existence_check: "{{ cluster_existence_check_result.rc }}"
+
+- name: Check if a cluster has already been prepared (show)
+  debug: 
+    msg: "Cluster check return value: {{ cluster_existence_check }}"
+

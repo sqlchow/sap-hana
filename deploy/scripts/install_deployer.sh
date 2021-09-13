@@ -255,9 +255,10 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform -chdir="${terraform_module_directory}"  plan -no-color -detailed-exitcode -var-file="${var_file}" $extra_vars > plan_output.log 2>&1
-return_value=$?
-if [ 1 == $return_value ] ; then
+terraform -chdir="${terraform_module_directory}"  plan -var-file="${var_file}" $extra_vars > plan_output.log 2>&1
+str1=$(grep "Error: KeyVault " plan_output.log)
+
+if [ -n "${str1}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -265,10 +266,10 @@ if [ 1 == $return_value ] ; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    cat plan_output.log
+    echo $str1
     rm plan_output.log
     unset TF_DATA_DIR
-    exit $return_value
+    exit -1
 fi
 
 if [ -f plan_output.log ]; then
@@ -295,12 +296,13 @@ if [ 0 != $return_value ] ; then
     echo "#########################################################################################"
     echo ""
     unset TF_DATA_DIR
-    exit $return_value
+    exit -1
 fi
 
 
 keyvault=$(terraform -chdir="${terraform_module_directory}"  output deployer_kv_user_name | tr -d \")
 
+return_value=-1
 temp=$(echo "${keyvault}" | grep "Warning")
 if [ -z "${temp}" ]
 then
@@ -322,32 +324,9 @@ then
 
         save_config_var "keyvault" "${deployer_config_information}"
         return_value=0
+    else
+        return_value=-1
     fi
 fi
-
-sshsecret=$(terraform -chdir="${terraform_module_directory}"  output deployer_private_key_secret_name | tr -d \")
-
-temp=$(echo "${sshsecret}" | grep "Warning")
-if [ -z "${temp}" ]
-then
-    temp=$(echo "${sshsecret}" | grep "Backend reinitialization required")
-    if [ -z "${temp}" ]
-    then
-        save_config_var "sshsecret" "${deployer_config_information}"
-    fi
-fi
-
-deployer_public_ip_address=$(terraform -chdir="${terraform_module_directory}"  output deployer_public_ip_address | tr -d \")
-
-temp=$(echo "${deployer_public_ip_address}" | grep "Warning")
-if [ -z "${temp}" ]
-then
-    temp=$(echo "${deployer_public_ip_address}" | grep "Backend reinitialization required")
-    if [ -z "${temp}" ]
-    then
-        save_config_var "deployer_public_ip_address" "${deployer_config_information}"
-    fi
-fi
-
 unset TF_DATA_DIR
 exit $return_value

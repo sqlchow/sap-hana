@@ -112,7 +112,6 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
       object_id
     ]
   }
-
 }
 
 // Comment out code with users.object_id for the time being.

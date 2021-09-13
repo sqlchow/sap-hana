@@ -1,6 +1,6 @@
 # /*----------------------------------------------------------------------------8
 # |                                                                            |
-# |                         PLAYBOOK FOR BOM VALIDATION                         |
+# |                         PLAYBOOK FOR BOM DOWNLOADER                        |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
@@ -12,7 +12,7 @@
 
 - hosts:          localhost
 
-  name:           BOM Validator
+  name:           BOM Downloader
   gather_facts:   false
   connection:     local
   become:         yes

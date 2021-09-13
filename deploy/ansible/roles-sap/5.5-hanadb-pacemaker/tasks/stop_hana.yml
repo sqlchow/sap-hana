@@ -11,8 +11,8 @@
 #     4  GetProcessList succeeded, all processes stopped
 
 - name: Determine if HANA is stopped
-  become_user: "{{ hdb_sid_admin_user }}"
-  ansible.builtin.shell: >
+  become_user: "{{ hdb_sid | lower }}adm"
+  shell: >
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function GetProcessList
   failed_when: false
@@ -20,15 +20,15 @@
   register: hana_stopped
 
 - name: Ensure HANA is stopped
-  become_user: "{{ hdb_sid_admin_user }}"
-  ansible.builtin.shell: >
+  become_user: "{{ hdb_sid | lower }}adm"
+  shell: >
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function StopWait {{ hana_stop_start_timeout_in_seconds }} {{ hana_stop_start_delay_in_seconds }}
   when: hana_stopped.rc != 4
 
 - name: Check HANA is stopped
-  become_user: "{{ hdb_sid_admin_user }}"
-  ansible.builtin.shell: >
+  become_user: "{{ hdb_sid | lower }}adm"
+  shell: >
     source ~/.bashrc ;
     {{ sapcontrol_command }} -function GetProcessList
   changed_when: false

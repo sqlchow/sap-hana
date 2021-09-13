@@ -260,12 +260,15 @@
 
     4. Answer Input
        1. Do you want to specify the SPN Details Y/N?
+          - Environment name:
+          - Keyvault name:
           - SPN App ID:
           - SPN App Password:
           - SPN Tenant ID:
           - SPN Subscription:
-          
-    Alternatively the two previous steps can be combined to one.
+
+
+For a deployment to *westeurope* use this:
     
     Execute
     ```bash

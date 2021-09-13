@@ -769,7 +769,7 @@ if [ $ok_to_proceed ]; then
     terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file=${var_file} $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter
 fi
 
-return_value=$?
+return_value=0
 landscape_tfstate_key=${key}.terraform.tfstate
 save_config_var "landscape_tfstate_key" "${workload_config_information}"
 

@@ -52,7 +52,6 @@ Future Steps will include:
 
 ## Procedure
 
-Runtime environment: Deployer
 ### Post Deployment Configuration - Ansible
 <br/>
 
@@ -71,7 +70,6 @@ Runtime environment: Deployer
     | -------------------------- | -------------------------------------- |
     | bom_base_name              | S419009SPS03_v1                        |
     | sapbits_location_base_path | https://<storage_account_FQDN>/sapbits |
-    | sapbits_sas_token          | SAS token for storage account (if required) |
     | password_master            | MasterPass00                           |
     | sap_fqdn                   | sap.contoso.com                        |
     
@@ -88,7 +86,6 @@ Runtime environment: Deployer
 
     bom_base_name:                 S41909SPS03_v1
     sapbits_location_base_path:    https://<storage_account_FQDN>/sapbits
-    sapbits_sas_token:             <SAS-Token>
     password_master:               MasterPass00
     sap_fqdn:                      sap.contoso.com
 

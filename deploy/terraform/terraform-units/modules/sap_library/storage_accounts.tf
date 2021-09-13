@@ -135,6 +135,8 @@ resource "azurerm_role_assignment" "deployer_msi_sa_tfstate" {
   principal_id         = local.deployer_msi_principal_id
 }
 
+
+#ToDo Fix later
 resource "azurerm_key_vault_secret" "saplibrary_access_key" {
   provider     = azurerm.deployer
   count        = length(local.deployer_kv_user_arm_id) > 0 ? 1 : 0
