@@ -130,6 +130,7 @@
     
     - name: Stonith Timeout Property
       shell: sudo crm configure property stonith-timeout=900
+  when: inventory_hostname == primary_instance_name
 
 - name: Ensure Azure scheduled events is configured
   block:
