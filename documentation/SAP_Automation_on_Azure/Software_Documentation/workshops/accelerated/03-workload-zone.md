@@ -117,7 +117,7 @@ Logon to the deployer using the ssh key downloaded in the previous step.
      --vault DEMOSCUSDEP00user###                                            \
      ```
 
-For *westeurope* use
+For **westeurope** use
 
     <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
      ```bash
@@ -151,7 +151,9 @@ For *westeurope* use
 ```
 
 </br>
-For *westeurope* use:
+
+For **westeurope** use:
+
 
 </br>
 
