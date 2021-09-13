@@ -35,6 +35,7 @@ resource "azurerm_key_vault_access_policy" "kv_prvt_msi" {
 
   secret_permissions = [
     "Get",
+    "Set",
     "List"
   ]
 }
