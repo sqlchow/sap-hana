@@ -1,7 +1,7 @@
 ---
-name:    'HANA_2_00_055_v0003ms'
+name:    'HANA_2_00_055_v0004ms'
 target:  'HANA 2.0'
-version: 3
+version: 4
 
 materials:
 #   templates:
