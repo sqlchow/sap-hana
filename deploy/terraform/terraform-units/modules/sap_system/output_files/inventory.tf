@@ -124,7 +124,7 @@ resource "local_file" "ansible_inventory_yml" {
 */
 resource "local_file" "ansible_inventory_new_yml" {
   content = templatefile(format("%s%s", path.module, "/ansible_inventory_new.yml.tmpl"), {
-    ips_dbnodes = local.ips_dbnodes_db,
+    ips_dbnodes = var.database_admin_ips,
     dbnodes     = length(local.hdb_vms) > 0 ? local.hdb_vms : local.anydb_vms
     ips_scs = length(local.ips_scs) > 0 ? (
       length(local.ips_scs) > 1 ? (

@@ -14,7 +14,7 @@ output "nics_anydb_admin" {
 }
 
 output "anydb_admin_ip" {
-  value = local.enable_deployment ? azurerm_network_interface.anydb_admin[*].private_ip_address : []
+  value = local.enable_deployment ? (local.anydb_dual_nics ? azurerm_network_interface.anydb_admin[*].private_ip_address : azurerm_network_interface.anydb_db[*].private_ip_address) : []
 }
 
 output "anydb_db_ip" {

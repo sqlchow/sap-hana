@@ -64,3 +64,11 @@ output "db_ha" {
 output "db_lb_ip" {
   value = local.enable_deployment ? azurerm_lb.hdb[0].frontend_ip_configuration[0].private_ip_address : ""
 }
+
+output "db_admin_ip" {
+  value = local.enable_deployment ?  azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address : []
+}
+
+output "db_ip" {
+  value = local.enable_deployment ?  azurerm_network_interface.nics_dbnodes_db[*].private_ip_address : []
+}
