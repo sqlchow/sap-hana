@@ -8,7 +8,6 @@ module "sap_landscape" {
     azurerm.main     = azurerm.main
     azurerm.deployer = azurerm.deployer
     azurerm.fencing  = azurerm.fencing
-    azuread.fencing  = azuread.fencing
   }
   source                             = "../../terraform-units/modules/sap_landscape"
   infrastructure                     = local.infrastructure
