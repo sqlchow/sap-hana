@@ -179,7 +179,7 @@ resource "azurerm_subnet_route_table_association" "web" {
 # Creates network security rule to allow internal traffic for SAP db subnet
 resource "azurerm_network_security_rule" "nsr_internal_db" {
   provider = azurerm.main
-  count    = local.sub_db_nsg_exists ? 0 : 1
+  count    = local.sub_db_nsg_exists ? 0 : 0
   name     = "allow-internal-traffic"
   resource_group_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   network_security_group_name  = azurerm_network_security_group.db[0].name
