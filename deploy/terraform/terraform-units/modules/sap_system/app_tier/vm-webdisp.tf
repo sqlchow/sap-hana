@@ -1,6 +1,5 @@
 # Create Web dispatcher NICs
 resource "azurerm_network_interface" "web" {
-  depends_on                    = [azurerm_network_interface.app]
   provider                      = azurerm.main
   count                         = local.enable_deployment ? local.webdispatcher_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.nic)
@@ -54,7 +53,6 @@ resource "azurerm_network_interface" "web_admin" {
 # Create the Linux Web dispatcher VM(s)
 resource "azurerm_linux_virtual_machine" "web" {
   provider            = azurerm.main
-  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.web_ostype) == "LINUX" ? local.webdispatcher_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.web_computer_names[count.index]
@@ -148,7 +146,6 @@ resource "azurerm_linux_virtual_machine" "web" {
 # Create the Windows Web dispatcher VM(s)
 resource "azurerm_windows_virtual_machine" "web" {
   provider            = azurerm.main
-  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.web_ostype) == "WINDOWS" ? local.webdispatcher_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.web_computer_names[count.index]

@@ -18,6 +18,10 @@
   set_fact:
     dir_params:                   "{{ target_media_location }}/.params"
 
+- name:  
+  debug:
+    var: dir_params
+
 
 
 #   0x) Create hidden directory for parameter files
@@ -25,8 +29,9 @@
   file:
     path:   "{{ item.path }}"
     state:  directory
-    mode:   0755
+    mode:   '{{ item.mode }}'
   loop:
+    - { state: 'directory', mode: '0755', path: '{{ target_media_location }}' }
     - { state: 'directory', mode: '0755', path: '{{ dir_params }}' }
 
 - name:     "Create run flag directory"

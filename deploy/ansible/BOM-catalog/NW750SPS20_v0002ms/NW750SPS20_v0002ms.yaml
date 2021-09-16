@@ -2,7 +2,7 @@
 # Download time:  xx Minutes (Full    - xx GB)
 # Download time:  xx Minutes (Partial - xx GB)
 #                 
-name:    'NW750SPS20_v0001ms'
+name:    'NW750SPS20_v0002ms'
 target:  'NETWEAVER 7.50 SPS 20'
 version: 0002
 
@@ -96,11 +96,11 @@ materials:
 
     # SWPM
     - name:         "SWPM 1.0 SP32 for NW higher than 7.0x ; OS: Linux on x86_64 64bit"
-      archive:      70SWPM10SP32_5-20009701.SAR
+      archive:      SWPM10SP32_6-20009701.SAR
       extract:      true
       extractDir:   SWPM
       creates:      SIGNATURE.SMF
-      url:          https://softwaredownloads.sap.com/file/0020000001253692021
+      url:          https://softwaredownloads.sap.com/?file=0020000001335742021
 
     # DB Export
     - name:         "NW 7.5 Installation Export"
