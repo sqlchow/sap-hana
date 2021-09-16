@@ -1,3 +1,11 @@
+- name: Debug
+  ansible.builtin.debug: 
+    var: bom_processing
+
+- name: Deployer Keyvault name
+  ansible.builtin.set_fact:
+    deployer_kv_name: "{{ kv_uri }}"
+  when: bom_processing is  defined
 
 - name: Get Deployer Keyvault name from keyvault
   ansible.builtin.command: >-
@@ -6,17 +14,20 @@
       --name {{ deployer_kv_name }}
   changed_when: false
   register: deployer_kv_name_secret
+  when: bom_processing is not defined
 
 - name: Save Deployer Keyvault name
   ansible.builtin.set_fact:
     deployer_kv_name: >-
       {{ (deployer_kv_name_secret.stdout | from_json).value }}
+  when: bom_processing is not defined
 
 
 - name: Debug, Deployer Keyvault
   ansible.builtin.debug: 
     var: deployer_kv_name
-    verbosity: 2
+#    verbosity: 2
+
 
 
 - name: Extract SAP Binaries Storage Account information

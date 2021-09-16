@@ -81,15 +81,15 @@ PS3='Please select playbook: '
 options=(
 
         # Special menu entries
-        "BOM Validator"
         "BOM Downloader"
+        "BOM Uploader"
         "Quit"
 )
 
 # List of all possible playbooks
 all_playbooks=(
-        ${cmd_dir}/playbook_bom_validator.yaml
         ${cmd_dir}/playbook_bom_downloader.yaml
+        ${cmd_dir}/playbook_bom_uploader.yaml
 )
 
 # Set of options that will be passed to the ansible-playbook command
@@ -97,6 +97,7 @@ playbook_options=(
         --private-key=${ANSIBLE_PRIVATE_KEY_FILE}
         --extra-vars="_workspace_directory=`pwd`"
         --extra-vars="@${sap_params_file}"
+        --extra-vars="bom_processing=true"
         "${@}"
 )
 
