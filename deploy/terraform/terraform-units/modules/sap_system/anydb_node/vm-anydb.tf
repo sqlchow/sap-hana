@@ -147,8 +147,10 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   lifecycle  {
   ignore_changes = [
     // Ignore changes to computername
+    tags,
     computer_name
   ]
+  }
 
 }
 
@@ -230,8 +232,10 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   lifecycle  {
   ignore_changes = [
     // Ignore changes to computername
-    computer_name
+    computer_name, 
+    tags
   ]
+  }
 }
 
 // Creates managed data disks
