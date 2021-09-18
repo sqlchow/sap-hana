@@ -6,7 +6,6 @@ resource "azurerm_resource_group" "resource_group" {
   location = local.region
   tags     = var.infrastructure.tags
 
-  prevent_deletion_if_contains_resources = true
 
   lifecycle {
     ignore_changes = [
