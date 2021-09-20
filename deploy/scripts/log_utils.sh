@@ -16,29 +16,35 @@ function __init_logger() {
 
 function __init_log() {
 
-    #global variables
-    
+    #variables - which can be exported
+    #SCRIPTNAME="$(basename ${BASH_SOURCE[0]})"
     SCRIPTPATH_FULL="$(realpath "${BASH_SOURCE[0]}")"
     SCRIPTDIR="$(dirname "${SCRIPTPATH_FULL}")"
-    #SCRIPTNAME="$(basename ${BASH_SOURCE[0]})"
     DATETIME=$(date +%Y%m%d%H%M%S)
     INFOLOGFILENAME="infolog-${DATETIME}.txt"
     DEBUGLOGFILENAME="debuglog-${DATETIME}.txt"
-    PROCESS_OF_LOG_MODULE="$$"
+    PROCESS_OF_LOGGER="$$"
 
-    readonly PROCESS_OF_LOG_MODULE
+    readonly PROCESS_OF_LOGGER
+
+    #save stdout and stderr file discriptors
+    exec 3>&1 4>&2
 
     # initialize log files and redirect stdout and stderr to log files
-    printf "Execution started at : %s\n" "${DATETIME}" > "${INFOLOGFILENAME}" 
-    printf "Execution started at : %s\n" "${DATETIME}" > "${DEBUGLOGFILENAME}"
+    printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 INFO \
+            "excution started at : '${DATETIME}'\n" > "${INFOLOGFILENAME}" 
     
-    exec 3>&1 4>&2
+    printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 DEBUG \
+            "execution started at : '${DATETIME}'\n" > "${DEBUGLOGFILENAME}"
     
-    tail -f "${INFOLOGFILENAME}" &
+    # redirect info log to debug log and send the process to background
+    # this way we can close the file handles at the end of the script
+    tail -f "${INFOLOGFILENAME}" | tee -a "${DEBUGLOGFILENAME}" &
     PROCESS_OF_BCK_LOGGER=$!
-
-    # redirect stdout and stderr to log files
-    exec 1> >(tee -a "${INFOLOGFILENAME}" "${DEBUGLOGFILENAME}") 2> >(tee -a "${DEBUGLOGFILENAME}" >&2)
+    readonly PROCESS_OF_BCK_LOGGER
+    
+    #redirect stdout and stderr to log files
+    exec 1> >(tee -a "${DEBUGLOGFILENAME}") 2> >(tee -a "${DEBUGLOGFILENAME}" >&2)
 
     # letting colors be defined, use cat, less -R or tail to see the colors
     # if cat is not displaying colors, then the control characters may not be
@@ -69,12 +75,14 @@ function __init_log() {
         color_white=""
     fi
 
-    readonly color_normal color_red color_green color_yellow color_magenta color_cyan color_white
+    readonly color_normal color_red color_green color_yellow color_magenta \
+                color_cyan color_white
 
 
     # clear out any old values
     # shellcheck disable=SC2034
     unset log_levels log_levels_map
+    # shellcheck disable=SC2034
     declare -gA log_levels log_levels_map
 
     # create hash table of log levels
@@ -83,6 +91,7 @@ function __init_log() {
     # set default log level mapper to INFO
     log_level_mapper["default"]=3
     
+    # set the trap to catch the script termination
     # shellcheck disable=SC2034
     trap reset_file_descriptors EXIT HUP INT ABRT QUIT TERM
 }
@@ -249,12 +258,16 @@ function __list_available_environment_variables(){
 }
 
 function reset_file_descriptors() {
-    # reset the file descriptors set above
+    # reset file descriptors to default
+    # this is useful for scripts that fork and exec
     exec 2>&4 1>&3
-    # close all file descriptors
+    # close the additional file descriptors
     exec 3>&- 4>&-
+    
     # remove the background process for log file
-    pkill -P "${PROCESS_OF_LOG_MODULE}"
+    pkill -P "${PROCESS_OF_BCK_LOGGER}"
+    # remove the process for log file
+    pkill -P "${PROCESS_OF_LOGGER}"
 }
 
 dump_stack_trace() {
@@ -310,27 +323,8 @@ __init_logger
 #########################################################################
 #error codes include those from /usr/include/sysexits.h
 
-#colors for terminal
-# readonly CRIT_COLOR="\e[1;4;31m"
-# readonly ERROR_COLOR="\e[1;31m"
-# readonly SUCCESS_COLOR="\e[1;32m"
-# readonly WARN_COLOR="\e[1;33m"
-# readonly DBG_COLOR="\e[1;34m"
-# readonly INFO_COLOR="\e[1;36m"
-# readonly RESET_COLOR="\e[0m"
-
-# #global variables
-# SCRIPTARGS="$@"
-# SCRIPTPATH_FULL="$(realpath "${BASH_SOURCE[0]}")"
-# SCRIPTDIR="$(dirname "${SCRIPTPATH}")"
-# SCRIPTNAME="$(basename ${BASH_SOURCE[0]})"
-# DATETIME=$(date +%Y%m%d%H%M%S)
-# INFOLOGFILENAME="infolog-${DATETIME}.txt"
-# DEBUGLOGFILENAME="debuglog-${DATETIME}.txt"
-# PROCESS_OF_LOG_MODULE="$$"
-
 # function log_info() {
-#     echo -e "${INFO_COLOR}${PROCESS_OF_LOG_MODULE} ${1}${RESET_COLOR}"
+#     echo -e "${INFO_COLOR}${PROCESS_OF_LOGGER} ${1}${RESET_COLOR}"
 # }
 
 # function strip_colors() {
