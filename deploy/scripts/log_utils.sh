@@ -110,7 +110,8 @@ function set_log_level() {
             log_level_mapper[$logger]=$l
         else
             printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 WARN \
-                "${BASH_SOURCE[2]}:${BASH_LINENO[1]} Unknown log level '$curr_log_level' for logger '$logger'; setting to INFO"
+                "${BASH_SOURCE[2]}:${BASH_LINENO[1]} Unknown log level `
+                `'$curr_log_level' for logger '$logger'; setting to INFO"
             log_level_mapper[$logger]=3
         fi
     else
@@ -134,11 +135,13 @@ function _printlog() {
 
     #+${BASH_SOURCE/$HOME/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
     #who_called="+${BASH_SOURCE[2]}@${BASH_LINENO[1]}:${FUNCNAME[2]}:"
-    who_called="+${BASH_SOURCE/$DEPLOYMENT_REPO_PATH/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:"
+    who_called="+${BASH_SOURCE/$DEPLOYMENT_REPO_PATH/\~}@`
+                `${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:"
 
     if [[ $log_level_set ]]; then
         ((log_level_set >= log_level)) && {
-            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" "$who_called"
+            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" \
+                    "$who_called"
             printf '%s\n' "$@"
         }
     else
@@ -155,35 +158,30 @@ function _writelog_to_file() {
         logger=$2
         shift 2
     }
-    #file=$1
-    file="${SCRIPTDIR}/$1"
-    #writes a message to the log file
+    #log_file=$1
+    log_file="${SCRIPTDIR}/$1"
+    #writes a message to the log log_file
     # we may not need this, if the log file doesn't exist, create it
-    if [ ! -f "${file}" ]; then
-        touch "${file}"
+    if [ ! -f "${log_file}" ]; then
+        touch "${log_file}"
     fi
     log_level="${log_levels[$current_log_level]}"
     log_level_set="${log_level_mapper[$logger]}"
 
     #+${BASH_SOURCE/$HOME/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
     #+${BASH_SOURCE/$DEPLOYMENT_REPO_PATH/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
-    who_called="+${BASH_SOURCE[2]/$HOME/\~}@${BASH_LINENO[1]}:${FUNCNAME[2]}:"
+    who_called="+${BASH_SOURCE[2]/$DEPLOYMENT_REPO_PATH/\~}@`
+                `${BASH_LINENO[1]}:${FUNCNAME[2]}:"
 
     if [[ $log_level_set ]]; then
-        if ((log_level_set >= log_level)) && [[ -f "${file}" ]]; then
-            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" \
-                "$who_called"
-            #printf '%s\n' "$@" >> "${file}"
-            shift
+        if ((log_level_set >= log_level)) && [[ -f "${log_file}" ]]; then
+            shift 1
             printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s %s\n' -1 "$current_log_level" \
-                "$who_called" "$@" >>"${file}"
+                "$who_called" "$@" >>"${log_file}"
         else
-            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" \
-                "$who_called"
-            #printf '%s\n' "$@" >> "${file}"
-            shift
+            shift 1
             printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s %s\n' -1 "$current_log_level" \
-                "$who_called" "$@" >>"${file}"
+                "$who_called" "$@" >>"${log_file}"
         fi
     else
         printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 WARN \
@@ -206,9 +204,10 @@ log_verbose() { _printlog VERBOSE "$@"; }
 #
 # logging file content
 #
-log_info_file() { _writelog_to_file INFO "$@"; }
-log_debug_file() { _writelog_to_file DEBUG "$@"; }
+log_info_file()    { _writelog_to_file INFO "$@";    }
+log_debug_file()   { _writelog_to_file DEBUG "$@";   }
 log_verbose_file() { _writelog_to_file VERBOSE "$@"; }
+
 #
 # logging for function entry and exit
 #
@@ -218,44 +217,6 @@ log_verbose_enter() { _printlog VERBOSE "Entering function ${FUNCNAME[1]}"; }
 log_info_leave() { _printlog INFO "Leaving function ${FUNCNAME[1]}"; }
 log_debug_leave() { _printlog DEBUG "Leaving function ${FUNCNAME[1]}"; }
 log_verbose_leave() { _printlog VERBOSE "Leaving function ${FUNCNAME[1]}"; }
-
-function __list_log_levels() {
-    local i
-    for i in "${!log_levels[@]}"; do
-        printf '%s\n' "$i"
-    done
-}
-
-function __list_available_loggers() {
-    local i
-    for i in "${!log_level_mapper[@]}"; do
-        printf '%s\n' "$i"
-    done
-}
-
-function __list_available_functions() {
-    #typeset -f | awk '/ \(\) $/ && !/^main / { print $1 }'
-    #typeset -f | awk '!/^main[ (]/ && /^[^ {}]+ *\(\)/ { gsub(/[()]/, "", $1); print $1}'
-    local funcRefs
-    funcRefs=$(declare -F -p | cut -d " " -f 3)
-    readonly funcRefs
-    printf "%s\n" "${funcRefs[@]}"
-}
-
-function __list_available_environment_variables(){
-    local envVars
-    envVars=$(declare -xp | grep --perl-regexp \
-                --only-match '(?<=^declare -x )[^=]+')
-    readonly envVars
-    printf "%s\n" "${envVars[@]}"
-}
-
-function __list_available_environment_variables(){
-    local envVars
-    compgen -v | while read -r envVars; do
-        printf "$envVars=%q\n" "${!envVars}"
-    done
-}
 
 function reset_file_descriptors() {
     # reset file descriptors to default
