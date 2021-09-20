@@ -32,10 +32,10 @@ function __init_log() {
 
     # initialize log files and redirect stdout and stderr to log files
     printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 INFO \
-            "excution started at : '${DATETIME}'\n" > "${INFOLOGFILENAME}" 
+            "excution started at : '${DATETIME}'" > "${INFOLOGFILENAME}" 
     
     printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 DEBUG \
-            "execution started at : '${DATETIME}'\n" > "${DEBUGLOGFILENAME}"
+            "execution started at : '${DATETIME}'" > "${DEBUGLOGFILENAME}"
     
     # redirect info log to debug log and send the process to background
     # this way we can close the file handles at the end of the script
@@ -49,10 +49,7 @@ function __init_log() {
     # letting colors be defined, use cat, less -R or tail to see the colors
     # if cat is not displaying colors, then the control characters may not be
     # intact. Look at the following link for more info:
-    # https://unix.stackexchange.com/questions/262185/display-file-with-ansi-colors
-
-    # use declare -p to see the variables or declare -xp to see the environment
-    # variables.
+    # https://unix.stackexchange.com/questions/262185/
 
     # shellcheck disable=SC2034
     if [ -t 1 ]; then
@@ -78,7 +75,6 @@ function __init_log() {
     readonly color_normal color_red color_green color_yellow color_magenta \
                 color_cyan color_white
 
-
     # clear out any old values
     # shellcheck disable=SC2034
     unset log_levels log_levels_map
@@ -86,7 +82,7 @@ function __init_log() {
     declare -gA log_levels log_levels_map
 
     # create hash table of log levels
-    log_levels=([CRITICAL]=0 [ERROR]=1 [WARN]=2 [INFO]=3 [DEBUG]=4 [VERBOSE]=5)
+    log_levels=([SUCCESS]=0 [ERROR]=1 [WARN]=2 [INFO]=3 [DEBUG]=4 [VERBOSE]=5)
 
     # set default log level mapper to INFO
     log_level_mapper["default"]=3
@@ -168,8 +164,6 @@ function _writelog_to_file() {
     log_level="${log_levels[$current_log_level]}"
     log_level_set="${log_level_mapper[$logger]}"
 
-    #+${BASH_SOURCE/$HOME/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
-    #+${BASH_SOURCE/$DEPLOYMENT_REPO_PATH/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
     who_called="+${BASH_SOURCE[2]/$DEPLOYMENT_REPO_PATH/\~}@`
                 `${BASH_LINENO[1]}:${FUNCNAME[2]}:"
 
