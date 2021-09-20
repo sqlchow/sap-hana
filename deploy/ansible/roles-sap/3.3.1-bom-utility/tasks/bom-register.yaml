@@ -14,7 +14,7 @@
 #
 
 - name:                                Check for Microsoft Supplied BOM ({{ bom_name }})
-  ansible.builtin.stat:                   
+  ansible.builtin.stat:
     path:                              BOM-catalog/{{ bom_name }}/{{ bom_name }}.yaml
   register:                            microsoft_supplied_bom
   delegate_to:                         localhost
@@ -24,7 +24,7 @@
     var:                               microsoft_supplied_bom
 
 - name:                                Check for Microsoft Supplied BOM ({{ bom_name }})
-  ansible.builtin.stat:                   
+  ansible.builtin.stat:
     path:                              BOM-catalog/archives/{{ bom_name }}/{{ bom_name }}.yaml
   register:                            microsoft_supplied_bom
   delegate_to:                         localhost
@@ -40,7 +40,7 @@
 # If Microsoft supplied BOM not found
 
 - name:                                Retrieve BOM ({{ bom_name }}) from Storage Account
-  ansible.builtin.debug:                   
+  ansible.builtin.debug:
     msg:                               "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_name }}/{{ bom_name }}.yaml{{ sapbits_sas_token }}"
     verbosity:                         2
   when:                                not microsoft_supplied_bom.stat.exists
@@ -64,7 +64,7 @@
       become:                          true
 
     - name:                            Register downloaded BOM ({{ bom_name }})
-      ansible.builtin.include_vars:               
+      ansible.builtin.include_vars:
         file:                          "{{ inventory_dir }}/{{ bom_name }}.yaml"
         name:                          bom
 

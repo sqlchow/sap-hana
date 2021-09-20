@@ -3,7 +3,7 @@
 # -------------------------------------+---------------------------------------8
 #
 # Description:  Download specified BOM Template File
-#S41909SPS03_v1-scs-inifile-param.j2
+# S41909SPS03_v1-scs-inifile-param.j2
 #
 # TODO: Download to the install directory
 #       Fetch to controller
@@ -63,35 +63,35 @@
 #       sidadm_uid
 # -------------------------------------+---------------------------------------8
 
-#------------------<DEBUGGING>-------------------
+# ------------------<DEBUGGING>-------------------
 - name:                                Parameters
   ansible.builtin.debug:
     msg:
-      -                                "SAP SID              : {{ sap_sid }}"
-      -                                "Instance Number - SCS: {{ scs_instance_number }}"
-      -                                "SCS Virtual Hostname : {{ sap_scs_hostname }}"
-      -                                "DB Hostname          : {{ sap_db_hostname }}"
-      -                                "FQDN                 : {{ sap_fqdn }}"
-      -                                "Master Password      : {{ password_master }}"
-      -                                "sapadm UID           : {{ sapadm_uid }}"
-      -                                "sapsys GID           : {{ sapsys_gid }}"
-      -                                "<sid>adm UID         : {{ sidadm_uid }}"
+      - "SAP SID              : {{ sap_sid }}"
+      - "Instance Number - SCS: {{ scs_instance_number }}"
+      - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
+      - "DB Hostname          : {{ sap_db_hostname }}"
+      - "FQDN                 : {{ sap_fqdn }}"
+      - "Master Password      : {{ password_master }}"
+      - "sapadm UID           : {{ sapadm_uid }}"
+      - "sapsys GID           : {{ sapsys_gid }}"
+      - "<sid>adm UID         : {{ sidadm_uid }}"
     verbosity:                         2
-#------------------</DEBUGGING>------------------
+# ------------------</DEBUGGING>------------------
 
 
 - name:                                Check for Microsoft Supplied BOM ({{ bom_base_name }}) template
-  ansible.builtin.stat:                        
+  ansible.builtin.stat:
     path:                              BOM-catalog/{{ bom_base_name }}/templates/{{ sap_inifile_template }}
   register:                            microsoft_supplied_bom_template
   delegate_to:                         localhost
 
 - name:                                Check for Microsoft Supplied BOM ({{ bom_base_name }}) template in archive
-  ansible.builtin.stat:                        
+  ansible.builtin.stat:
     path:                              BOM-catalog/archives/{{ bom_base_name }}/templates/{{ sap_inifile_template }}
   register:                            microsoft_supplied_bom_template
   delegate_to:                         localhost
-  when:                                microsoft_supplied_bom_template.stat.exists != true
+  when:                                not microsoft_supplied_bom_template.stat.exists
 
 
 # If Microsoft supplied BOM template found
@@ -120,7 +120,7 @@
       become:                          false
 
     - name:                            "SAP SCS: deploy SCS Parameter file install template"
-      template:
+      ansible.builtin.template:
         src:                           "{{ inventory_dir }}/{{ sap_inifile_template }}"
         dest:                          /usr/sap/install/downloads/{{ sap_inifile }}
         mode:                          0644
