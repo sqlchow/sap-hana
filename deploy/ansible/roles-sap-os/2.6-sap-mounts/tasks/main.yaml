@@ -42,7 +42,7 @@
     - { type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
     - { type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
   when:
-    - tier == sapos
+    - tier == 'sapos'
     - node_tier == 'pas' or node_tier =='app'
     - sap_mnt | default ('none') | trim | length == 4
 
@@ -57,7 +57,7 @@
   loop:
     - { type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
   when:
-    - tier == dbload
+    - tier == 'dbload'
     - node_tier == 'pas' or node_tier =='app'
     - sap_mnt | default ('none') | trim | length == 4
 
@@ -73,7 +73,7 @@
   loop:
     - { type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'  }
   when:
-    - tier == sapos
+    - tier == 'sapos'
     - sap_mnt | default ('none') | trim | length == 4
     - node_tier == 'hana'
 
@@ -88,7 +88,7 @@
   loop:
     - { type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',  path: '/sapmnt/{{ sap_sid|upper }}' }
   when:
-    - tier == sapos
+    - tier == 'sapos'
     - sap_mnt | default ('none') | trim | length == 4
     - node_tier == 'scs'
 
@@ -104,6 +104,6 @@
   when:
     - sap_mnt is defined
     - sap_mnt | default ('none') | trim | length > 4
-    - tier == sapos
+    - tier == 'sapos'
 
 ...
