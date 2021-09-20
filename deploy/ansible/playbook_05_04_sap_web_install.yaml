@@ -41,6 +41,7 @@
   become:                              true
   become_user:                         root
   gather_facts:                        true
+
   vars_files:
     - vars/ansible-input-api.yaml                                               # API Input template with defaults
 
