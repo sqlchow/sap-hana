@@ -89,6 +89,8 @@
   args:
     chdir:            /usr/sap/install/SWPM
     creates:          /etc/sap_deployment_automation/sap_deployment_app.txt
+  tags:
+  - skip_ansible_lint
   # Skip when TRUE (test mode)
   # when: not test_new_bom
 # *====================================4=======================================8
