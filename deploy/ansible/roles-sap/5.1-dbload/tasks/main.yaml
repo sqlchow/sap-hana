@@ -42,7 +42,8 @@
     sap_db_hostname:                   "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
     sap_ciVirtualHostname:
     sap_appVirtualHostname:
-
+  tags:
+  - skip_ansible_lint
 
 # *====================================4=======================================8
 #   SAP DBLOAD: Install

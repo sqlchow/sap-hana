@@ -47,7 +47,8 @@
     sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
     sap_ciVirtualHostname:        "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_PAS') | first }}"
     sap_appVirtualHostname:
-
+  tags:
+  - skip_ansible_lint
 
 # *====================================4=======================================8
 #   SAP PAS: Install

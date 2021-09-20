@@ -43,6 +43,8 @@
     sap_db_hostname:
     sap_ciVirtualHostname:
     sap_appVirtualHostname:
+  tags:
+  - skip_ansible_lint
 
 - name:                           "Create run flag directory"
   ansible.builtin.file:
