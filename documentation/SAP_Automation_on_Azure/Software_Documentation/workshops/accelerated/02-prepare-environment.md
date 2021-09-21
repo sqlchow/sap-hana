@@ -271,9 +271,6 @@
           - SPN Tenant ID:
           - SPN Subscription:
 
-
-For a deployment to **westeurope** use this:
-
     
     Execute
     ```bash
