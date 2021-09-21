@@ -252,7 +252,7 @@
     ```
     <br/>
     
-    For a deployment to **westeurope** use this:
+    
 
 
     ```bash
