@@ -20,6 +20,10 @@
     - vars/ansible-input-api.yaml                               # API Input template with defaults
   tasks:
 
+    - name:                            Set 'ha' tier facts
+      ansible.builtin.set_fact:
+        tier:                          fencing
+
     - name:                            Remove .step6 flag
       ansible.builtin.file:
         path:                          "{{ _workspace_directory }}/.step6"
