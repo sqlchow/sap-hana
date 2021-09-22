@@ -53,7 +53,7 @@
       ansible.builtin.command:         pcs cluster start --all
 
     - name:                            Wait until cluster has stabilised
-      ansible.builtin.command:         pcs status | grep '^Online:'
+      ansible.builtin.shell:           pcs status | grep '^Online:'
       register:                        cluster_stable_check
       retries:                         30
       delay:                           10
@@ -63,7 +63,7 @@
       when:                            ansible_distribution_major_version != "8"
 
     - name:                            Wait until cluster has stabilised
-      ansible.builtin.command:         pcs status | grep '* Online:'
+      ansible.builtin.shell:           pcs status | grep '* Online:'
       register:                        cluster_stable_check
       retries:                         30
       delay:                           10
@@ -88,7 +88,7 @@
     # This command assumes the Azure VM resource name matches the hostname
     # If this changes, the pcmk_host_map should be used
     - name:                            Ensure the STONTIH device is configured
-      ansible.builtin.command: >
+      ansible.builtin.shell: >
                                        pcs stonith create rsc_st_azure fence_azure_arm
                                          login="{{ sap_hana_fencing_spn_client_id }}"
                                          passwd="{{ sap_hana_fencing_spn_client_pwd }}"
@@ -106,7 +106,7 @@
 
 
     - name:                            Ensure the STONTIH device is configured
-      ansible.builtin.command: >
+      ansible.builtin.shell: >
                                       pcs stonith create rsc_st_azure fence_azure_arm
                                         login="{{ sap_hana_fencing_spn_client_id }}"
                                         passwd="{{ sap_hana_fencing_spn_client_pwd }}"
@@ -131,3 +131,4 @@
 
 
 # End of Generic Pacemaker setup
+
