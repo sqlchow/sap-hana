@@ -66,122 +66,116 @@
 
 # -------------------------------------+---------------------------------------8
 #
-- name:                      Load the disk configuration settings
-  include_vars:              disks_config.yml
+- name:                                Load the disk configuration settings
+  ansible.builtin.include_vars:        disks_config.yml
 
-- name:                          "print unique disks"
-  debug:
-    var:                         disktypes
-    verbosity:                   2
+- name:                                "Print unique disks and volume group details"
+  ansible.builtin.debug:
+    var:
+      - disktypes
+      - volume_groups
+    verbosity:                         2
 
-- name:                          "Print volume group details"
-  debug:
-    var:                         volume_groups
-    #verbosity:                   2
-
-
-#CREATE VOLUME GROUPS BASED ON sap-parameters.yaml
+# CREATE VOLUME GROUPS BASED ON sap-parameters.yaml
 # -------------------------------------+---------------------------------------8
 #
-- name:                           "Volume Group creation"
-  lvg:
-    vg:                           "{{ item.vg }}"
-    pvs:                          "{{ item.pvs }}"
-    pesize:                       4M
-    state:                        present
-  loop:                           "{{ volume_groups }}"
+- name:                                "Volume Group creation"
+  ansible.builtin.lvg:
+    vg:                                "{{ item.vg }}"
+    pvs:                               "{{ item.pvs }}"
+    pesize:                            4M
+    state:                             present
+  loop:                                "{{ volume_groups }}"
+  register:                            vgscreated
   when:
     - tier == "sapos"
-  register: vgscreated  
+  
 
-- name: "Filter the vg name from vgscreated results"
-  set_fact:
-    vgcreatedlist: "{{ vgscreated | json_query('results[*].item.vg') }}"
+- name:                                "Filter the vg name from vgscreated results"
+  ansible.builtin.set_fact:
+    vgcreatedlist:                     "{{ vgscreated | json_query('results[*].item.vg') }}"
 
-#Debug for testing
-- name:                          "Print vgcreated details"
-  debug:
-    var:                        vgcreatedlist
+# Debug for testing
+- name:                                "Print vgcreated details"
+  ansible.builtin.debug:
+    var:
+      - vgcreatedlist
+      - logical_volumes
+      - vgscreated.results
+    verbosity:                         2
 
-- name:                         "Print logical group details"
-  debug:
-    var:                         logical_volumes
-
-- name:                          "created logical group details"
-  debug:
-    var:                         vgscreated.results
-    #verbosity:                   2
-
-#Debug testing end of line 
+# Debug testing end of line 
 
 
-#CREATE LOGICAL VOLUMES BASED ON VGCREATEDLIST
+# CREATE LOGICAL VOLUMES BASED ON VGCREATEDLIST
 # -------------------------------------+---------------------------------------8
 #
-- name:                           "Logical Volume creation"
-  lvol:
-    lv:                           "{{ item.lv }}"
-    vg:                           "{{ item.vg }}"
-    size:                         "{{ item.size }}"
-    opts:                         "{{ lvol_opts_from_lv_item }}"
-    active:                       yes
-    state:                        present
-    shrink:                       no
-    resizefs:                     no
-  loop: "{{ logical_volumes }}"
+- name:                                "Logical Volume creation"
+  ansible.builtin.lvol:
+    lv:                                "{{ item.lv }}"
+    vg:                                "{{ item.vg }}"
+    size:                              "{{ item.size }}"
+    opts:                              "{{ lvol_opts_from_lv_item }}"
+    active:                            true
+    state:                             present
+    shrink:                            false
+    resizefs:                          false
+  loop:                                "{{ logical_volumes }}"
+  register:                            lvscreated
   when:
     - tier == "sapos"
     - item.node_tier in ["all", node_tier]
-    - item.vg in vgcreatedlist 
-  register: lvscreated 
-
-  
-#Debug for testing
-- name:                           "Print vgcreated details"
-  debug:
-    var:                         lvscreated
+    - item.vg in vgcreatedlist
 
 
-- name: "Filter the logical volumes created results"
-  set_fact:
-    lvcreatedlist_tmp: "{{ lvscreated.results | rejectattr('skipped', 'defined') | list }}"
-
-    
-#Debug for testing
-- name:                           "Print vgcreated filtered details"
-  debug:
-    var:                         lvcreatedlist_tmp
-
-#- fail: msg="here"
-
-- name: "Filter the logical volumes created results1"
-  set_fact:
-    lvcreatedlist: "{{ lvcreatedlist_tmp | map(attribute='item.lv') | list }}"
-    
-
-#Debug for testing
-- name:                           "Print vgcreated details"
-  debug:
-    var:                         lvcreatedlist
+# Debug for testing
+- name:                                "Print lvscreated details"
+  ansible.builtin.debug:
+    var:                               lvscreated
+    verbosity:                         2
 
 
-- name:                       "Filesystem creation"
-  filesystem:
-    dev:                       "{{ dev_path_from_lv_item }}"
-    fstype:                    "{{ item.fstype }}"
-    opts:                      "{{ item.fsopts | default('') }}"
-  loop: "{{ logical_volumes }}"
+- name:                                "Filter the logical volumes created results"
+  ansible.builtin.set_fact:
+    lvcreatedlist_tmp:                 "{{ lvscreated.results | rejectattr('skipped', 'defined') | list }}"
+
+# Debug for testing
+- name:                                "Print vgcreated filtered details"
+  ansible.builtin.debug:
+    var:                               lvcreatedlist_tmp
+    verbosity:                         2
+
+
+- name:                                "Filter the logical volumes created results1"
+  ansible.builtin.set_fact:
+    lvcreatedlist:                     "{{ lvcreatedlist_tmp | map(attribute='item.lv') | list }}"
+
+
+# Debug for testing
+- name:                                "Print vgcreated details"
+  ansible.builtin.debug:
+    var:                               lvcreatedlist
+    verbosity:                         2
+
+
+- name:                                "Filesystem creation"
+  ansible.builtin.filesystem:
+    dev:                               "{{ dev_path_from_lv_item }}"
+    fstype:                            "{{ item.fstype }}"
+    opts:                              "{{ item.fsopts | default('') }}"
+  loop:                                "{{ logical_volumes }}"
+  register :                           filesystemscreated
   when:
-        - item.tier in ["all", tier ]
-        - item.node_tier in ["all", node_tier]
-        - item.fstype is defined
-        - item.lv in lvcreatedlist     
-  register : filesystemscreated    
-  
-#Debug for testing
-- name:                           "Print values to be passed for filesystem creation"
-  debug:
-    var:                         filesystemscreated
+    - item.tier in ["all", tier ]
+    - item.node_tier in ["all", node_tier]
+    - item.fstype is defined
+    - item.lv in lvcreatedlist
+
+# Debug for testing
+- name:                                "Print values to be passed for filesystem creation"
+  ansible.builtin.debug:
+    var:                               filesystemscreated
+    verbosity:                         2
 
 ...
 # /*---------------------------------------------------------------------------8
