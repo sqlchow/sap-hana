@@ -1,21 +1,21 @@
 ---
 # Download time:  xx Minutes (Full    - xx GB)
 # Download time:  xx Minutes (Partial - xx GB)
-#                 
-name:    'NW75SPS20_v0001ms'
-target:  'NETWEAVER 7.5 SPS 20'
-version: 0001ms
+#
+name:    'NW750SPS20_v0001ms'
+target:  'NETWEAVER 7.50 SPS 20'
+version: 0001
 
 product_ids:
-  scs:    
-  dbl:    
-  pas:    
-  app:    
-  web:    
+  scs:    NW_ABAP_ASCS:NW750.HDB.ABAP
+  dbl:    NW_ABAP_DB:NW750.HDB.ABAP
+  pas:    NW_ABAP_CI:NW750.HDB.ABAP
+  app:
+  web:
 
 materials:
   dependencies:
-    - name:     HANA_2_00_055_v1
+    - name:     HANA_2_00_055_v0004ms
 
 #   templates:
     # - name:     X
@@ -104,26 +104,26 @@ materials:
 
     # DB Export
     - name:         "NW 7.5 Installation Export"
-      archive:      51050829_3.zip
-      path:         download_basket
+      archive:      51050829_3.ZIP
+      extract:      true
+      extractDir:   CD_EXPORT
+      creates:      CDLABEL.ASC
       url:          https://softwaredownloads.sap.com/file/0030000000635092016
 
     # Languages
     - name:         "NW 7.5 Language 1/2"
-      archive:      51050829_4.zip
-      path:         download_basket
+      archive:      51050829_LNG1_part1.exe
       url:          https://softwaredownloads.sap.com/file/0030000000635132016
 
     - name:         "NW 7.5 Language 2/2"
-      archive:      51050829_5.zip
-      path:         download_basket
+      archive:      51050829_LNG1_part2.rar
       url:          https://softwaredownloads.sap.com/file/0030000000635142016
 
     # MISC
     - name:         "KIMMO - Patch 6 for SOFTWARE UPDATE MANAGER 2.0 SP10 ; OS: Linux on x86_64 64bit"
       archive:      SUM20SP10_6-80002456.SAR
       download:     false
-      url:          https://softwaredownloads.sap.com/file/0020000000749052021 
+      url:          https://softwaredownloads.sap.com/file/0020000000749052021
 
     # SPAM
     - name:         "SPAM/SAINT Update - Version 750/0077"
@@ -136,7 +136,7 @@ materials:
       archive:      K-74002INSTPI.SAR
       download:     true
       url:          https://softwaredownloads.sap.com/file/0010000000057482015
-  
+
     - name:         "ST-PI 740: SP 0003"
       archive:      K-74003INSTPI.SAR
       download:     false

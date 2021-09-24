@@ -29,16 +29,15 @@
   when: ansible_os_family == 'Suse'
 
 - name: Check if a cluster has already been prepared
-  ansible.builtin.shell: "{{ cluster_status_cmd[ansible_os_family] }}"
+  ansible.builtin.command: "{{ cluster_status_cmd[ansible_os_family] }}"
   register: cluster_existence_check_result
   changed_when: false
   failed_when: false
 
 - name: Check if a cluster has already been prepared (save)
-  ansible.builtin.set_fact: 
+  ansible.builtin.set_fact:
     cluster_existence_check: "{{ cluster_existence_check_result.rc }}"
 
 - name: Check if a cluster has already been prepared (show)
-  debug: 
+  debug:
     msg: "Cluster check return value: {{ cluster_existence_check }}"
-

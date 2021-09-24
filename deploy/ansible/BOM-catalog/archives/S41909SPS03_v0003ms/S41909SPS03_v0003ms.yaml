@@ -1,10 +1,10 @@
 ---
 # Download time:  70 Minutes (Full - 63GB)
 # Download time:  43 Minutes (Partial - 38GB)
-#                 
-name:    'S41909SPS03_v0001ms'
+#
+name:    'S41909SPS03_v0003ms'
 target:  'S/4 HANA 1909 SPS 03'
-version: 2
+version: 3
 
 product_ids:
   scs:    NW_ABAP_ASCS:S4HANA1909.CORE.HDB.ABAP
@@ -15,7 +15,7 @@ product_ids:
 
 materials:
   dependencies:
-    - name:     HANA_2_00_055_v0001ms
+    - name:     HANA_2_00_055_v0002ms
 
 #   templates:
     # - name:     X
@@ -95,12 +95,12 @@ materials:
       url:          https://softwaredownloads.sap.com/file/0020000000703122018
 
     # SWPM
-    - name:         "KIMMO -SWPM20SP08 ; OS: Linux on x86_64 64bit"
-      archive:      SWPM20SP08_6-80003424.SAR
+    - name:         "SWPM20SP09 ; OS: Linux on x86_64 64bit"
+      archive:      SWPM20SP09_0-80003424.SAR
       extract:      true
       extractDir:   SWPM
       creates:      SIGNATURE.SMF
-      url:          https://softwaredownloads.sap.com/file/0020000000778192021
+      url:          https://softwaredownloads.sap.com/file/0020000000893902021
 
     # DB Export
     - name:         "File on DVD"
@@ -234,10 +234,10 @@ materials:
       download:     false
       url:          https://softwaredownloads.sap.com/file/0020000000410162020
 
-    - name:         "KIMMO - Patch 6 for SOFTWARE UPDATE MANAGER 2.0 SP10 ; OS: Linux on x86_64 64bit"
-      archive:      SUM20SP10_6-80002456.SAR
+    - name:         "KIMMO - Patch 7 for SOFTWARE UPDATE MANAGER 2.0 SP10 ; OS: Linux on x86_64 64bit"
+      archive:      SUM20SP10_7-80002456.SAR
       download:     false
-      url:          https://softwaredownloads.sap.com/file/0020000000749052021 
+      url:          https://softwaredownloads.sap.com/file/0020000000821552021
 
     - name:         "KIMMO - SP12 Patch4 for UMML4HANA 1"
       archive:      HANAUMML12_4-70001054.ZIP
