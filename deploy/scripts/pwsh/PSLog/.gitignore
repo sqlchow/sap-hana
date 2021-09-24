@@ -1,1 +1,2 @@
-Output/
+Output/*.json
+Output/*.xml
