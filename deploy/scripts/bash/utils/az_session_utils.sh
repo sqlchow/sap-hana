@@ -20,16 +20,13 @@ function getEnvVarValue() {
     echo "${varValue}"
 }
 
-function checkforEnvVar() {
+function checkforExportedEnvVar() {
     local env_var=
     env_var=$(declare -p "$1")
-    if ! [[  -v $1 && $env_var =~ ^declare\ -x ]]; then
-        echo "Error: Define $1 environment variable"
-        return 1
-    else
-        echo "OK: $1 environment variable is defined"
+    if [[  -v $1 && $env_var =~ ^declare\ -x ]]; then
         getEnvVarValue "$1"
-        return 0
+    else
+        echo "__NotExported"
     fi
 }
 
@@ -43,11 +40,9 @@ function checkforEnvVar() {
 # AZUREPS_HOST_ENVIRONMENT=cloud-shell/1.0
 function checkIfCloudShell() {
     local isRunInCloudShell=1 # default value is false
+    
     if [ "$POWERSHELL_DISTRIBUTION_CHANNEL" == "CloudShell" ]; then
         isRunInCloudShell=0
-        echo "isRunInCloudShell: true"
-    else
-        echo "isRunInCloudShell: false"
     fi
     
     return $isRunInCloudShell
