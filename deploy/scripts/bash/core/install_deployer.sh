@@ -13,7 +13,10 @@ full_script_path="$(realpath "${BASH_SOURCE[0]}")"
 script_directory="$(dirname "${full_script_path}")"
 
 #call stack has full scriptname when using source 
-source "${script_directory}/deploy_utils.sh"
+source "${DEPLOYMENT_REPO_PATH}/deploy/scripts/bash/utils/deploy_utils.sh"
+source "${DEPLOYMENT_REPO_PATH}/deploy/scripts/bash/utils/az_session_utils.sh"
+source "${DEPLOYMENT_REPO_PATH}/deploy/scripts/bash/utils/log_utils.sh"
+
 
 #Internal helper functions
 function showhelp {
