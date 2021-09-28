@@ -334,7 +334,7 @@ resource "azurerm_key_vault_secret" "deployer_kv_user_name" {
 
 resource "azurerm_private_endpoint" "kv_user" {
   provider            = azurerm.main
-  count               = local.sub_admin_defined && var.use_private_endpoint ? 1 : 0
+  count               = local.sub_admin_defined && var.use_private_endpoint && local.enable_landscape_kv && !local.user_kv_exist ? 1 : 0
   name                = format("%s%s", local.prefix, local.resource_suffixes.keyvault_private_link)
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location

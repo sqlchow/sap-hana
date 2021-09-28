@@ -74,7 +74,7 @@ resource "azurerm_storage_container" "storagecontainer_ansible" {
 }
 
 resource "azurerm_private_endpoint" "storage_tfstate" {
-  count               = var.use_private_endpoint ? 1 : 0
+  count               = var.use_private_endpoint && !local.sa_tfstate_exists ? 1 : 0
   name                = format("%s%s", local.prefix, local.resource_suffixes.storage_private_link_tf)
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.library[0].location : azurerm_resource_group.library[0].location
@@ -126,7 +126,7 @@ resource "azurerm_storage_account" "storage_sapbits" {
 }
 
 resource "azurerm_private_endpoint" "storage_sapbits" {
-  count               = var.use_private_endpoint ? 1 : 0
+  count               = var.use_private_endpoint && !local.sa_sapbits_exists ? 1 : 0
   name                = format("%s%s", local.prefix, local.resource_suffixes.storage_private_link_sap)
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.library[0].location : azurerm_resource_group.library[0].location
