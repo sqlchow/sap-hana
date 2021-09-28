@@ -61,10 +61,14 @@ resource "azurerm_key_vault" "kv_user" {
     ]
   }
 
-  network_acls  {
-    bypass                     = "AzureServices"
-    default_action             = var.use_private_endpoint ? "Deny" : "Allow"
-    ip_rules                   = [local.enable_deployer_public_ip ? azurerm_public_ip.deployer[0].ip_address : null]
+  network_acls {
+    bypass         = "AzureServices"
+    default_action = "Allow"
+    ip_rules = var.use_private_endpoint ? (
+      local.enable_deployer_public_ip ? [azurerm_public_ip.deployer[0].ip_address] : []
+      ) : (
+      []
+    )
     virtual_network_subnet_ids = var.use_private_endpoint ? [local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0].id : azurerm_subnet.subnet_mgmt[0].id] : []
   }
 

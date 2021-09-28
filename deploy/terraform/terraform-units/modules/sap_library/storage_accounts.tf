@@ -30,8 +30,11 @@ resource "azurerm_storage_account" "storage_tfstate" {
   }
 
   network_rules {
-    default_action             = "Allow"
-    ip_rules                   = [local.deployer_public_ip_address]
+    default_action = "Allow"
+    ip_rules = var.use_private_endpoint ? (
+      [length(local.deployer_public_ip_address) > 0 ? local.deployer_public_ip_address : null]) : (
+      []
+    )
     virtual_network_subnet_ids = var.use_private_endpoint ? [local.subnet_mgmt_id] : []
   }
 }
@@ -112,8 +115,12 @@ resource "azurerm_storage_account" "storage_sapbits" {
   // TODO: soft delete for file share
 
   network_rules {
-    default_action             =  "Allow"
-    ip_rules                   = [local.deployer_public_ip_address]
+    default_action = "Allow"
+    ip_rules = var.use_private_endpoint ? (
+      [length(local.deployer_public_ip_address) > 0 ? local.deployer_public_ip_address : null]) : (
+      []
+    )
+
     virtual_network_subnet_ids = var.use_private_endpoint ? [local.subnet_mgmt_id] : []
   }
 }
