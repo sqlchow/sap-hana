@@ -27,6 +27,7 @@ set-clustering-auth*.sh
 
 **/.vscode/*
 .vscode/
+.vscode/settings.json
 deploy/scripts/pwsh/SAPDeploymentUtilities/Output/stats.json
 deploy/scripts/pwsh/PSLog/*.json
 deploy/scripts/pwsh/PSLog/*.xml

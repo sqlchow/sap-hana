@@ -1,0 +1,48 @@
+{
+    "editor.suggestSelection": "first",
+    "workbench.activityBar.visible": true,
+    "workbench.statusBar.visible": true,
+    "breadcrumbs.enabled": false,
+    "editor.fontFamily": "'CaskaydiaCove NF','Delugia Nerd Font Book','Cascadia Code PL',Consolas, 'Courier New', monospace",
+    "editor.minimap.enabled": false,
+    "debug.openDebug": "neverOpen",
+    "zenMode.hideActivityBar": true,
+    "zenMode.centerLayout": false,
+    "zenMode.hideLineNumbers": false,
+    "editor.fontLigatures": true,
+    "files.associations": {
+        "**/*.yml": "yaml",
+        "*.yml": "yaml"
+    },
+    "[yaml]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        }
+    },
+    "editor.renderControlCharacters": true,
+    "editor.inlineSuggest.enabled": true,
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "name": "envKeys",
+                "scope": "string.quoted.double.env,source.env,constant.numeric.env",
+                "settings": {
+                    "foreground": "#19354900"
+                }
+            },
+            {
+                "name": "envKeys",
+                "scope": "string.quoted.double.env,source.env,constant.numeric.env",
+                "settings": {
+                    "foreground": "#19354900"
+                }
+            }
+        ]
+    },
+    "editor.rulers": [80, 100, 120]
+}
