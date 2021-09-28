@@ -116,7 +116,7 @@ function set_log_level() {
     fi
 }
 
-# Core and private log printing logic to be called by all logging functions
+# Core and printing logic to be called by all logging functions
 # use bash internal printf to format the output
 function _printlog() {
     local current_log_level=$1
@@ -189,7 +189,7 @@ function _writelog_to_file() {
 
 # main logging functions
 #
-log_critical() { _printlog CRITICAL "$@"; }
+log_success() { _printlog SUCCESS "$@"; }
 log_error() { _printlog ERROR "$@"; }
 log_warn() { _printlog WARN "$@"; }
 log_info() { _printlog INFO "$@"; }
@@ -248,7 +248,7 @@ exit_if_error() {
         rc=1
     fi
     ((rc)) && {
-        log_critical "$message"
+        log_verbose "$message"
         dump_stack_trace "$@"
         exit $rc
     }

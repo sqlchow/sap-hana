@@ -11,11 +11,12 @@ resetformatting="\e[0m"
 #. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
 full_script_path="$(realpath "${BASH_SOURCE[0]}")"
 script_directory="$(dirname "${full_script_path}")"
+script_parent_directory="$(dirname "${script_directory}")"
 
 #call stack has full scriptname when using source 
-source "${DEPLOYMENT_REPO_PATH}/deploy/scripts/bash/utils/deploy_utils.sh"
-source "${DEPLOYMENT_REPO_PATH}/deploy/scripts/bash/utils/az_session_utils.sh"
-source "${DEPLOYMENT_REPO_PATH}/deploy/scripts/bash/utils/log_utils.sh"
+source "${script_parent_directory}/utils/deploy_utils.sh"
+source "${script_parent_directory}/utils/az_session_utils.sh"
+source "${script_parent_directory}/utils/log_utils.sh"
 
 
 #Internal helper functions
