@@ -134,4 +134,4 @@ firewall_deployment=true
 #assign_subscription_permissions=true
 
 # use_private_endpoint is a boolean flag controlling if the keyvaults and storage accounts have private endpoints
-use_private_endpoint=true
+# use_private_endpoint=false
