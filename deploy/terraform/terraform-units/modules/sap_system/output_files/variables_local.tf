@@ -140,10 +140,19 @@ variable "scs_lb_ip" {
 }
 
 variable "sap_mnt" {
-  description = "ANF Volume"
+  description = "ANF Volume for SAP mount"
   default     = ""
 }
 
+<<<<<<< HEAD
+=======
+variable "sap_transport" {
+  description = "ANF Volume for SAP Transport"
+  default     = ""
+}
+
+
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
 variable "database_admin_ips" {
   description = "List of Admin NICs for the DB VMs"
 }
