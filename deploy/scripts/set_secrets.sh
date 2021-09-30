@@ -102,11 +102,11 @@ while :; do
     esac
 done
 
-while [ -z "${environment}" ]; then
+if [ -z "${environment}" ]; then
     read -r -p "Environment name: " environment
 fi
 
-while [ -z "${region}" ]; then
+if [ -z "${region}" ]; then
     read -r -p "Region name: " region
 fi
 
