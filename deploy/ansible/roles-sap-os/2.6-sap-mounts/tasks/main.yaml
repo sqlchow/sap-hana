@@ -102,16 +102,8 @@
 - name:                                Import ANF tasks
   ansible.builtin.import_tasks:        2.6.1-anf-mounts.yaml
   when:
-<<<<<<< HEAD
-    - sap_mnt is defined
-=======
     - sap_mnt is defined or sap_trans is defined
-<<<<<<< HEAD
->>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
-    - sap_mnt | default ('none') | trim | length > 4
-=======
     - sap_mnt | trim | length != 0
->>>>>>> origin/alfa
     - tier == 'sapos'
 
 ...
