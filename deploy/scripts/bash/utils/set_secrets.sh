@@ -102,6 +102,14 @@ while :; do
     esac
 done
 
+while [ -z "${environment}" ]; then
+    read -r -p "Environment name: " environment
+fi
+
+while [ -z "${region}" ]; then
+    read -r -p "Region name: " region
+fi
+
 automation_config_directory=~/.sap_deployment_automation
 environment_config_information="${automation_config_directory}"/"${environment}""${region}"
 
@@ -110,10 +118,6 @@ if [ ! -d "${automation_config_directory}" ]; then
     mkdir "${automation_config_directory}"
 else
     touch "${environment_config_information}"
-fi
-
-if [ -z "${environment}" ]; then
-    read -r -p "Environment name:" environment
 fi
 
 if [ -z "$subscription" ]; then
