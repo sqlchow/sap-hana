@@ -102,13 +102,13 @@ while :; do
     esac
 done
 
-if [ -z "${environment}" ]; then
+while [ -z "${environment}" ]; do
     read -r -p "Environment name: " environment
-fi
+done
 
-if [ -z "${region}" ]; then
+while [ -z "${region}" ]; do
     read -r -p "Region name: " region
-fi
+then
 
 automation_config_directory=~/.sap_deployment_automation
 environment_config_information="${automation_config_directory}"/"${environment}""${region}"
@@ -160,10 +160,6 @@ fi
 
 if [ -z "$subscription" ]; then
     read -r -p "SPN Subscription: " subscription
-fi
-
-if [ -z "${environment}" ]; then
-    read -r -p "Environment: " environment
 fi
 
 if [ -z "${keyvault}" ]; then
