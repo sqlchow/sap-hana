@@ -110,6 +110,23 @@ while [ -z "${region}" ]; do
     read -r -p "Region name: " region
 done
 
+# NOTE: If we want to be more specific on the permitted number of
+# letters in the environment name, e.g. between 3 and 6 letters,
+# replate the '\+' in the next line with '\{3,6\}'.
+if [[ ! "${environment}" =~ ^[[:upper:]]\+$ ]]; then
+    echo "The 'environment' must be specified as an non-empty uppercase string!"
+    showhelp
+    exit 65	#/* data format error */
+fi
+
+# NOTE: If we have the list of possible regions in a file somewhere
+# we can validate it is one of the entries in that list.
+if [[ ! "${region}" =~ ^[[:lower:]]\+$ ]]; then
+    echo "The 'region' must be specified as an non-empty lower string!"
+    showhelp
+    exit 65	#/* data format error */
+fi
+
 automation_config_directory=~/.sap_deployment_automation
 environment_config_information="${automation_config_directory}"/"${environment}""${region}"
 
@@ -145,10 +162,8 @@ fi
 
 if [ ! -n "$client_secret" ]; then
     #do not output the secret to screen
-    stty -echo
-    read -ers -p "        -> Kindly provide SPN Password: " client_secret
+    read -rs -p "        -> Kindly provide SPN Password: " client_secret
     echo "********"
-    stty echo
 fi
 
 if [ -z "${tenant_id}" ]; then
