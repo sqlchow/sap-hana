@@ -108,7 +108,7 @@ done
 
 while [ -z "${region}" ]; do
     read -r -p "Region name: " region
-then
+done
 
 automation_config_directory=~/.sap_deployment_automation
 environment_config_information="${automation_config_directory}"/"${environment}""${region}"
