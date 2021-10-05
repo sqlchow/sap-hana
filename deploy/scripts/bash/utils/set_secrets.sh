@@ -102,12 +102,29 @@ while :; do
     esac
 done
 
-while [ -z "${environment}" ]; then
+while [ -z "${environment}" ]; do
     read -r -p "Environment name: " environment
+done
+
+while [ -z "${region}" ]; do
+    read -r -p "Region name: " region
+done
+
+# NOTE: If we want to be more specific on the permitted number of
+# letters in the environment name, e.g. between 3 and 6 letters,
+# replate the '\+' in the next line with '\{3,6\}'.
+if [[ ! "${environment}" =~ ^[[:upper:]]\+$ ]]; then
+    echo "The 'environment' must be specified as an non-empty uppercase string!"
+    showhelp
+    exit 65	#/* data format error */
 fi
 
-while [ -z "${region}" ]; then
-    read -r -p "Region name: " region
+# NOTE: If we have the list of possible regions in a file somewhere
+# we can validate it is one of the entries in that list.
+if [[ ! "${region}" =~ ^[[:lower:]]\+$ ]]; then
+    echo "The 'region' must be specified as an non-empty lower string!"
+    showhelp
+    exit 65	#/* data format error */
 fi
 
 automation_config_directory=~/.sap_deployment_automation
@@ -145,10 +162,8 @@ fi
 
 if [ ! -n "$client_secret" ]; then
     #do not output the secret to screen
-    stty -echo
-    read -ers -p "        -> Kindly provide SPN Password: " client_secret
+    read -rs -p "        -> Kindly provide SPN Password: " client_secret
     echo "********"
-    stty echo
 fi
 
 if [ -z "${tenant_id}" ]; then
@@ -160,10 +175,6 @@ fi
 
 if [ -z "$subscription" ]; then
     read -r -p "SPN Subscription: " subscription
-fi
-
-if [ -z "${environment}" ]; then
-    read -r -p "Environment: " environment
 fi
 
 if [ -z "${keyvault}" ]; then
